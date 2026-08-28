@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escuela de Edificadores NAVI · Nación Viva</title>
+<style>
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Regular.ttf');font-weight:400}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-SemiBold.ttf');font-weight:600}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Bold.ttf');font-weight:700}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-ExtraBold.ttf');font-weight:800}
+:root{
+  --navy:#0E1B33; --navy2:#0A1426; --ink:#EEF1F6; --dim:#AEBBCE; --soft:#7C8AA0;
+  --steel:#7FA8D6; --bright:#BAD3EF; --hair:rgba(255,255,255,.12);
+  --disp:'Roundelay', Georgia, serif; --sans:'Inter','Helvetica Neue',Arial,system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--ink); line-height:1.6;
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(127,168,214,.16), transparent 60%),
+    radial-gradient(1000px 800px at 5% 115%, rgba(127,168,214,.08), transparent 55%),
+    linear-gradient(165deg, #12203c 0%, var(--navy) 45%, var(--navy2) 100%);
+  background-attachment:fixed;
+}
+.wrap{max-width:960px; margin:0 auto; padding:0 26px}
+
+/* HERO: el logo ocupa ~3/4 de la pantalla */
+.hero{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px}
+.hero .emblem{height:62vh; max-height:640px; width:auto; object-fit:contain;
+  filter:drop-shadow(0 20px 60px rgba(127,168,214,.28)); animation:rise .9s cubic-bezier(.22,1,.36,1) both}
+.hero .kick{margin-top:6px; font-size:13px; letter-spacing:.34em; text-transform:uppercase; color:var(--steel); font-weight:700}
+.hero h1{font-family:var(--disp); font-weight:800; font-size:clamp(34px,5.4vw,60px); letter-spacing:-.02em; line-height:1; margin:14px 0 0}
+.hero .tag{margin-top:16px; font-size:clamp(16px,2vw,21px); font-style:italic; color:var(--dim)}
+.cta{display:inline-block; margin-top:30px; font-size:17px; font-weight:700; letter-spacing:.01em;
+  color:var(--navy2); background:linear-gradient(180deg,#A9C7E8,#7FA8D6); border-radius:999px;
+  padding:16px 40px; text-decoration:none; box-shadow:0 12px 30px rgba(127,168,214,.32); transition:transform .12s, box-shadow .18s}
+.cta:hover{transform:translateY(-2px); box-shadow:0 16px 40px rgba(127,168,214,.45)}
+.cta:active{transform:translateY(0)}
+.scrollcue{margin-top:34px; font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft)}
+
+/* DESCRIPCIÓN (texto justificado) */
+.about{padding:20px 0 96px}
+.about .eyebrow{text-align:center; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--steel); font-weight:700; margin-bottom:14px}
+.about h2{font-family:var(--disp); font-weight:800; font-size:clamp(28px,4vw,42px); text-align:center; letter-spacing:-.01em; line-height:1.08; margin-bottom:30px}
+.about p{text-align:justify; text-justify:inter-word; hyphens:auto; font-size:18px; color:rgba(238,241,246,.9); margin:0 auto 20px; max-width:760px}
+.about p .em{color:var(--bright); font-weight:600}
+.divider{width:60px; height:2px; background:var(--steel); opacity:.7; margin:36px auto}
+.grid{max-width:820px; margin:6px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:18px 40px}
+.grid .it{border-top:1px solid var(--hair); padding-top:14px}
+.grid .it b{font-family:var(--disp); font-size:19px; font-weight:700; color:var(--ink); display:block; margin-bottom:4px}
+.grid .it span{font-size:15.5px; color:var(--dim)}
+.closer{text-align:center; margin-top:52px}
+.closer .big{font-family:var(--disp); font-weight:800; font-size:clamp(24px,3.4vw,34px); letter-spacing:-.01em; margin-bottom:8px}
+.closer .sub{color:var(--dim); font-size:17px; margin-bottom:26px}
+
+/* FOOTER */
+.foot{border-top:1px solid var(--hair); padding:26px 0 40px; text-align:center; color:var(--soft); font-size:13px}
+.foot a{color:var(--dim); text-decoration:none; border-bottom:1px solid transparent}
+.foot a:hover{border-color:var(--dim)}
+
+@keyframes rise{from{opacity:0; transform:translateY(16px) scale(.98)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){.hero .emblem{animation:none}}
+@media (max-width:640px){
+  .hero .emblem{height:48vh}
+  .grid{grid-template-columns:1fr}
+  .about p{font-size:16.5px}
+}
+</style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <img class="emblem" src="assets/logo_edificadores_navi_transp.png" alt="Escuela de Edificadores NAVI">
+    <div class="kick">Nación Viva · Generación 2026–2027</div>
+    <h1>Escuela de Edificadores NAVI</h1>
+    <div class="tag">Criterio y carácter para la vida pública de México</div>
+    <a class="cta" href="inscripcion.html">Inscribirme</a>
+    <div class="scrollcue">Conoce la Escuela ↓</div>
+  </section>
+
+  <!-- DESCRIPCIÓN -->
+  <section class="about">
+    <div class="wrap">
+      <div class="eyebrow">Qué es</div>
+      <h2>Una escuela para edificar México</h2>
+
+      <p>La <b>Escuela de Edificadores NAVI</b> es una iniciativa de Nación Viva para formar liderazgos —sociales, docentes, empresariales y de servidores públicos— capaces de gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de quienes la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores.</p>
+
+      <p>No formamos para un partido ni para un movimiento, sino para el <span class="em">propósito de Dios para México</span>, sin importar tu color ni tu bandera. Creemos que el servicio público, la educación y la economía se transforman cuando quienes los ejercen lo hacen con criterio, carácter e integridad.</p>
+
+      <p>El programa se cursa <b>en línea</b> a lo largo de tres trimestres —Gobierno Civil, Educación y Economía—, con clases quincenales en video que ves a tu ritmo, reuniones mensuales en vivo, lecturas seleccionadas y el acompañamiento cercano de mentores. No tiene costo de inscripción: se sostiene con un donativo mensual voluntario, la cantidad que cada quien decida.</p>
+
+      <div class="divider"></div>
+
+      <div class="grid">
+        <div class="it"><b>Tres trimestres</b><span>Gobierno Civil, Educación y Economía, de septiembre 2026 a julio 2027.</span></div>
+        <div class="it"><b>Ritmo quincenal</b><span>Clases en video a tu tiempo y una reunión en vivo cada mes.</span></div>
+        <div class="it"><b>Con mentores</b><span>Acompañamiento cualitativo, sin calificaciones con números.</span></div>
+        <div class="it"><b>Sin inscripción</b><span>Donativo mensual voluntario desde $200; el que tú decidas.</span></div>
+      </div>
+
+      <div class="closer">
+        <div class="big">Sé parte de la primera generación de edificadores.</div>
+        <div class="sub">Regístrate hoy; te contactamos con los datos de tu grupo.</div>
+        <a class="cta" href="inscripcion.html">Inscribirme</a>
+      </div>
+    </div>
+
+    <div class="foot">
+      Escuela de Edificadores NAVI · Nación Viva &nbsp;·&nbsp;
+      <a href="/plataforma">¿Ya tienes cuenta? Entrar a la plataforma</a>
+    </div>
+  </section>
+
+</body>
+</html>
