@@ -1,1 +1,10 @@
-{ "cleanUrls": true, "trailingSlash": false }
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/", "destination": "/inscripcion", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/plataforma", "destination": "/index.html" }
+  ]
+}
