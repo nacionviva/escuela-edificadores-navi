@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escuela de Edificadores NAVI · Nación Viva</title>
+<!-- ===== Conexión Supabase (login real + datos reales) ===== -->
+<script src="assets/vendor/supabase.js"></script>
+<script>
+  // Config de conexión. live:true = login/datos reales contra Supabase.
+  // MODO DEMO por ahora: cuando tengas la cuenta de Supabase EXCLUSIVA de la
+  // plataforma, pega aquí la URL y el anon key de ESE proyecto y pon live:true.
+  window.NAVI_CFG = {
+    url:  '',   // ej. https://TU-PROYECTO.supabase.co
+    anon: '',   // anon key del proyecto nuevo de Nación Viva
+    live: false
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Regular.ttf') format('truetype');font-weight:400}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-SemiBold.ttf') format('truetype');font-weight:600}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Bold.ttf') format('truetype');font-weight:700}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-ExtraBold.ttf') format('truetype');font-weight:800}
+:root{
+  --navy:#13233D;--navy-deep:#0A1426;--navy-darker:#050B17;--cream:#EEEFEC;
+  --dim:rgba(238,239,236,.82);--soft:rgba(238,239,236,.6);
+  --line:rgba(238,239,236,.14);--card:rgba(238,239,236,.05);
+  --accent:#7FA8D6;--accent-bright:#B8D2EE;--accent-hover:#93B7DF;--accent-tint:rgba(127,168,214,.15);--accent-line:rgba(127,168,214,.42);
+  --focus-ring:rgba(127,168,214,.55);
+  --blue:#6FC7D0;
+  --lime:#D1D972;--coral:#FF914D;--red:#E27B6B;--gold:#7FA8D6;
+  --glass:rgba(255,255,255,.06);--glassline:rgba(255,255,255,.16);--glasshi:inset 0 1px 0 rgba(255,255,255,.18);
+  --ease:cubic-bezier(.22,1,.36,1);--font:'Roundelay',system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--navy);color:var(--cream);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(560px 420px at 12% -6%,rgba(127,168,214,.10),transparent 70%),
+    radial-gradient(640px 480px at 105% 108%,rgba(255,145,77,.08),transparent 70%),
+    repeating-linear-gradient(45deg,rgba(255,255,255,.016) 0,rgba(255,255,255,.016) 1px,transparent 1px,transparent 7px),
+    repeating-linear-gradient(-45deg,rgba(255,255,255,.011) 0,rgba(255,255,255,.011) 1px,transparent 1px,transparent 7px)}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+.hidden{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+/* glass + botones */
+.glass{background:var(--glass);border:1px solid var(--glassline);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);box-shadow:var(--glasshi),0 8px 32px rgba(0,0,0,.25)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;border:1px solid var(--glassline);background:var(--glass);color:var(--dim);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);box-shadow:var(--glasshi);transition:background .18s var(--ease),border-color .18s,transform .18s var(--ease)}
+.btn:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn-accent{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent-bright);font-weight:700}
+.btn-accent:hover{background:rgba(127,168,214,.26)}
+.btn-solid{background:var(--accent);border-color:transparent;color:var(--navy-darker);font-weight:700;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 6px 20px rgba(127,168,214,.28)}
+.btn-solid:hover{background:var(--accent-bright)}
+.btn-sm{min-height:32px;padding:5px 13px;font-size:12.5px}
+.btn-lg{min-height:46px;padding:12px 22px;font-size:14px;width:100%}
+.btn:disabled,.btn[disabled],.btn-solid:disabled,.btn-accent:disabled{opacity:.45;pointer-events:none;transform:none}
+.btn-solid:active{background:var(--accent-hover)}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:8px}
+.btn:focus-visible,.btn-green:focus-visible,a:focus-visible{outline:2px solid var(--focus-ring);outline-offset:3px}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:1;
+  background:linear-gradient(180deg,#050B17 0%,#0A1426 30%,#13233D 70%,#1A2A4C 100%)}
+.login-card{width:100%;max-width:410px;text-align:center;border-radius:26px;padding:36px 32px}
+.login-logo{height:100px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+.login-logo img{height:100%;width:auto;object-fit:contain;display:block}
+.login-school{font-size:13px;color:var(--accent);font-weight:700;margin:14px 0 4px}
+.login-title{font-size:27px;font-weight:800;line-height:1.15;margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--dim);margin-bottom:24px}
+.field{text-align:left;margin-bottom:13px}
+.field label{display:block;font-size:13px;color:var(--dim);margin-bottom:6px;font-weight:600}
+.field input,.field select{width:100%;padding:12px 15px;border-radius:13px;border:1px solid var(--glassline);background:rgba(255,255,255,.06);color:var(--cream);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input::placeholder{color:var(--soft)}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.login-demo{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--soft)}
+.login-demo b{color:var(--dim)}
+
+/* WELCOME / INGRESO · documento oficial (tipografía Public Sans) */
+#welcome{--gov:'Public Sans',system-ui,-apple-system,sans-serif;--mono:'Courier New',ui-monospace,monospace;
+  min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;
+  background:radial-gradient(1100px 560px at 50% -12%,rgba(127,168,214,.11),transparent 62%),linear-gradient(180deg,#050B17,#0A1426 46%,#13233D)}
+.wl-strip{font-family:var(--mono);font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--accent);text-align:center;padding:12px 16px;border-bottom:1px solid rgba(127,168,214,.28)}
+.wl-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;max-width:840px;width:100%;margin:0 auto;padding:44px 24px 60px}
+.wl-seal{height:122px;width:auto;display:block;margin-bottom:22px}
+.wl-eyebrow{font-family:var(--gov);font-size:13px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--accent)}
+.wl-title{font-family:var(--gov);font-size:clamp(34px,6vw,58px);font-weight:900;letter-spacing:-.02em;line-height:1.03;margin:12px 0 20px;color:var(--cream);text-wrap:balance}
+.wl-lead{font-family:var(--gov);font-size:16px;font-weight:400;color:var(--dim);line-height:1.72;max-width:62ch;margin:0 auto 34px}
+.wl-brief{display:grid;grid-template-columns:1fr 1fr;width:100%;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.02);text-align:left;margin-bottom:34px;overflow:hidden}
+.wl-col{padding:22px 26px}
+.wl-col:first-child{border-right:1px solid var(--line)}
+.wl-k{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.wl-col p{font-family:var(--gov);font-size:14px;color:var(--dim);line-height:1.62}
+.wl-cta{font-family:var(--gov);font-size:16px;font-weight:800;letter-spacing:.01em;color:var(--navy-darker);background:var(--accent);border:none;border-radius:6px;padding:15px 34px;cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s var(--ease)}
+.wl-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(127,168,214,.34)}
+.wl-cta:active{transform:translateY(0)}
+.wl-foot{font-family:var(--mono);font-size:12px;color:var(--soft);margin-top:22px;letter-spacing:.04em}
+@media(max-width:640px){.wl-brief{grid-template-columns:1fr}.wl-col:first-child{border-right:none;border-bottom:1px solid var(--line)}}
+
+/* SHELL */
+#app{display:flex;min-height:100vh;position:relative;z-index:1}
+.sidebar{width:236px;flex-shrink:0;background:rgba(10,20,38,.75);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.side-logo{display:flex;align-items:center;gap:10px;padding:0 8px 16px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.side-logo .lg{height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.side-logo .lg img{height:100%;width:auto;object-fit:contain;display:block}
+.side-logo .t{font-size:12.5px;font-weight:700;line-height:1.25}
+.side-logo .t span{display:block;font-size:10.5px;font-weight:600;color:var(--accent)}
+.side-toggle{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--soft);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;cursor:pointer;flex-shrink:0;transition:color .15s,border-color .15s}
+.side-toggle:hover{color:var(--accent-bright);border-color:var(--accent-line)}
+@media(min-width:881px){
+  .sidebar{transition:width .2s var(--ease),padding .2s var(--ease)}
+  #app.nav-collapsed .sidebar{width:64px;padding:18px 8px}
+  #app.nav-collapsed .side-logo{flex-direction:column;gap:12px;justify-content:center;padding:0 0 12px}
+  #app.nav-collapsed .side-logo .t{display:none}
+  #app.nav-collapsed #navMenu{display:none}
+  #app.nav-collapsed .side-foot{display:none}
+  #app.nav-collapsed .side-toggle{margin:0}
+}
+.nav-btn{display:flex;align-items:center;gap:11px;width:100%;min-height:42px;padding:10px 13px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--dim);font-size:14px;text-align:left;margin-bottom:3px;transition:background .15s,border-color .15s}
+.nav-btn:hover{background:rgba(255,255,255,.06)}
+.nav-btn.active{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent-bright);font-weight:600;box-shadow:var(--glasshi)}
+.nav-btn .ic{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-btn .ic svg{width:19px;height:19px}
+.side-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--navy-darker);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.user-chip .n{font-size:13px;font-weight:600;line-height:1.2}
+.user-chip .r{font-size:11.5px;color:var(--soft)}
+.logout{margin-top:9px;width:100%;min-height:32px;padding:6px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--soft);font-size:12px}
+.logout:hover{color:var(--red);border-color:var(--red)}
+.main-wrap{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* topbar with role switcher */
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 26px;border-bottom:1px solid var(--line);background:rgba(10,20,38,.4);backdrop-filter:blur(12px)}
+.topbar .crumb{font-size:13px;color:var(--soft)}
+.topbar .crumb b{color:var(--dim);font-weight:600}
+.role-switch{margin-left:auto;display:flex;align-items:center;gap:9px}
+.role-switch .lbl{font-size:11.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.1em}
+.role-switch select{font-family:inherit;font-size:13px;font-weight:600;color:var(--accent-bright);background:var(--glass);border:1px solid var(--accent-line);border-radius:999px;padding:7px 14px;outline:none;backdrop-filter:blur(18px);cursor:pointer}
+.demo-tag{font-size:10.5px;font-weight:700;color:var(--accent);border:1px solid var(--accent-line);border-radius:999px;padding:3px 9px;background:var(--accent-tint)}
+.main{padding:28px 26px 70px;max-width:1120px;width:100%}
+
+/* headings + generic */
+.page-head{margin-bottom:22px}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:5px}
+h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--dim);max-width:74ch}
+.sec-title{font-size:15px;font-weight:700;margin:26px 0 12px}
+.sec-title::before{content:"▸";color:var(--accent);font-family:'Courier New',ui-monospace,monospace;margin-right:8px;font-size:13px;vertical-align:1px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.stat-n{font-size:28px;font-weight:800;color:var(--accent)}
+.stat-l{font-size:13px;color:var(--dim)}
+.progress-track{height:7px;border-radius:99px;background:rgba(238,239,236,.1);overflow:hidden;margin-top:9px}
+.progress-fill{height:100%;border-radius:99px;background:var(--accent)}
+.pill{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap;display:inline-block}
+.pill-ok{background:rgba(209,217,114,.15);color:var(--lime)}
+.pill-wait{background:rgba(255,255,255,.08);color:var(--soft)}
+.pill-info{background:var(--accent-tint);color:var(--accent)}
+.pill-warn{background:rgba(255,145,77,.15);color:var(--coral)}
+
+/* next session hero */
+.hero{border-radius:20px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:22px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(rgba(255,255,255,.03) 0 1px,transparent 1px 3px)}
+.hero>*{position:relative;z-index:1}
+.hero .lbl{font-family:'Courier New',ui-monospace,monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-bright);font-weight:700;display:flex;align-items:center;gap:7px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--lime);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero .tt{font-size:19px;font-weight:700;margin:4px 0 2px}
+.hero .dt{font-size:13.5px;color:var(--dim)}
+.countdown{display:flex;gap:8px;margin-top:12px}
+.cd-box{min-width:54px;text-align:center;border-radius:13px;padding:7px 6px 5px;background:rgba(255,255,255,.06);border:1px solid var(--glassline);box-shadow:var(--glasshi)}
+.cd-box .n{font-size:20px;font-weight:800;color:var(--accent-bright);font-variant-numeric:tabular-nums;line-height:1.1}
+.cd-box .u{font-size:10px;color:var(--soft);font-weight:600}
+
+/* rows / list items */
+.row{display:flex;align-items:center;gap:15px;padding:14px 17px;border:1px solid var(--line);border-radius:15px;margin-bottom:9px;background:var(--card);transition:border-color .15s}
+.row.click{cursor:pointer}
+.row.click:hover{border-color:var(--accent-line)}
+.row.locked{opacity:.5}
+.rnum{width:37px;height:37px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.row.locked .rnum{border-color:var(--soft);color:var(--soft)}
+.rinfo{flex:1;min-width:0}
+.rinfo .t{font-size:14.5px;font-weight:600}
+.rinfo .d{font-size:12.5px;color:var(--soft);margin-top:2px}
+.ractions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:12px;color:var(--soft);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line)}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .nm{color:var(--cream);font-weight:600}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+
+/* forms */
+.form label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:6px;font-weight:600;margin-top:14px}
+.form input,.form select,.form textarea{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--accent)}
+.form input::placeholder{color:var(--soft)}
+.cred{font-family:monospace;font-size:15px;background:var(--accent-tint);border:1px solid var(--accent-line);border-radius:10px;padding:10px 14px;color:var(--accent-bright);display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+
+/* reading + method (module view) */
+.reading{display:flex;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:14px;margin-bottom:9px;background:var(--card);align-items:flex-start}
+.reading .ri{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.07)}
+.reading .rt{font-size:14px;font-weight:600}
+.reading .rd{font-size:12.5px;color:var(--dim)}
+.reading input[type=checkbox]{margin-left:auto;margin-top:7px;accent-color:var(--accent);width:18px;height:18px;flex-shrink:0;cursor:pointer}
+.mlist{counter-reset:mq;list-style:none}
+.mlist li{counter-increment:mq;position:relative;padding:9px 0 9px 38px;font-size:13.5px;color:var(--dim);border-bottom:1px solid var(--line)}
+.mlist li:last-child{border-bottom:none}
+.mlist li::before{content:counter(mq,lower-roman);position:absolute;left:0;top:9px;width:25px;height:25px;border-radius:50%;background:var(--accent-tint);color:var(--accent);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.mlist li b{color:var(--cream)}
+.mod-q{border-radius:16px;padding:17px 21px;margin:16px 0 22px;background:var(--card);border:1px solid var(--line)}
+.mod-q .k{font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.mod-q .q{font-size:16.5px;font-style:italic;color:var(--dim);line-height:1.5}
+.back-link{background:none;border:none;color:var(--accent);font-size:13px;margin-bottom:16px;padding:5px 0}
+
+/* asistencia toggles */
+.att-btn{border:1px solid var(--glassline);background:var(--glass);color:var(--soft);border-radius:999px;min-height:30px;padding:4px 12px;font-size:12px;font-weight:600;margin-right:5px}
+.att-btn.on-p{background:rgba(209,217,114,.2);border-color:rgba(209,217,114,.5);color:var(--lime)}
+.att-btn.on-a{background:rgba(226,123,107,.18);border-color:rgba(226,123,107,.5);color:var(--red)}
+.att-btn.on-j{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent-bright)}
+
+/* post */
+.post{display:flex;gap:12px;padding:15px 0;border-bottom:1px solid var(--line)}
+.post:last-child{border-bottom:none}
+.post .avatar{width:38px;height:38px;font-size:13px}
+.post .who{font-size:14px;font-weight:700}
+.post .when{font-size:12px;color:var(--soft);font-weight:400;margin-left:8px}
+.post .txt{font-size:14px;color:var(--dim);margin-top:3px;max-width:66ch}
+.thread-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--accent-tint);color:var(--accent);margin-top:7px}
+.composer{display:flex;gap:12px;align-items:flex-start}
+.composer textarea{flex:1;min-height:70px;padding:11px 14px;border-radius:13px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:14px;resize:vertical;outline:none}
+.composer textarea:focus{border-color:var(--accent)}
+
+.video-box{position:relative;aspect-ratio:16/9;border-radius:16px;border:1px solid var(--glassline);background:linear-gradient(135deg,#0A1426,#1A2A4C);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;overflow:hidden;box-shadow:var(--glasshi);margin-bottom:8px}
+.video-box:hover .play{transform:scale(1.08);background:var(--accent)}
+.video-box .play{width:64px;height:64px;border-radius:50%;background:var(--accent-tint);border:1px solid var(--accent-line);color:var(--accent-bright);display:flex;align-items:center;justify-content:center;font-size:22px;padding-left:4px;transition:transform .2s var(--ease),background .2s;box-shadow:var(--glasshi)}
+.video-box .vlabel{font-size:13.5px;color:var(--dim);font-weight:600}
+.transbox{margin:4px 0;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);font-size:13.5px;color:var(--dim)}
+.transbox p{margin-bottom:10px}.transbox p:last-child{margin-bottom:0;color:var(--soft);font-size:12.5px;font-style:italic}
+.reunion-card{border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:16px;padding:18px 20px;margin:16px 0}
+.reunion-card .reunion-h{font-size:14.5px;font-weight:700;color:var(--accent-bright);margin-bottom:6px}
+.reunion-card p{font-size:13.5px;color:var(--dim);margin-bottom:12px}
+.qa{margin-bottom:14px}.qa label{display:block;font-size:13.5px;color:var(--cream);font-weight:600;margin-bottom:6px}
+.qa textarea{width:100%;min-height:74px;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px;resize:vertical;outline:none}
+.qa textarea:focus{border-color:var(--accent)}.qa textarea:disabled{opacity:.65}
+/* mentores */
+.mentor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.mentor-card{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:22px 20px;text-align:center;cursor:pointer;transition:transform .2s var(--ease),border-color .2s}
+.mentor-card:hover{transform:translateY(-3px);border-color:var(--accent-line)}
+.mphoto{width:96px;height:96px;border-radius:50%;margin:0 auto 12px;object-fit:cover;border:2px solid var(--accent-line);background:linear-gradient(135deg,#1A2A4C,#2A3F5C);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:var(--accent-bright)}
+.mentor-card .mn{font-size:16px;font-weight:700}
+.mentor-card .mm{font-size:12px;color:var(--soft);margin-top:2px}
+.mentor-card .mf{font-size:13px;color:var(--dim);font-style:italic;margin-top:10px;line-height:1.45}
+.mentor-detail{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.mentor-detail .mphoto{width:150px;height:150px;font-size:44px;margin:0}
+.mentor-detail .mbody{flex:1;min-width:260px}
+.mentor-mini{display:flex;align-items:center;gap:12px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:16px;padding:12px 14px;max-width:330px}
+.mentor-mini .mphoto{width:54px;height:54px;font-size:18px;margin:0;flex-shrink:0;border-width:1px;border-radius:8px;filter:grayscale(1) contrast(1.05)}
+.mentor-mini .mmn{font-size:13px;font-weight:700}
+.mentor-mini .mmf{font-size:12px;color:var(--dim);font-style:italic;line-height:1.4;margin-top:2px}
+.mod-top{display:flex;gap:18px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px}
+.mod-top-main{flex:1;min-width:260px}
+/* ===== Expediente / dossier de mentores ===== */
+.dossier-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.dossier-card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008));border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s}
+.dossier-card:hover{border-color:var(--accent-line);transform:translateY(-2px)}
+.dz-topbar{display:flex;justify-content:space-between;font-family:'Courier New',ui-monospace,monospace;font-size:10.5px;letter-spacing:.12em;color:var(--soft);padding:8px 12px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.18)}
+.dz-topbar .cls{color:var(--coral);font-weight:700}
+.dzc-body{display:flex;gap:14px;padding:14px}
+.dz-photo,.dz-photo-lg{position:relative;background:#0A1426;border:1px solid rgba(238,239,236,.22);overflow:hidden;filter:grayscale(1) contrast(1.06);flex-shrink:0}
+.dz-photo{width:94px;height:114px}
+.dz-photo-lg{width:200px;height:250px}
+.dz-photo img,.dz-photo-lg img{width:100%;height:100%;object-fit:cover;display:block}
+.dz-photo .ini,.dz-photo-lg .ini{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Courier New',ui-monospace,monospace;font-weight:700;color:rgba(238,239,236,.5);background:repeating-linear-gradient(180deg,#0d1a30,#0d1a30 2px,#0a1626 2px,#0a1626 4px)}
+.dz-photo .ini{font-size:34px}.dz-photo-lg .ini{font-size:74px}
+.dz-photo .scan,.dz-photo-lg .scan{position:absolute;inset:0;background:repeating-linear-gradient(rgba(255,255,255,.05) 0 1px,transparent 1px 3px);pointer-events:none}
+.dz-photo .cor,.dz-photo-lg .cor{position:absolute;width:12px;height:12px;border:2px solid var(--accent-bright)}
+.dz-photo .cor.tl,.dz-photo-lg .cor.tl{top:4px;left:4px;border-right:none;border-bottom:none}
+.dz-photo .cor.tr,.dz-photo-lg .cor.tr{top:4px;right:4px;border-left:none;border-bottom:none}
+.dz-photo .cor.bl,.dz-photo-lg .cor.bl{bottom:4px;left:4px;border-right:none;border-top:none}
+.dz-photo .cor.br,.dz-photo-lg .cor.br{bottom:4px;right:4px;border-left:none;border-top:none}
+.dz-stamp{position:absolute;bottom:12px;right:-4px;transform:rotate(-11deg);font-family:'Courier New',ui-monospace,monospace;font-weight:700;font-size:12.5px;letter-spacing:.1em;color:#7FE090;border:2px solid #7FE090;padding:3px 9px;border-radius:4px;background:rgba(10,20,38,.55)}
+.dzc-meta{font-family:'Courier New',ui-monospace,monospace;min-width:0}
+.dzc-exp{font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+.dzc-name{font-size:16px;font-weight:700;color:var(--cream);text-transform:uppercase;line-height:1.15;margin:4px 0 6px;letter-spacing:.02em}
+.dzc-area{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.dzc-open{font-size:11px;letter-spacing:.1em;color:var(--accent-bright);margin-top:12px}
+.dossier{border:1px solid var(--accent-line);border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.006))}
+.dz-head{display:flex;justify-content:space-between;align-items:center;font-family:'Courier New',ui-monospace,monospace;font-size:12px;letter-spacing:.14em;color:var(--dim);padding:11px 16px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.22)}
+.dz-head .cls{color:var(--coral);font-weight:700;border:1px solid var(--coral);padding:2px 8px;border-radius:3px}
+.dz-body{display:flex;gap:26px;padding:24px;flex-wrap:wrap}
+.dz-fields{flex:1;min-width:260px;font-family:'Courier New',ui-monospace,monospace}
+.dz-row{display:flex;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px dashed var(--line)}
+.dz-row:last-child{border-bottom:none}
+.dz-label{font-size:11px;letter-spacing:.07em;color:var(--soft);text-transform:uppercase;width:120px;flex-shrink:0}
+.dz-val{font-size:13.5px;color:var(--cream);line-height:1.45}
+.dz-val.big{font-size:18px;font-weight:700;letter-spacing:.02em;color:var(--accent-bright)}
+.dz-section{font-family:'Courier New',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;padding:16px 24px 0}
+.dz-statement{font-family:'Courier New',ui-monospace,monospace;font-size:14px;color:var(--dim);font-style:italic;padding:6px 24px 0;line-height:1.55}
+.dz-notes{font-size:13.5px;color:var(--dim);line-height:1.6;padding:8px 24px 24px;max-width:72ch}
+@media(max-width:620px){.dz-photo-lg{width:100%;height:280px}}
+/* carrusel de artículos */
+.carousel{position:relative;aspect-ratio:1600/362;border-radius:16px;overflow:hidden;border:1px solid var(--glassline);box-shadow:var(--glasshi);margin-bottom:24px}
+.slide.has-img .slide-bg{background-position:center top!important}
+.slide.has-img::after{display:none}
+.slide-read-only{position:absolute;right:14px;top:14px;z-index:2;font-size:12px;font-weight:700;color:#fff;background:rgba(27,26,23,.72);padding:6px 13px;border-radius:999px;letter-spacing:.02em;box-shadow:0 3px 10px rgba(0,0,0,.28)}
+.slide:hover .slide-read-only{background:var(--red,#C0281C)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .6s var(--ease);cursor:pointer;pointer-events:none}
+.slide.on{opacity:1;pointer-events:auto}
+.slide-bg{position:absolute;inset:0}
+.slide::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,11,23,.88),rgba(5,11,23,.4) 55%,rgba(5,11,23,.1))}
+.slide-txt{position:absolute;left:24px;bottom:22px;right:24px;z-index:2}
+.slide-tag{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-bright);background:var(--accent-tint);border:1px solid var(--accent-line);border-radius:999px;padding:3px 10px}
+.slide-tit{font-size:21px;font-weight:800;color:#fff;margin:9px 0 3px;max-width:72%;line-height:1.2;text-wrap:balance}
+.slide-aut{font-size:13px;color:var(--dim)}
+.slide-read{margin-top:9px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--accent-bright)}
+.slide:hover .slide-read{text-decoration:underline}
+.dots{position:absolute;bottom:15px;right:18px;display:flex;gap:6px;z-index:3}
+.dot{width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.35);cursor:pointer;padding:0;transition:width .2s,background .2s}
+.dot.on{background:var(--accent-bright);width:20px;border-radius:99px}
+@media(max-width:700px){.slide-tit{max-width:100%;font-size:17px}}
+/* inicio: saludo + donativo discreto arriba */
+.inicio-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.inicio-greet{flex:1;min-width:240px}
+.don-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;padding-top:6px}
+.don-top .don-txt{font-size:12px;color:var(--soft);text-align:right;line-height:1.4;max-width:210px}
+.btn-green{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 18px;border-radius:999px;border:1px solid rgba(52,199,123,.5);background:rgba(52,199,123,.16);color:#8FE3B0;font-family:inherit;font-weight:700;font-size:13px;white-space:nowrap;backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);box-shadow:var(--glasshi);transition:background .18s var(--ease),transform .18s var(--ease)}
+.btn-green:hover{background:rgba(52,199,123,.28);transform:translateY(-1px)}
+.btn-green:active{transform:scale(.97)}
+@media(max-width:700px){.don-top{justify-content:flex-start;width:100%}.don-top .don-txt{text-align:left;max-width:none}}
+/* ===== Comunidad · guiño Messenger 2000s ===== */
+.msn{display:flex;gap:14px;height:560px;max-height:74vh}
+.msn-side{width:214px;flex-shrink:0;border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;display:flex;flex-direction:column}
+.msn-me{padding:14px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(127,168,214,.14),transparent)}
+.msn-me .row{display:flex;align-items:center;gap:10px}
+.msn-me .st{font-size:11.5px;color:var(--lime);margin-top:8px;display:flex;align-items:center;gap:6px}
+.dotg{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px var(--lime);flex-shrink:0}
+.msn-conh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);padding:11px 14px 5px}
+.msn-contacts{overflow-y:auto;flex:1}
+.msn-contact{display:flex;align-items:center;gap:9px;padding:7px 14px}
+.msn-contact .avatar{width:30px;height:30px;font-size:11px;border-radius:8px}
+.msn-contact .nm{font-size:12.5px;font-weight:600;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msn-contact .pm{font-size:11px;color:var(--soft);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msn-main{flex:1;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);min-width:0}
+.msn-head{padding:11px 16px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,rgba(98,153,209,.16),rgba(127,168,214,.07));display:flex;align-items:center;justify-content:space-between}
+.msn-head .t{font-size:14px;font-weight:700}
+.msn-head .o{font-size:11.5px;color:var(--lime);display:flex;align-items:center;gap:6px}
+.msn-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px}
+.msn-msgs.shake{animation:zumbido .5s}
+@keyframes zumbido{0%,100%{transform:translate(0)}15%{transform:translate(-7px,4px)}30%{transform:translate(7px,-4px)}45%{transform:translate(-6px,-4px)}60%{transform:translate(6px,4px)}75%{transform:translate(-4px,3px)}}
+.bub{display:flex;gap:9px;max-width:82%}
+.bub .avatar{width:32px;height:32px;font-size:12px;border-radius:9px;flex-shrink:0}
+.bub .body{background:rgba(255,255,255,.06);border:1px solid var(--glassline);border-radius:4px 14px 14px 14px;padding:8px 13px;min-width:0}
+.bub .who{font-size:12px;font-weight:700;color:var(--accent-bright)}
+.bub .who .tm{font-weight:400;color:var(--soft);font-size:11px;margin-left:7px}
+.bub .tx{font-size:13.5px;color:var(--cream);margin-top:2px;line-height:1.45;word-wrap:break-word}
+.bub.me{margin-left:auto;flex-direction:row-reverse}
+.bub.me .body{background:rgba(127,168,214,.14);border-color:var(--accent-line);border-radius:14px 4px 14px 14px}
+.bub.me .who{text-align:right}
+.bub.sys{max-width:100%;justify-content:center}
+.bub.sys .body{background:transparent;border:none;color:var(--soft);font-size:12px;font-style:italic;text-align:center;padding:2px}
+.msn-emojis{display:flex;gap:3px;flex-wrap:wrap;padding:7px 12px;border-top:1px solid var(--line);background:rgba(0,0,0,.14)}
+.msn-emojis button{border:none;background:transparent;font-size:18px;cursor:pointer;padding:3px 5px;border-radius:8px;line-height:1}
+.msn-emojis button:hover{background:rgba(255,255,255,.1)}
+.msn-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);align-items:flex-end}
+.msn-input textarea{flex:1;min-height:42px;max-height:120px;padding:10px 13px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px;resize:none;outline:none}
+.msn-input textarea:focus{border-color:var(--accent)}
+.zumbido-btn{border:1px solid var(--glassline);background:var(--glass);border-radius:12px;min-height:42px;padding:0 13px;font-size:16px;cursor:pointer;color:var(--accent-bright);transition:background .15s}
+.zumbido-btn:hover{background:rgba(127,168,214,.2)}
+@media(max-width:760px){.msn-side{display:none}.msn{height:auto;max-height:none}.msn-msgs{height:340px;flex:none}.bub{max-width:92%}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy-darker);border:1px solid var(--accent-line);color:var(--accent-bright);font-size:13.5px;font-weight:600;padding:11px 20px;border-radius:999px;z-index:80;opacity:0;transition:opacity .25s,transform .25s var(--ease);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:40px 20px;color:var(--soft);font-size:14px}
+
+@media(max-width:880px){
+  #app{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static;flex-direction:row;align-items:center;overflow-x:auto;padding:12px}
+  .side-logo{border:none;padding:0 10px 0 0;margin:0}.side-logo .t{display:none}.side-foot{display:none}
+  .nav-btn{white-space:nowrap;width:auto;margin:0 2px}
+  .topbar{padding:10px 16px}.crumb{display:none}.role-switch{margin-left:0;width:100%}
+  .main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="hidden">
+  <div class="login-card glass">
+    <div class="login-logo"><img src="assets/logo_edificadores_navi_transp.png" alt="Nación Viva" onerror="this.parentElement.innerHTML='<b style=color:#EEEFEC;font-size:26px>NV</b>'"></div>
+    <div class="login-school">Una iniciativa de Nación Viva</div>
+    <div class="login-title">Escuela de Edificadores NAVI</div>
+    <div class="login-sub">Criterio y carácter para la vida pública de México</div>
+    <form onsubmit="doLogin(event)">
+      <div class="field"><label for="inUser">Usuario</label><input id="inUser" type="text" value="jose.sanchez" autocomplete="username"></div>
+      <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" value="Edificadores2026" autocomplete="current-password"></div>
+      <button class="btn btn-solid btn-lg" type="submit">Ingresar a la Escuela</button>
+    </form>
+    <div style="margin-top:16px;font-size:12.5px;color:var(--dim);line-height:1.55">La Escuela no cobra inscripción. Se sostiene con un <b>donativo mensual voluntario</b> (desde $200), no obligatorio, para mantener la plataforma y seguir formando líderes para México.</div>
+    <div class="login-demo">Demo: entra con cualquier usuario. Dentro podrás cambiar de <b>rol</b> (participante, mentor, director, inscripciones) desde la barra superior.</div>
+  </div>
+</div>
+
+<!-- WELCOME / INGRESO (se muestra primero) -->
+<div id="welcome">
+  <div class="wl-strip">Escuela de Edificadores NAVI · Nación Viva — Documento de bienvenida</div>
+  <div class="wl-inner">
+    <img class="wl-seal" src="assets/logo_edificadores_navi_transp.png" alt="Nación Viva" onerror="this.style.display='none'">
+    <div class="wl-eyebrow">Una iniciativa de Nación Viva</div>
+    <h1 class="wl-title">Escuela de Edificadores NAVI</h1>
+    <p class="wl-lead">Formamos liderazgos —sociales, docentes, empresariales y de servidores públicos— para gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de los individuos que la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores. No para un partido ni un movimiento, sino para el propósito de Dios para México, sin importar tu color ni tu bandera.</p>
+    <div class="wl-brief">
+      <div class="wl-col"><div class="wl-k">En qué consiste</div><p>Tres trimestres —Gobierno Civil, Educación y Economía— con clases quincenales en video, reuniones mensuales en vivo, lecturas, comunidad y mentores que te acompañan.</p></div>
+      <div class="wl-col"><div class="wl-k">Cómo se sostiene</div><p>No cobramos inscripción. Se mantiene con un donativo mensual voluntario, desde $200, la cantidad que tú decidas. Con tu primer donativo entras; los meses siguientes puedes aportar o no —no pasa nada—, pero tu apoyo nos ayuda a seguir.</p></div>
+    </div>
+    <button class="wl-cta" onclick="doEnterWelcome()">Entrar a la plataforma →</button>
+    <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="side-logo">
+      <div class="lg" onclick="toggleSidebar()" title="Mostrar u ocultar el menú" style="cursor:pointer"><img id="sideLogoImg" src="assets/logo_edificadores_navi_transp.png" alt="Nación Viva" onerror="this.parentElement.innerHTML='<b style=color:#EEEFEC;font-size:14px>NV</b>'"></div>
+      <div class="t">Escuela de Edificadores NAVI<span>Nación Viva</span></div>
+      <button class="side-toggle" onclick="toggleSidebar()" aria-label="Ocultar menú" title="Ocultar menú">‹</button>
+    </div>
+    <nav id="navMenu"></nav>
+    <div class="side-foot">
+      <div class="user-chip">
+        <div class="avatar" id="sideAvatar">JP</div>
+        <div><div class="n" id="sideName">—</div><div class="r" id="sideRole">—</div></div>
+      </div>
+      <button class="logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="crumb" id="crumb">Inicio</div>
+      <div class="role-switch">
+        <span class="demo-tag">DEMO</span>
+        <span class="lbl">Ver como</span>
+        <select id="roleSel" onchange="switchRole(this.value)">
+          <option value="participante">Participante</option>
+          <option value="profesor">Mentor</option>
+          <option value="director">Director Académico</option>
+          <option value="inscripciones">Inscripciones</option>
+        </select>
+      </div>
+    </div>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CAPA DE DATOS (simulada) — misma forma que el esquema `navi`.
+   Al desplegar, cada método de DB se reemplaza por una llamada
+   a Supabase, p.ej:  supabase.schema('navi').from('modulos').select()
+   El resto de la app NO cambia.
+   ============================================================ */
+const HOY = new Date();
+const iso = (y,m,d,h=19)=>new Date(y,m-1,d,h,0,0);
+
+const store = {
+  generacion:{id:1,nombre:'Generación 2026–2027',ciclo:'2026-2027'},
+  config:{logo:'assets/logo_edificadores_navi_transp.png'},
+  grupos:[
+    {id:1,nombre:'Grupo A',ciclo:'2026–2027',cupo:12,inscritos:9,estatus:'abierto',dia:'Jueves',hora:'19:00',inicio:'2026-09-17'},
+    {id:2,nombre:'Grupo B',ciclo:'2026–2027',cupo:12,inscritos:12,estatus:'cerrado',dia:'Martes',hora:'20:00',inicio:'2026-09-15'}
+  ],
+  roles:['superadmin','director','coordinador','profesor','participante','inscripciones'],
+  trimestres:[
+    {id:1,numero:1,nombre:'Gobierno Civil',pregunta:'¿Cuál es el propósito del gobierno civil ante Dios, y cómo debe servir un cristiano dentro del Estado sin idolatrarlo, despreciarlo ni usarlo para beneficio privado?',rango:'Sep – Nov 2026'},
+    {id:2,numero:2,nombre:'Educación Pública',pregunta:'¿Quién tiene autoridad para formar a las personas y ciudadanos, y hacia qué visión debe orientarse la educación pública?',rango:'Ene – Abr 2027'},
+    {id:3,numero:3,nombre:'Economía',pregunta:'¿Cómo deben entender los cristianos su relación con el trabajo, la propiedad, la pobreza, la riqueza y la política económica?',rango:'Abr – Jul 2027'}
+  ],
+  modulos:[
+    {id:1,tri:1,num:1,titulo:'Antropología cristiana y vida pública',pf:'¿Qué visión del ser humano debe sostener una comprensión cristiana del gobierno civil?',fecha:iso(2026,9,17),prof:'Roberto Hernández'},
+    {id:2,tri:1,num:2,titulo:'Propósito y límites del gobierno civil',pf:'¿Para qué existe el gobierno civil ante Dios y qué cosas no debe pretender hacer?',fecha:iso(2026,10,1),prof:'Roberto Hernández'},
+    {id:3,tri:1,num:3,titulo:'Corrupción y Estado de Derecho',pf:'¿Por qué la corrupción es más que una falla administrativa o de eficiencia?',fecha:iso(2026,10,15),prof:'Roberto Hernández'},
+    {id:4,tri:1,num:4,titulo:'Secularismo, Estado secular y libertad religiosa',pf:'¿Cómo debe servir un cristiano en un Estado secular sin privatizar su fe?',fecha:iso(2026,10,29),prof:'Roberto Hernández'},
+    {id:5,tri:1,num:5,titulo:'Función pública como vocación',pf:'¿Qué carácter, criterio y hábitos necesita el cristiano que sirve dentro del Estado?',fecha:iso(2026,11,12),prof:'Roberto Hernández'},
+    {id:6,tri:2,num:1,titulo:'El propósito general de la educación',pf:'¿Qué significa educar a una persona y no solo transmitirle información?',fecha:iso(2027,1,7),prof:'Ana Ruiz'},
+    {id:7,tri:2,num:2,titulo:'Educación y formación moral del ciudadano',pf:'¿Qué tipo de ciudadano forma una educación que nunca es moralmente neutral?',fecha:iso(2027,1,21),prof:'Ana Ruiz'},
+    {id:8,tri:2,num:3,titulo:'Autoridades formativas: familia, Iglesia, escuela, Estado y cultura digital',pf:'¿Qué funciones formativas corresponden a cada autoridad y cuáles son sus límites?',fecha:iso(2027,2,4),prof:'Ana Ruiz'},
+    {id:9,tri:2,num:4,titulo:'Verdad, contenido académico y neutralidad moral',pf:'¿Puede la educación pública ser neutral respecto de la verdad y la moral?',fecha:iso(2027,2,18),prof:'Ana Ruiz'},
+    {id:10,tri:2,num:5,titulo:'Educación cívica, identidad nacional y bien común',pf:'¿Cómo formar ciudadanos que amen rectamente a México sin manipulación ideológica?',fecha:iso(2027,3,4),prof:'Ana Ruiz'},
+    {id:11,tri:2,num:6,titulo:'Desigualdad educativa, justicia y responsabilidad pública',pf:'¿Qué exige la justicia cristiana frente a la desigualdad educativa en México?',fecha:iso(2027,3,18),prof:'Ana Ruiz'},
+    {id:12,tri:3,num:1,titulo:'Trabajo, vocación y mandato cultural',pf:'¿Cuál es el propósito de Dios para el trabajo humano?',fecha:iso(2027,4,22),prof:'Carlos Mendoza'},
+    {id:13,tri:3,num:2,titulo:'Propiedad, mayordomía y recursos naturales',pf:'¿Cómo deben entender los cristianos la propiedad y los recursos naturales ante Dios?',fecha:iso(2027,5,6),prof:'Carlos Mendoza'},
+    {id:14,tri:3,num:3,titulo:'Pecado, incentivos y estructuras económicas injustas',pf:'¿Cómo afecta el pecado personal e institucional la vida económica?',fecha:iso(2027,5,20),prof:'Carlos Mendoza'},
+    {id:15,tri:3,num:4,titulo:'Mercados y orden moral de la economía',pf:'¿Qué lugar deben ocupar los mercados en una visión cristiana de la economía?',fecha:iso(2027,6,10),prof:'Carlos Mendoza'},
+    {id:16,tri:3,num:5,titulo:'Pobreza, riqueza, desigualdad y responsabilidad social',pf:'¿Cómo debe responder el cristiano ante la pobreza, la riqueza y la desigualdad?',fecha:iso(2027,6,24),prof:'Carlos Mendoza'},
+    {id:17,tri:3,num:6,titulo:'Estado, mercado, sociedad civil y subsidiariedad',pf:'¿Qué responsabilidades corresponden al Estado, al mercado, a la familia y a la Iglesia?',fecha:iso(2027,7,8),prof:'Carlos Mendoza'},
+    {id:18,tri:3,num:7,titulo:'Política económica y prudencia cristiana',pf:'¿Cómo debe evaluar un cristiano las propuestas de política económica?',fecha:iso(2027,7,22),prof:'Carlos Mendoza'}
+  ],
+  // materiales detallados para módulo 2 (ejemplo del documento); el resto se genera abajo
+  materiales:[
+    {id:1,mod:2,tipo:'biblico',icon:'📖',titulo:'Textos bíblicos principales',ref:'Hechos 5:29 · Romanos 13:1-7 · 1 Pedro 2:13-17'},
+    {id:2,mod:2,tipo:'cristiano',icon:'🏛️',titulo:'Fuente cristiana · San Agustín',ref:'La Ciudad de Dios, Libro XIX, cap. 13, 17 y 21'},
+    {id:3,mod:2,tipo:'complementario',icon:'✒️',titulo:'Fuente complementaria · Calvino',ref:'Instituciones de la Fe Cristiana, Cap. IV, xx'},
+    {id:4,mod:2,tipo:'herramienta',icon:'⚖️',titulo:'Herramientas contemporáneas',ref:'Estado de Derecho · división de poderes · rendición de cuentas'},
+    {id:5,mod:2,tipo:'caso',icon:'🇲🇽',titulo:'Casos mexicanos',ref:'Uso político de fiscalías · militarización · captura institucional'}
+  ],
+  usuarios:[
+    {id:'u1',nombre:'José Pablo Sánchez',usuario:'jose.sanchez',rol:'participante',perfil:'servidor_publico',estatus:'activo',insc:'activo'},
+    {id:'u2',nombre:'María González',usuario:'maria.gonzalez',rol:'participante',perfil:'maestro',estatus:'activo',insc:'activo'},
+    {id:'u3',nombre:'Luis Treviño',usuario:'luis.trevino',rol:'participante',perfil:'servidor_publico',estatus:'activo',insc:'activo'},
+    {id:'u4',nombre:'Patricia Lira',usuario:'patricia.lira',rol:'participante',perfil:'empresario',estatus:'activo',insc:'confirmado'},
+    {id:'u5',nombre:'Jorge Ramos',usuario:'jorge.ramos',rol:'participante',perfil:'servidor_publico',estatus:'activo',insc:'preinscrito'},
+    {id:'u6',nombre:'Sofía Herrera',usuario:'sofia.herrera',rol:'participante',perfil:'maestro',estatus:'activo',insc:'preinscrito'},
+    {id:'p1',nombre:'Roberto Hernández',usuario:'roberto.hernandez',rol:'profesor',perfil:'otro',estatus:'activo',insc:'—'},
+    {id:'d1',nombre:'Dirección Académica',usuario:'direccion',rol:'director',perfil:'otro',estatus:'activo',insc:'—'},
+    {id:'i1',nombre:'Registro NAVI',usuario:'registro',rol:'inscripciones',perfil:'otro',estatus:'activo',insc:'—'}
+  ],
+  // asistencias: sesion(modulo).usuario -> estatus
+  asistencias:{1:{u1:'presente',u2:'presente',u3:'presente',u4:'ausente'}},
+  // entregas por modulo: usuario -> {estatus, calif, retro}
+  entregas:{1:{
+    u1:{estatus:'retroalimentado',respuestas:['En mi municipio se ve en la rotación de mandos y en decisiones tomadas por presión política más que por el bien común.','Revela una visión del hombre como medio y del Estado como fin último; la Escritura pone límites a ambos.','Documentando decisiones y empujando rendición de cuentas en mi área de trabajo.'],retro:'Muy bien, José Pablo. Tu ejemplo municipal es concreto y honesto. Para la reunión, trae una propuesta de un mecanismo de rendición de cuentas realista para tu área.'},
+    u2:{estatus:'retroalimentado',retro:'Buen análisis de Romanos 13. Profundiza en la diferencia entre respetar la autoridad e idolatrar al Estado; tu conclusión puede aterrizar más en tu contexto.'},
+    u3:{estatus:'entregado'}}},
+  // progreso de lectura: usuario -> Set de material ids
+  progreso:{},
+  foro:[
+    {id:1,mod:1,autor:'María González',ini:'MG',color:'var(--lime)',cuando:'hace 2 horas',texto:'Terminé la lectura de Romanos 13 y me quedé pensando en la diferencia entre someterse a la autoridad y obedecer en todo. ¿Alguien más ve la tensión con Hechos 5:29?'},
+    {id:2,mod:1,autor:'Prof. Roberto Hernández',ini:'RH',color:'var(--coral)',cuando:'hace 5 horas',texto:'Excelente pregunta, María. La traemos a la discusión del jueves: la clave está en distinguir la autoridad como institución de Dios y el mandato concreto de un gobernante.'},
+    {id:3,mod:1,autor:'Luis Treviño',ini:'LT',color:'var(--accent)',cuando:'ayer',texto:'Para los que trabajamos en municipio: el caso de captura institucional se parece muchísimo a lo que vivimos en los comités de adquisiciones. Llevo notas para la clase.'}
+  ],
+  avisos:[
+    {id:1,titulo:'Bienvenidos a la generación 2026–2027',cuerpo:'La sesión inaugural es el jueves 10 de septiembre a las 7 pm. Revisen que su acceso funcione.',autor:'Dirección Académica',cuando:'hace 3 días',alcance:'generación'},
+    {id:2,titulo:'Lecturas del Módulo 1 disponibles',cuerpo:'Ya pueden descargar los textos del Módulo 1. Lleguen con la aplicación prudencial resuelta.',autor:'Prof. Roberto Hernández',cuando:'hace 1 día',alcance:'módulo'}
+  ],
+  donativos:[
+    {id:1,usuario:'María González',monto:500,fecha:'12 sep 2026',metodo:'Transferencia',estatus:'confirmado'},
+    {id:2,usuario:'Patricia Lira',monto:1000,fecha:'14 sep 2026',metodo:'Tarjeta',estatus:'registrado'}
+  ],
+  // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
+  mentores:[
+    {id:'m1',nombre:'Roberto Hernández',materia:'Gobierno Civil · Trimestre 1',foto:'',expediente:'NV-M1-2026',ingreso:'2026',
+     frase:'“El poder que no se somete a Dios termina sometiendo al hombre.”',
+     formacion:'Derecho y Filosofía Política',
+     experiencia:'Administración pública; organizaciones de sociedad civil (Estado de Derecho y rendición de cuentas).',
+     bio:'Biografía de ejemplo (se reemplaza con la real). Formación en Derecho y Filosofía Política, con experiencia en administración pública y en organizaciones de sociedad civil enfocadas en Estado de Derecho y rendición de cuentas.'},
+    {id:'m2',nombre:'Ana Ruiz',materia:'Educación Pública · Trimestre 2',foto:'',expediente:'NV-M2-2026',ingreso:'2026',
+     frase:'“Toda educación forma un tipo de persona; la pregunta es cuál.”',
+     formacion:'Ciencias de la Educación',
+     experiencia:'Diseño curricular, formación cívica y acompañamiento a escuelas públicas y privadas.',
+     bio:'Biografía de ejemplo. Pedagoga y formadora de docentes; ha trabajado en diseño curricular, formación cívica y acompañamiento a escuelas.'},
+    {id:'m3',nombre:'Carlos Mendoza',materia:'Economía · Trimestre 3',foto:'',expediente:'NV-M3-2026',ingreso:'2026',
+     frase:'“La economía empieza en el trabajo como vocación, no en el mercado.”',
+     formacion:'Economía',
+     experiencia:'Desarrollo regional, análisis de política pública y proyectos productivos comunitarios.',
+     bio:'Biografía de ejemplo. Economista con trayectoria en desarrollo regional y análisis de política pública; ha asesorado proyectos productivos comunitarios.'}
+  ],
+  // ARTÍCULOS de la revista/blog Nación Viva (se conectará al blog real). img: placeholder con degradado.
+  articulos:[
+    {id:1,titulo:'¿Cuál es el mejor modelo para desarrollar liderazgo?',autor:'Dr. Jorge Salcedo Mireles',edicion:'1ª edición',img:'assets/revista/art1.png',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)'},
+    {id:2,titulo:'Requisitos para ser un buen gobernante',autor:'Dr. Alfredo Serés',edicion:'1ª edición',img:'assets/revista/art2.png',bg:'linear-gradient(135deg,#15243C,#4A3358)'},
+    {id:3,titulo:'La mujer en su papel trascendental dentro de la política mexicana',autor:'Lic. Gamaliela Tan',edicion:'1ª edición',img:'assets/revista/art3.png',bg:'linear-gradient(135deg,#13233D,#8E4D3E)'}
+  ],
+  revista:{edicion:'Julio 2025 · 1ª edición',pdf:'',nombre:''},
+  // Donativo mensual voluntario
+  donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
+  cuenta:{banco:'BBVA',titular:'Nación Viva A.C.',clabe:'012 180 00000000000 0',concepto:'Donativo NAVI'},
+  transparencia:{periodo:'Ejercicio 2026',items:[
+    {cat:'Plataforma y tecnología',pct:35},
+    {cat:'Producción de videos y materiales',pct:25},
+    {cat:'Becas y apoyos a participantes',pct:20},
+    {cat:'Operación y administración',pct:20}
+  ]},
+  rubrica:[
+    {criterio:'Asistencia',desc:'Presencia en las sesiones en vivo del trimestre',peso:25},
+    {criterio:'Participación',desc:'Aportes en la discusión de clase y en el foro',peso:25},
+    {criterio:'Entregas por módulo',desc:'Aplicación prudencial de cada módulo (1 cuartilla)',peso:20},
+    {criterio:'Presentación oral',desc:'Análisis y propuesta sobre un problema de México',peso:30}
+  ]
+};
+
+// Generar materiales genéricos para módulos que no tienen (para que la vista nunca esté vacía)
+(function(){
+  let nid = 100;
+  const tpl=[['biblico','📖','Textos bíblicos principales','Lecturas base del módulo (PDF en plataforma)'],
+    ['cristiano','🏛️','Fuente cristiana o clásica','Autor de la tradición cristiana asignado al módulo'],
+    ['herramienta','⚖️','Herramientas contemporáneas','Conceptos jurídicos, económicos o pedagógicos'],
+    ['caso','🇲🇽','Casos mexicanos','Casos para la discusión de clase']];
+  store.modulos.forEach(m=>{
+    if(store.materiales.some(x=>x.mod===m.id)) return;
+    tpl.forEach(t=>store.materiales.push({id:nid++,mod:m.id,tipo:t[0],icon:t[1],titulo:t[2],ref:t[3]}));
+  });
+})();
+
+// Asignar por defecto los participantes de ejemplo al Grupo A
+store.usuarios.forEach(u=>{ if(u.rol==='participante'&&!u.grupo) u.grupo='Grupo A'; });
+// Estado de publicación (borrador/publicado) para el contenido que ven los participantes
+store.mentores.forEach(m=>{ if(m.publicado===undefined) m.publicado=true; });
+store.avisos.forEach(a=>{ if(a.publicado===undefined) a.publicado=true; });
+store.articulos.forEach(a=>{ if(a.publicado===undefined) a.publicado=true; });
+
+// Enriquecer módulos: cada uno es una CLASE PREGRABADA en video, disponible una quincena.
+// El 2º módulo de cada par (num par) incluye además la reunión mensual por Google Meet.
+(function(){
+  const byTri={}; store.modulos.forEach(m=>(byTri[m.tri]||(byTri[m.tri]=[])).push(m));
+  Object.values(byTri).forEach(list=>{
+    list.sort((a,b)=>a.num-b.num);
+    list.forEach((m,i)=>{
+      m.ventanaIni=m.fecha;
+      m.ventanaFin=list[i+1]?new Date(list[i+1].fecha.getTime()-86400000):new Date(m.fecha.getTime()+13*86400000);
+      m.reunion=(m.num%2===0);                       // reunión en el 2º del par
+      if(m.reunion){ m.reunionFecha=m.fecha; m.ligaMeet='https://meet.google.com/navi-t'+m.tri+'-m'+m.num; }
+      m.videoUrl='';                                 // se cargará al subir la grabación
+      m.frase='';                                    // frase del mentor sobre esta clase (editable por él)
+      m.transcripcion='En esta clase abordamos “'+m.titulo+'”. Partimos de la pregunta formativa: “'+m.pf+'” y recorremos el problema público tal como se manifiesta en México, el diagnóstico de cosmovisión, el fundamento bíblico, la tradición cristiana, las herramientas técnicas y la aplicación prudencial.\n\nLa transcripción completa del video se cargará cuando se publique la grabación de este módulo.';
+      m.preguntas=[
+        '¿Cómo se manifiesta en México el problema que aborda este módulo?',
+        '¿Qué visión del ser humano y del Estado revela este tema, a la luz de la Escritura?',
+        'En tu ámbito (gobierno, escuela o empresa), ¿cómo abordarías este problema con prudencia cristiana?'
+      ];
+    });
+  });
+})();
+
+// ---- DB: API estable (esto es lo que se conecta a Supabase al desplegar) ----
+const DB = {
+  generacion:()=>store.generacion,
+  trimestres:()=>store.trimestres,
+  modulos:()=>store.modulos,
+  modulosDeTrimestre:t=>store.modulos.filter(m=>m.tri===t),
+  modulo:id=>store.modulos.find(m=>m.id===id),
+  trimestre:id=>store.trimestres.find(t=>t.id===id),
+  materialesDeModulo:id=>store.materiales.filter(m=>m.mod===id),
+  participantes:()=>store.usuarios.filter(u=>u.rol==='participante'),
+  usuariosDe:rol=>store.usuarios.filter(u=>u.rol===rol),
+  usuarioPorUser:u=>store.usuarios.find(x=>x.usuario===u),
+  rubrica:()=>store.rubrica,
+  foroDeModulo:id=>store.foro.filter(p=>p.mod===id),
+  foro:()=>store.foro,
+  avisos:()=>store.avisos,
+  donativos:()=>store.donativos,
+  grupos:()=>store.grupos,
+  gruposConCupo:()=>store.grupos.filter(g=>g.estatus==='abierto'&&g.inscritos<g.cupo),
+  mentores:()=>store.mentores,
+  mentor:id=>store.mentores.find(x=>x.id===id),
+  mentorPorNombre:n=>store.mentores.find(x=>x.nombre===n),
+  articulos:()=>store.articulos,
+  asistenciaSesion:mod=>store.asistencias[mod]||{},
+  entregasModulo:mod=>store.entregas[mod]||{},
+  progresoDe:uid=>store.progreso[uid]||new Set(),
+  proximaSesion:()=>store.modulos[0]
+};
+</script>
+<script>
+/* ============================================================
+   APP — estado, navegación, render por rol, acciones
+   ============================================================ */
+const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod:1, editGrupo:null, showNuevoGrupo:false, editMentor:null, editAviso:null, editArt:null, editMod:null};
+const MENUS = {
+  participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
+  profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
+  director:[['dpanel','grid','Panel'],['dgrupos','layers','Grupos'],['dparticipantes','users','Participantes'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  inscripciones:[['ialta','userplus','Alta de participante'],['iinscripciones','list','Inscripciones'],['idonativos','heart','Donativos']]
+};
+const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones'};
+const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1'};
+const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta'};
+
+function initials(n){return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
+const ICONS={
+ home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+ book:'<path d="M12 6c-2-1.1-4-1.4-7-1.4V18c3 0 5 .3 7 1.4 2-1.1 4-1.4 7-1.4V4.6c-3 0-5 .3-7 1.4z"/><path d="M12 6v13.4"/>',
+ cap:'<path d="M22 9 12 5 2 9l10 4 10-4z"/><path d="M6 11v4.5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5V11"/>',
+ calendar:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3.2M16 3v3.2"/>',
+ chart:'<path d="M3 12h3l2.5 6 4-13 2.5 9 2-4h4"/>',
+ heart:'<path d="M12 20s-7-4.4-9.3-9C1.2 8 2.6 4.6 6 4.6c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.4 0 4.8 3.4 3.3 6.4C19 15.6 12 20 12 20z"/>',
+ chat:'<path d="M21 11.5a8 8 0 0 1-11.5 7.2L3 20l1.3-6.4A8 8 0 1 1 21 11.5z"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+ check:'<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 12.5l2.5 2.5L16 9"/>',
+ file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+ folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+ users:'<path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3.2"/><path d="M22 20v-2a4 4 0 0 0-3-3.8"/>',
+ mega:'<path d="M3 11v2a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 8a4 4 0 0 1 0 8"/>',
+ userplus:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5A4.5 4.5 0 0 1 7 14h4M16 8v6M13 11h6"/>',
+ grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+ list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+ image:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/>',
+ layers:'<path d="M12 3 2 8l10 5 10-5z"/><path d="M2 13l10 5 10-5"/><path d="M2 18l10 5 10-5"/>',
+ news:'<path d="M4 4h12v16H5a1 1 0 0 1-1-1z"/><path d="M16 8h3a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 12h6M7 16h4"/>'
+};
+function svgIcon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function fmtFecha(d){const dias=['dom','lun','mar','mié','jue','vie','sáb'];const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return dias[d.getDay()]+' '+d.getDate()+' '+mes[d.getMonth()]+' '+d.getFullYear();}
+
+function doEnterWelcome(){
+  document.getElementById('welcome').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+  window.scrollTo(0,0);
+  const u=document.getElementById('inUser'); if(u) u.focus();
+}
+/* ===== Integración Supabase (login real + datos reales) ===== */
+const NAVI = {
+  sb: (window.NAVI_CFG && window.NAVI_CFG.live && window.supabase)
+        ? window.supabase.createClient(window.NAVI_CFG.url, window.NAVI_CFG.anon)
+        : null,
+  // usuario/alias del formulario -> correo de la cuenta real
+  userMap:{
+    'jose.sanchez':'participante@edificadores.navi',
+    'participante':'participante@edificadores.navi',
+    'direccion':'director@edificadores.navi',
+    'director':'director@edificadores.navi',
+    'jorge.salcedo':'mentor@edificadores.navi',
+    'mentor':'mentor@edificadores.navi',
+    'registro':'inscripciones@edificadores.navi',
+    'inscripciones':'inscripciones@edificadores.navi'
+  },
+  rolMap:{1:'director',2:'director',3:'director',4:'profesor',5:'participante',6:'inscripciones'},
+  get activo(){ return !!this.sb; },
+  async cargarPerfilYDatos(){
+    const sb=this.sb;
+    const { data:{ user } } = await sb.auth.getUser();
+    // Perfil propio -> rol + nombre real
+    const { data:me } = await sb.schema('navi').from('usuarios')
+      .select('nombre,rol_id').eq('auth_uid', user.id).single();
+    if(me){
+      state.role = this.rolMap[me.rol_id] || 'participante';
+      const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
+      if(du) du.nombre = me.nombre;
+    }
+    // Trimestres reales
+    const { data:tr } = await sb.schema('navi').from('trimestres')
+      .select('id,numero,nombre,pregunta_rectora').order('numero');
+    if(tr && tr.length){
+      tr.forEach(t=>{
+        const d = store.trimestres.find(x=>x.id===t.id);
+        if(d){ d.nombre=t.nombre; if(t.pregunta_rectora) d.pregunta=t.pregunta_rectora; d.numero=t.numero; }
+      });
+    }
+    // NOTA: el contenido de módulos (títulos, fechas, reunión) se mantiene del set
+    // curado que coincide con los documentos oficiales. La hidratación de módulos
+    // reales requiere reconciliar fechas con navi.sesiones y se hará en el
+    // siguiente paso (los ids de navi.modulos no siguen el orden del currículo).
+    return true;
+  }
+};
+
+function enterApp(){
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('roleSel').value=state.role;
+  applyRole(true);
+  window.scrollTo(0,0);
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  const idf = document.getElementById('inUser').value.trim() || 'jose.sanchez';
+  const pass = document.getElementById('inPass').value;
+  // MODO DEMO (sin conexión configurada): comportamiento de siempre
+  if(!NAVI.activo){
+    const found=DB.usuarioPorUser(idf);
+    state.role = found?found.rol:'participante';
+    enterApp(); return;
+  }
+  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || idf);
+  const btn = e.target.querySelector('button[type=submit]');
+  const label = btn ? btn.textContent : '';
+  if(btn){ btn.disabled=true; btn.textContent='Entrando…'; }
+  try{
+    const { error } = await NAVI.sb.auth.signInWithPassword({ email, password:pass });
+    if(error) throw error;
+    await NAVI.cargarPerfilYDatos();
+    enterApp();
+  }catch(err){
+    const msg = (err && err.message) || '';
+    if(/invalid|credential|password|email|not.*confirm/i.test(msg)){
+      if(btn){ btn.disabled=false; btn.textContent=label; }
+      if(typeof toast==='function') toast('Usuario o clave incorrectos.');
+      else alert('Usuario o clave incorrectos.');
+    }else{
+      // Problema de red -> cae a modo demo para no bloquear
+      const found=DB.usuarioPorUser(idf);
+      state.role = found?found.rol:'participante';
+      enterApp();
+    }
+  }
+}
+
+async function doLogout(){
+  try{ if(NAVI.activo) await NAVI.sb.auth.signOut(); }catch(_){}
+  location.reload();
+}
+function switchRole(r){state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);}
+function applyRole(reset){
+  state.user=store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
+  if(reset) state.view=DEFVIEW[state.role];
+  document.getElementById('sideAvatar').textContent=initials(state.user.nombre);
+  document.getElementById('sideName').textContent=state.user.nombre;
+  document.getElementById('sideRole').textContent=ROLE_LABEL[state.role];
+  const sl=document.getElementById('sideLogoImg'); if(sl) sl.src=store.config.logo;
+  buildMenu();
+  render();
+}
+function buildMenu(){
+  const nav=document.getElementById('navMenu');
+  nav.innerHTML=MENUS[state.role].map(([k,ic,lb])=>
+    `<button class="nav-btn${k===state.view?' active':''}" onclick="nav('${k}')"><span class="ic">${svgIcon(ic)}</span> ${lb}</button>`).join('');
+}
+function nav(v){state.view=v;buildMenu();render();window.scrollTo(0,0);}
+function toggleSidebar(){const app=document.getElementById('app');if(!app)return;const c=app.classList.toggle('nav-collapsed');const b=document.querySelector('.side-toggle');if(b){b.textContent=c?'›':'‹';b.title=c?'Mostrar menú':'Ocultar menú';}}
+function goModule(id){state.modId=id;state.view=(state.role==='participante')?'modulo':state.view;buildMenu();render();window.scrollTo(0,0);}
+function goMentor(id){state.mentorId=id;state.view='mentorDetalle';buildMenu();render();window.scrollTo(0,0);}
+function mphoto(m){return m.foto?`<img class="mphoto" src="${m.foto}" alt="${m.nombre}">`:`<div class="mphoto">${initials(m.nombre)}</div>`;}
+const _cors='<span class="cor tl"></span><span class="cor tr"></span><span class="cor bl"></span><span class="cor br"></span>';
+function dossierPhoto(m,big){
+  const inner=m.foto?`<img src="${m.foto}" alt="${m.nombre}">`:`<div class="ini">${initials(m.nombre)}</div>`;
+  return `<div class="${big?'dz-photo-lg':'dz-photo'}">${inner}<div class="scan"></div>${_cors}${big?'<div class="dz-stamp">EN SERVICIO</div>':''}</div>`;
+}
+
+function render(){
+  const m=document.getElementById('main');
+  const crumb=document.getElementById('crumb');
+  const V=VIEWS[state.view];
+  crumb.innerHTML='<b>'+ROLE_LABEL[state.role]+'</b> · '+(V?V.title:state.view);
+  m.innerHTML=V?V.html():'<div class="empty">Vista no encontrada</div>';
+  if(V&&V.after)V.after();
+}
+</script>
+<script>
+/* ============================================================
+   VISTAS
+   ============================================================ */
+function head(eyebrow,title,sub){return `<div class="page-head"><div class="eyebrow">${eyebrow}</div><h1 class="page">${title}</h1>${sub?`<div class="page-sub">${sub}</div>`:''}</div>`;}
+function pill(txt,cls){return `<span class="pill ${cls}">${txt}</span>`;}
+
+const VIEWS = {
+
+/* ---------- PARTICIPANTE ---------- */
+inicio:{title:'Inicio',html(){
+  const u=state.user; const mods=DB.modulosDeTrimestre(1);
+  const done=avanceModulos(u.id);
+  return `<div class="inicio-top"><div class="inicio-greet">
+       <div class="eyebrow">Bienvenido</div><h1 class="page">Hola, ${u.nombre.split(' ')[0]}</h1>
+       <div class="page-sub">Trimestre 1 · Gobierno Civil</div></div>
+       <div class="don-top"><div class="don-txt">Donativo mensual voluntario, sin costo de inscripción · desde $200</div><button class="btn-green" onclick="nav('midonativo')">Hacer mi donativo</button></div>
+     </div>`
+   + (DB.articulos().filter(a=>a.publicado).length?`<div class="sec-title" style="margin-top:0">La Antorcha</div>`+articulosCarousel():'')
+   + heroProxima()
+   + `<div class="grid g3" style="margin:22px 0">
+        <div class="card"><div class="stat-n">${done}/5</div><div class="stat-l">Módulos completados<div class="progress-track"><div class="progress-fill" style="width:${done/5*100}%"></div></div></div></div>
+        <div class="card"><div class="stat-n">${DB.materialesDeModulo(1).length}</div><div class="stat-l">Lecturas del Módulo 1</div></div>
+        <div class="card"><div class="stat-n">26 nov</div><div class="stat-l">Presentación oral del trimestre</div></div>
+      </div>`
+   + `<div class="sec-title">Tus módulos de este trimestre</div>`
+   + mods.map(m=>moduloRow(m)).join('');
+},after(){startCarousel();}},
+
+mentores:{title:'Mis Mentores',html(){
+  const ms=DB.mentores().filter(x=>x.publicado);
+  return head('Archivo de la Escuela','Mis Mentores','Consulta el expediente de cada mentor que acompaña los trimestres. Toca una ficha para abrir el expediente completo.')
+   + (ms.length?`<div class="dossier-grid">`
+   + ms.map(x=>`<div class="dossier-card" onclick="goMentor('${x.id}')">
+        <div class="dz-topbar"><span>EXP. ${x.expediente}</span><span class="cls">CONFIDENCIAL</span></div>
+        <div class="dzc-body">${dossierPhoto(x,false)}
+          <div class="dzc-meta"><div class="dzc-exp">MENTOR · INGRESO ${x.ingreso}</div><div class="dzc-name">${x.nombre}</div><div class="dzc-area">${x.materia}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
+        </div></div>`).join('')
+   + `</div>`
+   : `<div class="empty">Los expedientes de los mentores se publicarán pronto.</div>`);
+}},
+
+mentorDetalle:{title:'Expediente',html(){
+  const x=DB.mentor(state.mentorId)||DB.mentores()[0];
+  return `<button class="back-link" onclick="nav('mentores')">← Volver al archivo</button>`
+   + `<div class="dossier">
+       <div class="dz-head"><span>ARCHIVO DE MENTORES · NACIÓN VIVA</span><span class="cls">CONFIDENCIAL</span></div>
+       <div class="dz-body">${dossierPhoto(x,true)}
+         <div class="dz-fields">
+           <div class="dz-row"><div class="dz-label">Expediente</div><div class="dz-val">${x.expediente}</div></div>
+           <div class="dz-row"><div class="dz-label">Nombre</div><div class="dz-val big">${x.nombre.toUpperCase()}</div></div>
+           <div class="dz-row"><div class="dz-label">Área asignada</div><div class="dz-val">${x.materia}</div></div>
+           <div class="dz-row"><div class="dz-label">Formación</div><div class="dz-val">${x.formacion}</div></div>
+           <div class="dz-row"><div class="dz-label">Experiencia</div><div class="dz-val">${x.experiencia}</div></div>
+           <div class="dz-row"><div class="dz-label">Ingreso</div><div class="dz-val">${x.ingreso}</div></div>
+           <div class="dz-row"><div class="dz-label">Estatus</div><div class="dz-val" style="color:#7FE090">EN SERVICIO</div></div>
+         </div>
+       </div>
+       <div class="dz-section">Declaración en archivo</div>
+       <div class="dz-statement">${x.frase}</div>
+       <div class="dz-section">Notas del expediente</div>
+       <div class="dz-notes">${x.bio}</div>
+     </div>`;
+}},
+
+trimestre:{title:'Mi Trimestre',html(){
+  const t=DB.trimestre(1);
+  return head('Trimestre 1 · '+t.rango,'Gobierno Civil','Pregunta rectora: '+t.pregunta)
+   + DB.modulosDeTrimestre(1).map(m=>moduloRow(m)).join('')
+   + `<div class="row locked"><div class="rnum">★</div><div class="rinfo"><div class="t">Presentaciones orales del trimestre</div><div class="d">Jue 26 nov · Análisis y propuesta sobre un problema de México</div></div>${pill('Evaluación','pill-info')}</div>`;
+}},
+
+modulo:{title:'Clase',html(){
+  const m=DB.modulo(state.modId||1); const mats=DB.materialesDeModulo(m.id);
+  const prog=DB.progresoDe(state.user.id);
+  const ent=DB.entregasModulo(m.id)[state.user.id];
+  const enviado=!!(ent&&ent.estatus&&ent.estatus!=='pendiente');
+  const resp=(ent&&ent.respuestas)||[];
+  const mentor=DB.mentorPorNombre(m.prof);
+  return `<button class="back-link" onclick="nav('trimestre')">← Volver al trimestre</button>`
+   + `<div class="mod-top"><div class="mod-top-main">`
+   +   `<div class="eyebrow">Trimestre ${m.tri} · Módulo ${m.num}</div><h1 class="page">${m.titulo}</h1>`
+   +   `<div class="mod-q" style="margin-top:14px"><div class="k">Pregunta formativa</div><div class="q">${m.pf}</div></div>`
+   + `</div>`
+   + (mentor?`<div class="mentor-mini">${mphoto(mentor)}<div><div class="mmn">${mentor.nombre}</div><div class="mmf">${m.frase||mentor.frase}</div></div></div>`:'')
+   + `</div>`
+   + ventanaBanner(m)
+   + videoBlock(m)
+   + (m.reunion?reunionBlock(m):'')
+   + `<div class="sec-title">Lecturas de apoyo</div>`
+   + mats.map(x=>`<div class="reading"><div class="ri">${x.icon}</div><div><div class="rt">${x.titulo}</div><div class="rd">${x.ref}</div></div><input type="checkbox" ${prog.has(x.id)?'checked':''} onchange="toggleLectura(${x.id})" aria-label="Marcar como leído"></div>`).join('')
+   + `<div class="sec-title">Preguntas de la clase · esta es tu entrega</div>`
+   + qaBlock(m,resp,enviado)
+   + feedbackBlock(ent);
+}},
+
+calendario:{title:'Calendario',html(){return calendarioHTML();}},
+
+comunidad:{title:'Comunidad',html(){
+  const me=state.user;
+  const contactos=[...DB.mentores().map(m=>({nombre:m.nombre,pm:'Mentor · '+m.materia.split(' · ')[0]})),
+    ...DB.participantes().filter(p=>p.insc==='activo'&&p.nombre!==me.nombre).map(p=>({nombre:p.nombre,pm:pmSample(p.nombre)}))];
+  return `<div class="page-head"><div class="eyebrow">Generación 2026–2027</div><h1 class="page">Comunidad</h1><div class="page-sub">Un espacio para conversar sobre las clases, con calma y buen humor. Un guiño a los messengers de los 2000. ✨</div></div>`
+   + `<div class="msn">`
+   +   `<div class="msn-side">
+         <div class="msn-me"><div class="row"><div class="avatar">${initials(me.nombre)}</div><div style="min-width:0"><div style="font-size:13px;font-weight:700">${me.nombre.split(' ')[0]}</div></div></div><div class="st"><span class="dotg"></span> Disponible</div></div>
+         <div class="msn-conh">En línea · ${contactos.length}</div>
+         <div class="msn-contacts">${contactos.map(c=>`<div class="msn-contact"><div class="avatar" style="background:${colorFor(c.nombre)}">${initials(c.nombre)}</div><div style="min-width:0"><div class="nm">${c.nombre.split(' ').slice(0,2).join(' ')}</div><div class="pm">${c.pm}</div></div></div>`).join('')}</div>
+       </div>`
+   +   `<div class="msn-main">
+         <div class="msn-head"><div class="t">Sala de la generación</div><div class="o"><span class="dotg"></span> ${contactos.length+1} en línea</div></div>
+         <div class="msn-msgs" id="feed">${DB.foro().map(bubbleHTML).join('')}</div>
+         <div class="msn-emojis">${EMOJIS.map(e=>`<button onclick="insEmoji('${e}')" tabindex="-1">${e}</button>`).join('')}</div>
+         <div class="msn-input"><textarea id="postText" placeholder="Escribe un mensaje…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();publicar();}"></textarea><button class="zumbido-btn" title="Enviar un zumbido" onclick="zumbido()">⚡</button><button class="btn btn-accent" onclick="publicar()">Enviar</button></div>
+       </div>`
+   + `</div>`;
+},after(){const f=document.getElementById('feed');if(f)f.scrollTop=f.scrollHeight;}},
+
+avisos:{title:'Avisos',html(){
+  const av=store.avisos.filter(a=>a.publicado);
+  return head('Generación 2026–2027','Avisos','Comunicados de la dirección y los mentores de la Escuela.')
+   + (av.length? av.map(a=>`<div class="row" style="align-items:flex-start;padding:14px 16px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0"></div><div class="rinfo"><div class="t">${a.titulo}</div><div class="d" style="color:var(--dim);font-size:13.5px;margin-top:4px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div></div>`).join('')
+     : `<div class="empty">No hay avisos por ahora.</div>`);
+}},
+
+revista:{title:'Revista',html(){
+  const r=store.revista;
+  let h=`<div class="page-head"><div class="eyebrow">Nación Viva</div><h1 class="page">La Antorcha</h1><div class="page-sub">Revista digital de Nación Viva · ${r.edicion}. Léela aquí, dentro de la Escuela.</div></div>`;
+  if(r.pdf){
+    h+=`<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><a class="btn btn-sm" href="${r.pdf}" target="_blank" rel="noopener">Abrir en pantalla completa</a><a class="btn btn-sm" href="${r.pdf}" download="La-Antorcha.pdf">Descargar</a></div>`
+      + `<div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0A1426"><iframe src="${r.pdf}" style="width:100%;height:76vh;border:0;display:block" title="La Antorcha"></iframe></div>`;
+  } else {
+    h+=`<div class="empty">La revista se publicará muy pronto. Cuando esté lista, la leerás aquí mismo, sin salir de la Escuela.</div>`;
+  }
+  h+=`<div class="sec-title">Artículos de este número</div><div class="grid g3">`
+    + DB.articulos().filter(a=>a.publicado).map(a=>`<div class="card" style="overflow:hidden;padding:0;cursor:pointer" onclick="${r.pdf?"document.querySelector('.main').scrollTo(0,0)":"toast('Se abrirá con el artículo en la revista.')"}"><div style="height:120px;background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div><div style="padding:14px 15px"><div style="font-weight:700;font-size:14px;line-height:1.25">${a.titulo}</div><div style="font-size:12px;color:var(--soft);margin-top:4px">Por ${a.autor}</div></div></div>`).join('')
+    + `</div>`;
+  return h;
+}},
+
+avance:{title:'Mi Avance',html(){
+  const u=state.user; const asis=asistenciaPct(u.id); const ent=entregasCount(u.id);
+  const retros=store.modulos.filter(m=>m.tri===1).map(m=>({m,e:DB.entregasModulo(m.id)[u.id]})).filter(x=>x.e&&x.e.retro);
+  return head('Acompañamiento','Mi avance','En la Escuela no calificamos con números: tu formación se acompaña con la retroalimentación cualitativa de tus profesores.')
+   + `<div class="grid g3" style="margin-bottom:22px">
+       <div class="card"><div class="stat-n">${asis}%</div><div class="stat-l">Asistencia (automática al enviar)</div></div>
+       <div class="card"><div class="stat-n">${ent}/5</div><div class="stat-l">Clases respondidas · T1</div></div>
+       <div class="card"><div class="stat-n">${retros.length}</div><div class="stat-l">Retroalimentaciones recibidas</div></div></div>`
+   + `<div class="sec-title">Retroalimentación de tus profesores</div>`
+   + (retros.length?retros.map(x=>`<div class="reunion-card" style="margin:0 0 10px"><div class="reunion-h">Módulo ${x.m.num} · ${x.m.titulo}</div><p style="margin:0;color:var(--cream)">${x.e.retro.replace(/</g,'&lt;')}</p></div>`).join('')
+       :`<div class="empty">Aún no tienes retroalimentaciones. Aparecerán aquí cuando tu profesor lea tus respuestas.</div>`)
+   + `<div class="sec-title">Cómo se te acompaña en el trimestre</div>`
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Dimensión</th><th>Qué observamos</th></tr></thead><tbody>`
+   + DB.rubrica().map(r=>`<tr><td class="nm">${r.criterio}</td><td>${r.desc}</td></tr>`).join('')
+   + `</tbody></table></div>`;
+}},
+
+midonativo:{title:'Donativo',html(){
+  const u=state.user; const info=store.donativoInfo; const c=store.cuenta; const tr=store.transparencia;
+  const mios=DB.donativos().filter(d=>d.usuario===u.nombre);
+  return head('Sostén de la Escuela','Tu donativo mensual', info.texto)
+   + `<div class="grid g2">`
+   + `<div class="card glass"><div class="sec-title" style="margin-top:0">Haz tu donativo</div>
+       <label style="font-size:12.5px;color:var(--dim);font-weight:600">Monto mensual (mínimo $${info.min})</label>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px">${[200,300,500,1000].map(v=>`<button class="btn btn-sm" onclick="setMonto(${v})">$${v}</button>`).join('')}</div>
+       <input id="donMonto" type="number" min="${info.min}" value="200" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:15px;font-family:inherit;outline:none">
+       <div class="sec-title">Datos para transferencia</div>
+       <div class="cred">${c.banco} · ${c.titular}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+       <label style="font-size:12px;color:var(--soft);margin:10px 0 4px;display:block">CLABE interbancaria</label>
+       <div class="cred">${c.clabe}<button class="btn btn-sm" onclick="toast('CLABE copiada')">Copiar</button></div>
+       <label style="font-size:12px;color:var(--soft);margin:10px 0 4px;display:block">Concepto</label>
+       <div class="cred">${c.concepto} · ${u.usuario}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+       <button class="btn btn-solid btn-lg" style="margin-top:16px" onclick="registrarDonativoPropio()">Ya transferí · registrar mi donativo</button>
+       <p style="font-size:12px;color:var(--soft);margin-top:10px">Tu donativo es privado: nadie ve cuánto donas. Con gusto reportamos en qué se usan los fondos.</p>
+     </div>`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">En qué se usan los donativos</div>
+       <p style="font-size:12.5px;color:var(--soft);margin-bottom:14px">Transparencia · ${tr.periodo}</p>
+       ${tr.items.map(x=>`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px"><span style="color:var(--dim)">${x.cat}</span><b style="color:var(--accent)">${x.pct}%</b></div><div class="progress-track"><div class="progress-fill" style="width:${x.pct}%"></div></div></div>`).join('')}
+       <p style="font-size:12px;color:var(--soft);margin-top:6px">Cada trimestre publicamos el detalle del uso de los donativos.</p>
+     </div></div>`
+   + `<div class="sec-title">Mi historial de donativos</div>`
+   + (mios.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Monto</th><th>Fecha</th><th>Método</th><th>Estatus</th></tr></thead><tbody>`
+       + mios.map(d=>`<tr><td class="nm">$${d.monto.toLocaleString('es-MX')}</td><td>${d.fecha}</td><td>${d.metodo}</td><td>${d.estatus==='confirmado'?pill('Confirmado','pill-ok'):pill('Registrado','pill-wait')}</td></tr>`).join('')
+       + `</tbody></table></div>`
+      : `<div class="empty">Aún no registras donativos. Cuando hagas tu transferencia, regístrala aquí y aparecerá en tu historial.</div>`);
+}},
+
+/* ---------- PROFESOR ---------- */
+pgrupo:{title:'Mi grupo',html(){
+  const activos=DB.participantes().filter(p=>p.insc==='activo');
+  const sp=activos.filter(p=>p.perfil==='servidor_publico').length;
+  const otros=activos.length-sp;
+  return head('Mentor','Mi grupo','Los participantes inscritos que acompañas este trimestre. Cuando abran nuevos grupos, verás aquí el que te corresponda.')
+   + `<div class="grid g3" style="margin-bottom:20px">
+       <div class="card"><div class="stat-n">${activos.length}</div><div class="stat-l">Alumnos en tu grupo</div></div>
+       <div class="card"><div class="stat-n">${sp}</div><div class="stat-l">Servidores públicos</div></div>
+       <div class="card"><div class="stat-n">${otros}</div><div class="stat-l">Maestros y empresarios</div></div></div>`
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Participante</th><th>Perfil</th><th>Clases respondidas</th><th>Asistencia</th></tr></thead><tbody>`
+   + activos.map(p=>`<tr><td class="nm">${p.nombre}</td><td>${perfilLabel(p.perfil)}</td><td>${entregasCount(p.id)}/5</td><td>${asistenciaPct(p.id)}%</td></tr>`).join('')
+   + `</tbody></table></div>`;
+}},
+
+pinicio:{title:'Inicio',html(){
+  const mods=misModulos();
+  return head('Mentor','Hola, '+state.user.nombre.split(' ')[0],'Tus módulos asignados y tus próximas sesiones.')
+   + heroProxima(mods[0])
+   + `<div class="sec-title">Módulos que impartes</div>`
+   + mods.map(m=>`<div class="row"><div class="rnum">${m.num}</div><div class="rinfo"><div class="t">${m.titulo}</div><div class="d">Sesión: ${fmtFecha(m.fecha)} · 7:00 pm</div></div>
+       <div class="ractions"><button class="btn btn-sm" onclick="nav('pasistencia')">Asistencia</button><button class="btn btn-sm" onclick="nav('pentregas')">Entregas</button></div></div>`).join('');
+}},
+
+pasistencia:{title:'Asistencia',html(){
+  const mods=misModulos(); const sel=state.sesMod||mods[0].id;
+  const att=DB.asistenciaSesion(sel); const ent=DB.entregasModulo(sel);
+  const activos=DB.participantes().filter(p=>p.insc==='activo');
+  const pres=activos.filter(p=>att[p.id]==='presente').length;
+  return head('Profesor','Asistencia','La asistencia se registra automáticamente cuando el participante envía sus respuestas de la clase.')
+   + `<div style="margin-bottom:16px">Módulo: <select onchange="state.sesMod=parseInt(this.value);render()" style="font-family:inherit;font-size:13px;color:var(--accent-bright);background:var(--glass);border:1px solid var(--accent-line);border-radius:999px;padding:7px 12px">
+       ${mods.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>Módulo ${x.num} · ${x.titulo}</option>`).join('')}</select>
+       <span class="pill pill-ok" style="margin-left:8px">${pres}/${activos.length} asistieron</span></div>`
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Participante</th><th>Envío de respuestas</th><th style="text-align:right">Asistencia</th></tr></thead><tbody>`
+   + activos.map(p=>{
+       const st=att[p.id]; const entrego=ent[p.id]&&ent[p.id].estatus&&ent[p.id].estatus!=='pendiente';
+       const asis = st==='presente'?pill('Presente (automático)','pill-ok'):st==='justificado'?pill('Justificado','pill-info'):pill('Pendiente','pill-wait');
+       return `<tr><td class="nm">${p.nombre}</td><td>${entrego?pill('Envió','pill-ok'):'<span style="color:var(--soft);font-size:12px">Aún no envía</span>'}</td>
+         <td style="text-align:right;white-space:nowrap">${asis}${st!=='presente'?` <button class="att-btn ${st==='justificado'?'on-j':''}" onclick="setAsis(${sel},'${p.id}','justificado')">Justificar</button>`:''}</td></tr>`;
+     }).join('')
+   + `</tbody></table></div>`;
+}},
+
+pentregas:{title:'Entregas',html(){
+  const mods=misModulos(); const sel=state.sesMod||mods[0].id;
+  const ent=DB.entregasModulo(sel); const m=DB.modulo(sel);
+  const activos=DB.participantes().filter(p=>p.insc==='activo');
+  const conEnvio=activos.filter(p=>ent[p.id]&&ent[p.id].estatus&&ent[p.id].estatus!=='pendiente');
+  const sinEnvio=activos.filter(p=>!(ent[p.id]&&ent[p.id].estatus&&ent[p.id].estatus!=='pendiente'));
+  let body=head('Profesor','Retroalimentación de entregas','Lee las respuestas de cada participante y escríbeles una retroalimentación cualitativa (sin calificación numérica).')
+   + `<div style="margin-bottom:16px">Módulo: <select onchange="state.sesMod=parseInt(this.value);render()" style="font-family:inherit;font-size:13px;color:var(--accent-bright);background:var(--glass);border:1px solid var(--accent-line);border-radius:999px;padding:7px 12px">
+       ${mods.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>Módulo ${x.num} · ${x.titulo}</option>`).join('')}</select></div>`;
+  if(!conEnvio.length) body+=`<div class="empty">Aún no hay respuestas enviadas en este módulo.</div>`;
+  conEnvio.forEach(p=>{
+    const e=ent[p.id];
+    const badge=e.estatus==='retroalimentado'?pill('Retroalimentado','pill-ok'):pill('Por revisar','pill-info');
+    body+=`<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><b style="font-size:15px">${p.nombre}</b>${badge}</div>`
+      + m.preguntas.map((q,i)=>`<div style="margin-bottom:10px"><div style="font-size:12.5px;color:var(--soft)">${i+1}. ${q}</div><div style="font-size:13.5px;color:var(--cream);margin-top:2px">${((e.respuestas&&e.respuestas[i])||'').replace(/</g,'&lt;')||'<span style=color:var(--soft)>(sin respuesta)</span>'}</div></div>`).join('')
+      + `<label style="display:block;font-size:12.5px;color:var(--dim);font-weight:600;margin:12px 0 6px">Tu retroalimentación</label>
+         <textarea id="retro-${p.id}" style="width:100%;min-height:70px;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px;resize:vertical;outline:none" placeholder="Comenta sus respuestas, una conclusión o una sugerencia…">${(e.retro||'').replace(/</g,'&lt;')}</textarea>
+         <button class="btn btn-accent btn-sm" style="margin-top:10px" onclick="guardarRetro(${sel},'${p.id}')">Guardar retroalimentación</button></div>`;
+  });
+  if(sinEnvio.length) body+=`<div class="sec-title">Aún no envían (${sinEnvio.length})</div>`+sinEnvio.map(p=>`<div class="row" style="padding:11px 15px"><div class="rinfo"><div class="t" style="font-size:14px">${p.nombre}</div></div>${pill('Pendiente','pill-wait')}</div>`).join('');
+  return body;
+}},
+
+ppreguntas:{title:'Mi clase',html(){
+  const mods=misModulos(); const sel=state.sesMod||mods[0].id; const m=DB.modulo(sel);
+  const mentor=DB.mentorPorNombre(state.user.nombre)||DB.mentorPorNombre(m.prof);
+  const selHTML=`<div style="margin-bottom:16px">Módulo: <select onchange="state.sesMod=parseInt(this.value);render()" style="font-family:inherit;font-size:13px;color:var(--accent-bright);background:var(--glass);border:1px solid var(--accent-line);border-radius:999px;padding:7px 12px">
+       ${mods.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>Módulo ${x.num} · ${x.titulo}</option>`).join('')}</select></div>`;
+  return head('Mentor','Personaliza tu clase','Tu foto y tu frase aparecen junto a la clase del participante. Cambia la frase, la pregunta formativa o las preguntas cuando quieras.')
+   + selHTML
+   + `<div class="card" style="margin-bottom:14px">
+       <div style="display:flex;gap:14px;align-items:center;margin-bottom:8px">${mentor?mphoto(mentor):''}<div><div style="font-weight:700">${mentor?mentor.nombre:'—'}</div><div style="font-size:12px;color:var(--soft)">Así apareces en la parte superior de esta clase</div></div></div>
+       <div class="qa"><label>Tu frase para esta clase</label><textarea id="pqFrase" placeholder="Una frase tuya sobre este tema…">${(m.frase||'').replace(/</g,'&lt;')}</textarea></div>
+       <div class="qa"><label>Pregunta formativa del módulo</label><textarea id="pqPF">${(m.pf||'').replace(/</g,'&lt;')}</textarea></div>
+     </div>`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">Preguntas de la clase · las responde el participante como su entrega</div>`
+   + m.preguntas.map((q,i)=>`<div class="qa"><label>Pregunta ${i+1} <button class="btn btn-sm" style="float:right;min-height:26px;padding:2px 10px" onclick="removePregunta(${sel},${i})">Quitar</button></label><textarea id="pq${i}">${(q||'').replace(/</g,'&lt;')}</textarea></div>`).join('')
+   + `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn" onclick="addPreguntaEdit(${sel})">＋ Agregar pregunta</button><button class="btn btn-accent" onclick="guardarPreguntas(${sel})">Guardar cambios</button></div>`
+   + `<p style="font-size:12px;color:var(--soft);margin-top:12px">Los cambios aplican de inmediato a la página de la clase.</p></div>`;
+}},
+
+pmateriales:{title:'Materiales',html(){
+  const mods=misModulos(); const sel=state.sesMod||mods[0].id;
+  return head('Mentor','Materiales de mis módulos','Sube las lecturas del módulo y clasifícalas en uno de los cuatro tipos.')
+   + `<div style="margin-bottom:16px">Módulo: <select onchange="state.sesMod=parseInt(this.value);render()" style="font-family:inherit;font-size:13px;color:var(--accent-bright);background:var(--glass);border:1px solid var(--accent-line);border-radius:999px;padding:7px 12px">
+       ${mods.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>Módulo ${x.num} · ${x.titulo}</option>`).join('')}</select></div>`
+   + `<div class="card glass" style="margin-bottom:16px"><div class="form">
+       <label>Título del material</label><input id="matTit" placeholder="Ej. La Ciudad de Dios, San Agustín">
+       <label>Referencia o detalle</label><input id="matRef" placeholder="Ej. Libro XIX, capítulos 13, 17 y 21">
+       <label>Tipo de material</label>
+       <select id="matTipo">
+         <option value="biblico">Texto bíblico principal</option>
+         <option value="cristiano">Fuente cristiana o clásica</option>
+         <option value="herramienta">Herramienta teórica contemporánea</option>
+         <option value="caso">Caso práctico mexicano</option>
+       </select>
+       <button class="btn btn-accent btn-sm" style="margin-top:14px" onclick="subirMaterial(${sel})">＋ Agregar material</button>
+     </div></div>`
+   + `<div class="sec-title" style="margin-top:0">Materiales del módulo</div>`
+   + DB.materialesDeModulo(sel).map(x=>`<div class="reading"><div class="ri">${x.icon}</div><div><div class="rt">${x.titulo}</div><div class="rd">${x.ref}</div></div><div style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="pill pill-info">${tipoLabel(x.tipo)}</span><button class="btn btn-sm" onclick="borrarMaterial(${x.id})">Eliminar</button></div></div>`).join('');
+}},
+
+/* ---------- DIRECTOR ---------- */
+dpanel:{title:'Panel',html(){
+  const parts=DB.participantes(); const activos=parts.filter(p=>p.insc==='activo').length;
+  return head('Dirección Académica','Panel de la generación','Generación 2026–2027 · resumen general.')
+   + `<div class="grid g4" style="margin-bottom:22px">
+       <div class="card"><div class="stat-n">${parts.length}</div><div class="stat-l">Participantes inscritos</div></div>
+       <div class="card"><div class="stat-n">${activos}</div><div class="stat-l">Con acceso activo</div></div>
+       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div>
+       <div class="card"><div class="stat-n">${DB.donativos().reduce((a,d)=>a+d.monto,0).toLocaleString('es-MX')}</div><div class="stat-l">Donativos (MXN)</div></div></div>`
+   + `<div class="grid g2">
+       <div class="card"><div class="sec-title" style="margin-top:0">Perfil de los participantes</div>${perfilResumen()}</div>
+       <div class="card"><div class="sec-title" style="margin-top:0">Próximas sesiones</div>${store.modulos.slice(0,4).map(m=>`<div class="row" style="margin-bottom:7px;padding:10px 13px"><div class="rinfo"><div class="t" style="font-size:13.5px">M${m.num} · ${m.titulo}</div><div class="d">${fmtFecha(m.fecha)}</div></div></div>`).join('')}</div></div>`
+   + `<div class="sec-title">Transparencia de donativos</div><div class="page-sub" style="margin:-6px 0 12px">Esto es lo que ven los participantes en su sección de Donativo, sobre en qué se usan los fondos.</div>`
+   + transparenciaEditor();
+}},
+
+dgrupos:{title:'Grupos',html(){
+  const gs=DB.grupos();
+  const abiertos=gs.filter(g=>g.estatus==='abierto').length;
+  const cupoTot=gs.reduce((a,g)=>a+g.cupo,0), ocup=gs.reduce((a,g)=>a+g.inscritos,0);
+  let h=head('Dirección Académica','Grupos y generaciones','Crea grupos (máximo 12 personas), abre o cierra la inscripción y define el horario de cada uno.')
+   + `<div class="grid g4" style="margin-bottom:20px">
+       <div class="card"><div class="stat-n">${gs.length}</div><div class="stat-l">Grupos</div></div>
+       <div class="card"><div class="stat-n">${abiertos}</div><div class="stat-l">Abiertos</div></div>
+       <div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div>
+       <div class="card"><div class="stat-n">${ocup}/${cupoTot}</div><div class="stat-l">Ocupación total</div></div></div>`;
+  h+= state.showNuevoGrupo ? formNuevoGrupo() : `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.showNuevoGrupo=true;render()">＋ Crear grupo</button>`;
+  h+= gs.map(g=>grupoCard(g)).join('');
+  return h;
+}},
+
+dparticipantes:{title:'Participantes',html(){
+  return head('Dirección Académica','Participantes','Padrón de la generación 2026–2027.')
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Perfil</th><th>Grupo</th><th>Inscripción</th><th>Asist.</th></tr></thead><tbody>`
+   + DB.participantes().map(p=>`<tr><td class="nm">${p.nombre}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario}</td><td>${perfilLabel(p.perfil)}</td><td>${p.grupo||'—'}</td><td>${inscPill(p.insc)}</td><td>${asistenciaPct(p.id)}%</td></tr>`).join('')
+   + `</tbody></table></div>`;
+}},
+
+dcontenido:{title:'Contenido',html(){
+  const mentores=store.mentores.map(x=>x.nombre);
+  return head('Dirección Académica','Contenido del programa','Edita el título, la pregunta formativa y el mentor asignado de cada módulo. Los cambios se reflejan al instante (el mentor personaliza su frase y sus preguntas desde "Mi clase").')
+   + DB.trimestres().map(t=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+       <div><b style="font-size:16px">Trimestre ${t.numero} · ${t.nombre}</b><div style="font-size:12.5px;color:var(--soft)">${t.rango}</div></div>${pill(DB.modulosDeTrimestre(t.id).length+' módulos','pill-info')}</div>`
+       + DB.modulosDeTrimestre(t.id).map(m=>{
+           if(state.editMod!==m.id) return `<div class="row" style="margin-bottom:7px;padding:11px 14px"><div class="rnum" style="width:30px;height:30px;font-size:12px">${m.num}</div><div class="rinfo"><div class="t" style="font-size:13.5px">${m.titulo}</div><div class="d">Mentor: ${m.prof} · ${fmtFecha(m.fecha)}</div></div><button class="btn btn-sm" onclick="state.editMod=${m.id};render()">Editar</button></div>`;
+           return `<div class="card" style="margin-bottom:8px;border-color:var(--accent-line)"><div class="form">
+             <label>Título del módulo ${m.num}</label><input id="cmTit" value="${(m.titulo||'').replace(/"/g,'&quot;')}">
+             <label>Pregunta formativa</label><textarea id="cmPf" style="min-height:58px">${(m.pf||'').replace(/</g,'&lt;')}</textarea>
+             <label>Mentor asignado</label><select id="cmProf">${mentores.map(n=>`<option ${n===m.prof?'selected':''}>${n}</option>`).join('')}</select>
+             <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-accent btn-sm" onclick="guardarModulo(${m.id})">Guardar</button><button class="btn btn-sm" onclick="state.editMod=null;render()">Cancelar</button></div>
+           </div></div>`;
+         }).join('')
+       + `</div>`).join('');
+}},
+
+dmentores:{title:'Mentores',html(){
+  const ms=store.mentores;
+  if(state.editMentor!==null) return head('Dirección Académica','Mentores','Completa la ficha; la foto se muestra en blanco y negro estilo expediente.')+mentorForm();
+  let h=head('Dirección Académica','Mentores','Da de alta, edita, publica o retira mentores. Solo los publicados aparecen en "Mis Mentores" para los participantes.')
+   + `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.editMentor='nuevo';render()">＋ Nuevo mentor</button>`;
+  h+= ms.length? ms.map(m=>`<div class="row" style="padding:11px 13px">
+       <div style="width:44px;height:52px;border-radius:5px;overflow:hidden;flex-shrink:0;background:#0A1426;filter:grayscale(1);border:1px solid rgba(238,239,236,.2);display:flex;align-items:center;justify-content:center">${m.foto?`<img src="${m.foto}" style="width:100%;height:100%;object-fit:cover" alt="">`:`<span style="font-family:'Courier New',monospace;color:rgba(238,239,236,.5);font-size:14px">${initials(m.nombre)}</span>`}</div>
+       <div class="rinfo"><div class="t">${m.nombre}</div><div class="d">${m.materia||'—'}</div></div>
+       <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">${m.publicado?pill('Publicado','pill-ok'):pill('Borrador','pill-wait')}
+         <button class="btn btn-sm" onclick="toggleMentorPub('${m.id}')">${m.publicado?'Despublicar':'Publicar'}</button>
+         <button class="btn btn-sm" onclick="state.editMentor='${m.id}';render()">Editar</button>
+         <button class="btn btn-sm" onclick="eliminarMentor('${m.id}')">Eliminar</button></div></div>`).join('')
+     : `<div class="empty">Aún no hay mentores. Agrega el primero.</div>`;
+  return h;
+}},
+
+drevista:{title:'Revista',html(){
+  const r=store.revista;
+  return head('Dirección Académica','Revista y avisos de inicio','Sube la revista en PDF para que se lea dentro de la Escuela, y administra los artículos que aparecen en el carrusel del inicio.')
+   + `<div class="card" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Revista digital (PDF)</div>
+       <p style="font-size:13px;color:var(--dim);margin-bottom:12px">Edición actual: <b style="color:var(--cream)">${r.edicion}</b>${r.nombre?' · archivo: '+r.nombre:' · sin archivo cargado'}.</p>
+       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+         <label class="btn btn-accent" style="cursor:pointer;margin:0">Subir PDF de la revista<input type="file" accept="application/pdf" style="display:none" onchange="subirRevistaPDF(event)"></label>
+         <input id="revEdicion" value="${r.edicion}" onchange="setRevEdicion(this.value)" placeholder="Ej. Enero 2026 · 2ª edición" style="flex:1;min-width:220px;padding:10px 13px;border-radius:11px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px;outline:none">
+       </div>
+       <p style="font-size:12px;color:var(--soft);margin-top:8px">Formato: PDF tamaño carta. Se muestra en el lector de la sección Revista del participante.</p></div>`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">${state.editArt?'Editar artículo':'Nuevo artículo del carrusel'}</div>`
+   + (()=>{const ed=state.editArt?DB.articulos().find(a=>a.id===state.editArt):null;const q=s=>(s||'').replace(/"/g,'&quot;');return `
+       <div class="form" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+         <div><label>Título del artículo</label><input id="artTit" value="${ed?q(ed.titulo):''}" placeholder="Ej. Economía, trabajo y dignidad"></div>
+         <div><label>Autor</label><input id="artAut" value="${ed?q(ed.autor):''}" placeholder="Ej. Carlos Mendoza"></div>
+         <div style="grid-column:1 / -1"><label>Edición</label><input id="artEd" value="${ed?q(ed.edicion||'1ª edición'):'1ª edición'}" placeholder="Ej. 1ª edición"></div>
+         <div style="grid-column:1 / -1"><label>Imagen del artículo</label>
+           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="btn" style="cursor:pointer;margin:0">Elegir imagen<input id="artImg" type="file" accept="image/png,image/jpeg" style="display:none" onchange="previewArtImg(event)"></label><span id="artImgName" style="font-size:12px;color:var(--soft)">${ed&&ed.img?'Imagen actual — elige otra para cambiarla':'Ninguna seleccionada'}</span></div>
+           <p style="font-size:12px;color:var(--soft);margin-top:6px">Imagen horizontal de <b style="color:var(--cream)">1600 × 600 px</b> (JPG o PNG), con el motivo hacia el centro; la plataforma le sobrepone el título y el autor.</p>
+         </div>
+       </div>
+       <div style="display:flex;gap:8px;margin-top:12px">${state.editArt?`<button class="btn btn-accent btn-sm" onclick="guardarArtEdit()">Guardar cambios</button><button class="btn btn-sm" onclick="state.editArt=null;_artImgURL='';render()">Cancelar</button>`:`<button class="btn btn-accent btn-sm" onclick="crearArticulo()">Agregar artículo</button>`}</div>`;})()
+   + `<div class="sec-title">Artículos actuales</div>`
+   + (DB.articulos().length?DB.articulos().map(a=>`<div class="row" style="padding:10px 12px"><div style="width:76px;height:42px;border-radius:6px;flex-shrink:0;background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div><div class="rinfo"><div class="t" style="font-size:13.5px">${a.titulo}</div><div class="d">Por ${a.autor}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${a.publicado?pill('Publicado','pill-ok'):pill('Borrador','pill-wait')}<button class="btn btn-sm" onclick="toggleArtPub(${a.id})">${a.publicado?'Despublicar':'Publicar'}</button><button class="btn btn-sm" onclick="state.editArt=${a.id};render()">Editar</button><button class="btn btn-sm" onclick="borrarArticulo(${a.id})">Eliminar</button></div></div>`).join('')
+       :`<div class="empty">Aún no hay artículos. Agrega el primero arriba.</div>`)
+   + `</div>`;
+}},
+
+didentidad:{title:'Identidad',html(){
+  const logos=[['assets/logo_edificadores_navi_transp.png','Edificadores NAVI'],['assets/eagle_padded.png','Águila NV'],['assets/logo-nacion-viva.png','Nación Viva'],['assets/logo_wordmark.png','Wordmark'],['assets/logo_h_oficial_nobg.png','Oficial']];
+  return head('Dirección Académica','Identidad de la plataforma','Cambia el logo principal que se muestra en la barra lateral. Sube tu propio archivo o elige uno de la marca.')
+   + `<div class="grid g2">`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">Logo actual</div>
+       <div style="background:var(--navy-deep);border:1px solid var(--line);border-radius:12px;padding:26px;display:flex;align-items:center;justify-content:center;min-height:120px"><img id="logoPreview" src="${store.config.logo}" style="max-height:80px;max-width:100%;object-fit:contain" alt="logo"></div>
+       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+         <label class="btn btn-accent" style="cursor:pointer;margin:0">Subir imagen<input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" onchange="subirLogo(event)"></label>
+         <button class="btn" onclick="restablecerLogo()">Restablecer</button>
+       </div>
+       <p style="font-size:12px;color:var(--soft);margin-top:10px">PNG con fondo transparente se ve mejor sobre el navy.</p>
+     </div>`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">De la marca Nación Viva</div>
+       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`
+   +   logos.map(([src,nom])=>`<div onclick="elegirLogo('${src}')" title="${nom}" style="background:var(--navy-deep);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;align-items:center;justify-content:center;min-height:82px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent-line)'" onmouseout="this.style.borderColor='var(--line)'"><img src="${src}" style="max-height:46px;max-width:100%;object-fit:contain" alt="${nom}" onerror="this.replaceWith(document.createTextNode('${nom}'))"></div>`).join('')
+   +   `</div></div></div>`
+   + `<p style="font-size:12.5px;color:var(--soft);margin-top:14px">El cambio se aplica de inmediato en la barra lateral. Al conectar la plataforma, el logo quedará guardado en la configuración del sistema (permiso CONFIG_SISTEMA).</p>`;
+}},
+
+davisos:{title:'Avisos',html(){
+  const ed=state.editAviso?store.avisos.find(a=>a.id===state.editAviso):null; const q=s=>(s||'').replace(/"/g,'&quot;'); const tt=s=>(s||'').replace(/</g,'&lt;');
+  return head('Dirección Académica','Avisos y comunicados','Crea, edita, publica o retira comunicados. En su inicio, los participantes solo ven los publicados.')
+   + `<div class="card glass" style="margin-bottom:18px"><div class="sec-title" style="margin-top:0">${ed?'Editar aviso':'Nuevo aviso'}</div><div class="form">
+       <input id="avTit" value="${ed?q(ed.titulo):''}" placeholder="Título del aviso">
+       <textarea id="avCuerpo" placeholder="Mensaje para la generación…" style="min-height:70px;margin-top:10px">${ed?tt(ed.cuerpo):''}</textarea>
+       <div style="display:flex;gap:8px;margin-top:12px">${ed?`<button class="btn btn-accent btn-sm" onclick="guardarAvisoEdit()">Guardar cambios</button><button class="btn btn-sm" onclick="state.editAviso=null;render()">Cancelar</button>`:`<button class="btn btn-accent btn-sm" onclick="publicarAviso()">Publicar aviso</button>`}</div></div></div>`
+   + (store.avisos.length?store.avisos.map(a=>`<div class="row" style="align-items:flex-start;padding:13px 15px"><div class="rinfo"><div class="t">${a.titulo} ${a.publicado?pill('Publicado','pill-ok'):pill('Borrador','pill-wait')}</div><div class="d" style="margin-top:5px;color:var(--dim);font-size:13px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start"><button class="btn btn-sm" onclick="toggleAvisoPub(${a.id})">${a.publicado?'Despublicar':'Publicar'}</button><button class="btn btn-sm" onclick="state.editAviso=${a.id};render()">Editar</button><button class="btn btn-sm" onclick="eliminarAviso(${a.id})">Eliminar</button></div></div>`).join('')
+     :`<div class="empty">Aún no hay avisos.</div>`);
+}},
+
+/* ---------- INSCRIPCIONES ---------- */
+ialta:{title:'Alta de participante',html(){
+  return head('Coordinación de Inscripciones','Alta de participante','Registra un nuevo participante; el sistema genera su usuario y clave de acceso.')
+   + `<div class="grid g2"><div class="card glass"><div class="form">
+       <label>Nombre completo</label><input id="alNombre" placeholder="Ej. Ana Beltrán Ruiz">
+       <label>Correo electrónico</label><input id="alEmail" type="email" placeholder="ana@correo.com">
+       <label>Perfil</label><select id="alPerfil"><option value="servidor_publico">Servidor público</option><option value="maestro">Maestro</option><option value="empresario">Empresario</option><option value="otro">Otro</option></select>
+       <label>Grupo</label><select id="alGrupo">${DB.gruposConCupo().map(g=>`<option value="${g.nombre}">${g.nombre} · ${g.dia} ${fmtHora(g.hora)} (${g.inscritos}/${g.cupo})</option>`).join('')||'<option value="">Sin grupos con cupo — abre uno en Grupos</option>'}</select>
+       <button class="btn btn-solid btn-lg" style="margin-top:18px" onclick="darAlta()">Generar acceso e inscribir</button>
+     </div></div>
+     <div class="card" id="altaResult"><div class="empty">Al dar de alta, aquí aparecerá el usuario y la clave generados para entregar al participante.</div></div></div>`;
+}},
+
+iinscripciones:{title:'Inscripciones',html(){
+  return head('Coordinación de Inscripciones','Inscripciones','Confirma o activa las inscripciones de la generación.')
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Perfil</th><th>Estatus</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
+   + DB.participantes().map(p=>`<tr><td class="nm">${p.nombre}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario}</td><td>${perfilLabel(p.perfil)}</td><td>${inscPill(p.insc)}</td>
+       <td style="text-align:right">${p.insc==='activo'?'<span style="color:var(--soft);font-size:12px">—</span>':`<button class="btn btn-sm btn-accent" onclick="confirmarInsc('${p.id}')">${p.insc==='preinscrito'?'Confirmar':'Activar acceso'}</button>`}</td></tr>`).join('')
+   + `</tbody></table></div>`;
+}},
+
+idonativos:{title:'Donativos',html(){
+  const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
+  return head('Coordinación de Inscripciones','Donativos','Registro y conciliación de donativos voluntarios (no condicionan el acceso).')
+   + `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line)"><div style="font-size:13px;color:var(--dim)">Los montos individuales son <b style="color:var(--cream)">confidenciales</b> y se usan solo para conciliación interna. La transparencia hacia los participantes es sobre el <b style="color:var(--cream)">uso de los fondos</b> (en qué se gastan), no sobre cuánto dona cada persona.</div></div>`
+   + `<div class="grid g3" style="margin-bottom:20px"><div class="card"><div class="stat-n">${tot.toLocaleString('es-MX')}</div><div class="stat-l">Total recibido (MXN)</div></div>
+       <div class="card"><div class="stat-n">${DB.donativos().length}</div><div class="stat-l">Donativos registrados</div></div>
+       <div class="card"><div class="stat-n">${DB.donativos().filter(d=>d.estatus==='confirmado').length}</div><div class="stat-l">Confirmados</div></div></div>`
+   + `<button class="btn btn-accent btn-sm" style="margin-bottom:14px" onclick="toast('Aquí se registra un donativo (demo).')">＋ Registrar donativo</button>`
+   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Participante</th><th>Monto</th><th>Fecha</th><th>Método</th><th>Estatus</th></tr></thead><tbody>`
+   + DB.donativos().map(d=>`<tr><td class="nm">${d.usuario}</td><td>$${d.monto.toLocaleString('es-MX')}</td><td>${d.fecha}</td><td>${d.metodo}</td><td>${d.estatus==='confirmado'?pill('Confirmado','pill-ok'):pill('Registrado','pill-wait')}</td></tr>`).join('')
+   + `</tbody></table></div>`;
+}}
+
+};
+</script>
+<script>
+/* ============================================================
+   HELPERS DE VISTA + ACCIONES (mutan el store y re-renderizan)
+   ============================================================ */
+function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
+function heroProxima(mod){
+  const m=mod||DB.proximaSesion();
+  return `<div class="hero glass"><div>
+     <div class="lbl">📹 Tu clase de esta quincena</div>
+     <div class="tt">Módulo ${m.num} · ${m.titulo}</div>
+     <div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}${m.reunion?' · incluye la reunión mensual (Meet)':''}</div>
+     ${m.reunion?`<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Cuenta regresiva a la reunión en vivo (hora simulada).</div>`:''}
+   </div><button class="btn btn-accent" onclick="goModule(${m.id})">Ver la clase</button></div>`;
+}
+function ventanaBanner(m){
+  return `<div class="hero glass" style="margin-bottom:14px"><div>
+     <div class="lbl">📹 Clase pregrabada</div>
+     <div class="tt" style="font-size:16px;margin-top:5px">Disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)} de ${m.ventanaFin.getFullYear()}</div>
+     <div class="dt">Tienes toda la quincena para ver el video y responder las preguntas a tu ritmo.</div>
+   </div><span class="pill pill-info">Video</span></div>`;
+}
+function videoBlock(m){
+  return `<div class="video-box" onclick="toast('Aquí se reproduce el video de la clase (demo).')"><div class="play">▶</div><div class="vlabel">Ver la clase · Módulo ${m.num}</div></div>`
+   + `<button class="btn btn-sm" onclick="toggleTrans()">Ver transcripción</button>`
+   + `<div id="trans" class="transbox hidden">${m.transcripcion.split('\n\n').map(p=>'<p>'+p+'</p>').join('')}</div>`;
+}
+function reunionBlock(m){
+  return `<div class="reunion-card"><div class="reunion-h">🗓️ Reunión del mes · Google Meet</div>
+     <p>En vivo comentamos los dos temas del mes (este módulo y el anterior). Jueves ${fmtFecha(m.reunionFecha)} · 7:00 pm (CDMX).</p>
+     <button class="btn btn-accent btn-sm" onclick="toast('Aquí se abre la liga de Google Meet de la reunión mensual.')">Ir a la reunión (Google Meet)</button></div>`;
+}
+function qaBlock(m,resp,enviado){
+  const qs=m.preguntas.map((q,i)=>`<div class="qa"><label>${i+1}. ${q}</label><textarea id="qa${i}" ${enviado?'disabled':''} placeholder="Escribe tu respuesta…">${(resp[i]||'').replace(/</g,'&lt;')}</textarea></div>`).join('');
+  const acc=enviado
+    ? `<span class="pill pill-ok">Entregado</span><button class="btn btn-sm" onclick="editarRespuestas(${m.id})">Editar</button>`
+    : `<button class="btn" onclick="guardarRespuestas(${m.id},false)">Guardar borrador</button><button class="btn btn-accent" onclick="guardarRespuestas(${m.id},true)">Enviar respuestas</button>`;
+  return `<div class="card">${qs}<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${acc}</div>
+     <p style="font-size:12px;color:var(--soft);margin-top:10px">Al enviar, tus respuestas cuentan como la entrega del módulo y el equipo las revisa.</p></div>`;
+}
+function moduloRow(m){
+  return `<div class="row click" onclick="goModule(${m.id})"><div class="rnum">${m.num}</div>
+    <div class="rinfo"><div class="t">${m.titulo}</div><div class="d">📹 Video · ${fmtDM(m.ventanaIni)}–${fmtDM(m.ventanaFin)}${m.reunion?' · 🗓️ reunión Meet':''}</div></div>
+    ${m.reunion?pill('Video + reunión','pill-ok'):pill('Video','pill-info')}</div>`;
+}
+function postHTML(p){return `<div class="post"><div class="avatar" style="background:${p.color}">${p.ini}</div><div><div class="who">${p.autor} <span class="when">${p.cuando}</span></div><div class="txt">${p.texto}</div><span class="thread-tag">Módulo ${p.mod} · ${DB.modulo(p.mod).titulo}</span></div></div>`;}
+function avisoHTML(a){return `<div class="row" style="align-items:flex-start"><div class="rinfo"><div class="t">${a.titulo} ${pill(a.alcance,'pill-info')}</div><div class="d" style="margin-top:5px;color:var(--dim);font-size:13px">${a.cuerpo}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div></div>`;}
+function calendarioHTML(){
+  let h=head('Generación 2026–2027','Calendario de sesiones','Ritmo quincenal · jueves 7 pm (CDMX) por Google Meet.');
+  DB.trimestres().forEach(t=>{
+    h+=`<div class="sec-title">Trimestre ${t.numero} · ${t.nombre}</div>`;
+    h+=DB.modulosDeTrimestre(t.id).map(m=>`<div class="row" style="padding:11px 15px"><div style="width:74px;text-align:center;flex-shrink:0"><div style="font-size:17px;font-weight:800;color:var(--accent)">${m.ventanaIni.getDate()}</div><div style="font-size:11px;color:var(--soft)">${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][m.ventanaIni.getMonth()]}</div></div><div class="rinfo"><div class="t">M${m.num} · ${m.titulo}</div><div class="d">📹 Video ${fmtDM(m.ventanaIni)}–${fmtDM(m.ventanaFin)}${m.reunion?' · 🗓️ Reunión mensual (Meet)':''}</div></div><div class="ractions"><button class="btn btn-sm btn-accent" onclick="goModule(${m.id})">Ver clase</button></div></div>`).join('');
+  });
+  return h;
+}
+function perfilLabel(p){return {servidor_publico:'Servidor público',maestro:'Maestro',empresario:'Empresario',otro:'Staff'}[p]||p;}
+function inscPill(s){return s==='activo'?pill('Activo','pill-ok'):s==='confirmado'?pill('Confirmado','pill-info'):s==='preinscrito'?pill('Preinscrito','pill-wait'):'—';}
+function perfilResumen(){
+  const parts=DB.participantes();const g={};parts.forEach(p=>g[p.perfil]=(g[p.perfil]||0)+1);
+  return Object.entries(g).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span style="color:var(--dim)">${perfilLabel(k)}</span><b style="color:var(--accent)">${v}</b></div>`).join('');
+}
+function misModulos(){return store.modulos.filter(m=>m.prof===state.user.nombre);}
+function tipoLabel(t){return {biblico:'Bíblico',cristiano:'Cristiana/clásica',complementario:'Complementaria',herramienta:'Herramienta',caso:'Caso mexicano'}[t]||t;}
+function borrarMaterial(id){store.materiales=store.materiales.filter(m=>m.id!==id);render();toast('Material eliminado');}
+function guardarModulo(id){const m=DB.modulo(id);if(!m)return;
+  const t=(document.getElementById('cmTit')||{}).value; if(t&&t.trim())m.titulo=t.trim();
+  const pf=(document.getElementById('cmPf')||{}).value; if(pf!==undefined&&pf.trim())m.pf=pf.trim();
+  const pr=(document.getElementById('cmProf')||{}).value; if(pr)m.prof=pr;
+  state.editMod=null; render(); toast('Módulo actualizado');}
+/* transparencia de donativos (director) */
+function transparenciaEditor(){
+  const tr=store.transparencia; const q=s=>(s||'').replace(/"/g,'&quot;');
+  const suma=tr.items.reduce((a,x)=>a+(+x.pct||0),0);
+  return `<div class="card"><div class="form">
+    <label>Periodo</label><input id="trPeriodo" value="${q(tr.periodo)}">
+    <div class="sec-title" style="margin-top:14px">Categorías (deben sumar 100%)</div>
+    ${tr.items.map((x,i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input id="trCat${i}" value="${q(x.cat)}" style="flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13px;outline:none"><input id="trPct${i}" type="number" value="${x.pct}" min="0" max="100" style="width:82px;padding:9px 12px;border-radius:10px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13px;outline:none"><span style="color:var(--soft)">%</span><button class="btn btn-sm" onclick="quitarTransp(${i})">✕</button></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center"><button class="btn btn-sm" onclick="agregarTransp()">＋ Categoría</button><button class="btn btn-accent btn-sm" onclick="guardarTransparencia()">Guardar transparencia</button><span style="font-size:12.5px;color:${suma===100?'var(--lime)':'var(--coral)'};align-self:center">Suma actual: ${suma}%</span></div>
+  </div></div>`;
+}
+function agregarTransp(){store.transparencia.items.push({cat:'Nueva categoría',pct:0});render();}
+function quitarTransp(i){store.transparencia.items.splice(i,1);render();}
+function guardarTransparencia(){const tr=store.transparencia;
+  const pe=document.getElementById('trPeriodo'); if(pe)tr.periodo=pe.value;
+  tr.items=tr.items.map((x,i)=>({cat:((document.getElementById('trCat'+i)||{}).value||x.cat),pct:parseInt((document.getElementById('trPct'+i)||{}).value)||0}));
+  const suma=tr.items.reduce((a,x)=>a+x.pct,0);
+  render(); toast(suma===100?'Transparencia guardada':'Guardado · la suma es '+suma+'%, ajústala a 100%');}
+function subirMaterial(mod){
+  const t=(document.getElementById('matTit').value||'').trim();
+  const r=(document.getElementById('matRef').value||'').trim();
+  const tipo=document.getElementById('matTipo').value;
+  if(!t)return toast('Escribe el título del material');
+  const icon={biblico:'📖',cristiano:'🏛️',complementario:'✒️',herramienta:'⚖️',caso:'🇲🇽'}[tipo]||'📄';
+  const id=Math.max(0,...store.materiales.map(m=>m.id))+1;
+  store.materiales.push({id,mod,tipo,icon,titulo:t,ref:r});
+  render(); toast('Material agregado y clasificado');
+}
+function avanceModulos(uid){let n=0;store.modulos.filter(m=>m.tri===1).forEach(m=>{const e=DB.entregasModulo(m.id)[uid];if(e&&e.estatus&&e.estatus!=='pendiente')n++;});return n;}
+function asistenciaPct(uid){let tot=0,pres=0;Object.values(store.asistencias).forEach(s=>{if(s[uid]){tot++;if(s[uid]==='presente')pres++;}});return tot?Math.round(pres/tot*100):100;}
+function entregasCount(uid){let n=0;store.modulos.filter(m=>m.tri===1).forEach(m=>{const e=DB.entregasModulo(m.id)[uid];if(e&&e.estatus&&e.estatus!=='pendiente')n++;});return n;}
+
+/* acciones */
+function toggleLectura(mid){const s=store.progreso[state.user.id]||(store.progreso[state.user.id]=new Set());s.has(mid)?s.delete(mid):s.add(mid);toast('Progreso de lectura actualizado');}
+function entregarTrabajo(mod){(store.entregas[mod]||(store.entregas[mod]={}))[state.user.id]={estatus:'entregado'};toast('Trabajo entregado · Módulo '+DB.modulo(mod).num);}
+function toggleTrans(){const t=document.getElementById('trans');if(t)t.classList.toggle('hidden');}
+function guardarRespuestas(mod,enviar){
+  const m=DB.modulo(mod);
+  const arr=m.preguntas.map((q,i)=>{const el=document.getElementById('qa'+i);return el?el.value:'';});
+  const prev=(store.entregas[mod]&&store.entregas[mod][state.user.id])||{};
+  const e=store.entregas[mod]||(store.entregas[mod]={});
+  e[state.user.id]={estatus:enviar?'entregado':'pendiente',respuestas:arr,retro:prev.retro};
+  if(enviar){ // la asistencia se registra automáticamente al enviar las respuestas
+    (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente';
+    toast('Respuestas enviadas · asistencia registrada');
+  } else toast('Borrador guardado');
+  if(enviar)render();
+}
+function editarRespuestas(mod){const e=store.entregas[mod]&&store.entregas[mod][state.user.id];if(e)e.estatus='pendiente';render();}
+/* profesor: retroalimentación cualitativa (sin números) */
+function guardarRetro(mod,uid){
+  const el=document.getElementById('retro-'+uid); if(!el)return;
+  const txt=(el.value||'').trim(); const e=store.entregas[mod][uid];
+  e.retro=txt; if(txt) e.estatus='retroalimentado';
+  render(); toast('Retroalimentación guardada');
+}
+/* profesor: editar las preguntas de un módulo cuando quiera */
+function captureClase(mod){const m=DB.modulo(mod);
+  const fr=document.getElementById('pqFrase'); if(fr)m.frase=fr.value;
+  const pf=document.getElementById('pqPF'); if(pf&&pf.value.trim())m.pf=pf.value.trim();
+  m.preguntas=m.preguntas.map((q,i)=>{const el=document.getElementById('pq'+i);return el?el.value:q;});}
+function addPreguntaEdit(mod){captureClase(mod);DB.modulo(mod).preguntas.push('');render();}
+function removePregunta(mod,i){captureClase(mod);DB.modulo(mod).preguntas.splice(i,1);render();}
+function guardarPreguntas(mod){captureClase(mod);const m=DB.modulo(mod);
+  m.preguntas=m.preguntas.map(q=>(q||'').trim()).filter(x=>x);
+  if(!m.preguntas.length)m.preguntas=['(Escribe una pregunta)'];
+  render(); toast('Clase actualizada');}
+/* carrusel de artículos (revista Nación Viva) */
+let carIdx=0, carInt=null;
+function articulosCarousel(){
+  const arts=DB.articulos().filter(a=>a.publicado);
+  if(!arts.length) return '';
+  return `<div class="carousel" id="carousel">`
+   + arts.map((a,i)=>`<div class="slide${i===0?' on':''}${a.img?' has-img':''}" onclick="nav('revista')"><div class="slide-bg" style="background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div>${a.img?`<div class="slide-read-only">Leer la revista →</div>`:`<div class="slide-txt"><span class="slide-tag">La Antorcha${a.edicion?' · '+a.edicion:''}</span><div class="slide-tit">${a.titulo}</div><div class="slide-aut">Por ${a.autor}</div><div class="slide-read">Leer la revista →</div></div>`}</div>`).join('')
+   + `<div class="dots">`+arts.map((a,i)=>`<button class="dot${i===0?' on':''}" onclick="goSlide(${i})" aria-label="Artículo ${i+1}"></button>`).join('')+`</div></div>`;
+}
+function goSlide(i){const c=document.getElementById('carousel');if(!c)return;const s=c.querySelectorAll('.slide'),d=c.querySelectorAll('.dot');if(!s.length)return;carIdx=(i+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('on',j===carIdx));d.forEach((x,j)=>x.classList.toggle('on',j===carIdx));}
+function startCarousel(){carIdx=0;if(carInt)clearInterval(carInt);carInt=setInterval(()=>{const c=document.getElementById('carousel');if(!c){clearInterval(carInt);carInt=null;return;}goSlide(carIdx+1);},5000);}
+function feedbackBlock(ent){
+  if(!ent||!ent.retro)return '';
+  return `<div class="reunion-card" style="margin-top:16px"><div class="reunion-h">✍ Retroalimentación de tu profesor</div><p style="margin:0;color:var(--cream)">${ent.retro.replace(/</g,'&lt;')}</p></div>`;
+}
+const EMOJIS=['😀','😄','😊','😉','😅','🤔','👍','🙏','❤️','🎉','🔥','✨','✝️','📖','💪','😎'];
+function colorFor(name){const cs=['var(--lime)','var(--coral)','var(--blue)','#B49CE0','#7FE090','#E9A23B'];let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))>>>0;return cs[h%cs.length];}
+function pmSample(name){const pms=['estudiando Romanos 13 📖','☕ y lecturas','pensando en la clase del jueves','avanzando con el módulo','listo para la reunión','trabajando por México 🇲🇽','con fe y prudencia'];let h=0;for(const c of name)h=(h*17+c.charCodeAt(0))>>>0;return pms[h%pms.length];}
+function bubbleHTML(p){
+  if(p.sys)return `<div class="bub sys"><div class="body">${(p.texto||'').replace(/</g,'&lt;')}</div></div>`;
+  const me=p.autor===state.user.nombre; const ini=p.ini||initials(p.autor);
+  return `<div class="bub ${me?'me':''}"><div class="avatar" style="background:${me?'var(--accent)':(p.color||colorFor(p.autor))}">${ini}</div><div class="body"><div class="who">${me?'Tú':p.autor}<span class="tm">${p.cuando}</span></div><div class="tx">${(p.texto||'').replace(/</g,'&lt;')}</div></div></div>`;
+}
+function insEmoji(e){const ta=document.getElementById('postText');if(!ta)return;ta.value+=e;ta.focus();}
+function publicar(){const ta=document.getElementById('postText');const t=(ta.value||'').trim();if(!t)return ta&&ta.focus();store.foro.push({id:Date.now(),mod:1,autor:state.user.nombre,ini:initials(state.user.nombre),cuando:'ahora',texto:t});render();}
+function zumbido(){
+  store.foro.push({id:Date.now(),sys:true,texto:'⚡ '+state.user.nombre.split(' ')[0]+' mandó un zumbido a la generación'});
+  render();
+  const f=document.getElementById('feed');
+  if(f){f.scrollTop=f.scrollHeight;f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');}
+  toast('¡Zumbido enviado! 📳');
+}
+function setAsis(mod,uid,st){const s=store.asistencias[mod]||(store.asistencias[mod]={});s[uid]=st;render();}
+function calificar(mod,uid){
+  const p=DB.participantes().find(x=>x.id===uid); const e=store.entregas[mod][uid];
+  let preview='';
+  if(e&&e.respuestas&&e.respuestas.length){const m=DB.modulo(mod);preview='Respuestas de '+p.nombre+':\n\n'+m.preguntas.map((q,i)=>(i+1)+'. '+q+'\n→ '+((e.respuestas[i]||'').trim()||'(sin respuesta)')).join('\n\n')+'\n\n———\n';}
+  const cal=prompt(preview+'Calificación (0-10) para '+p.nombre+':', e&&e.calif?String(e.calif):'9.0');
+  if(cal===null)return; e.calif=parseFloat(cal)||0; e.estatus='calificado'; render(); toast('Entrega calificada');}
+function publicarAviso(){const t=(document.getElementById('avTit').value||'').trim();const c=(document.getElementById('avCuerpo').value||'').trim();if(!t)return toast('Escribe un título');store.avisos.unshift({id:Date.now(),titulo:t,cuerpo:c,autor:state.user.nombre,cuando:'ahora',alcance:'generación',publicado:true});render();toast('Aviso publicado');}
+function guardarAvisoEdit(){const a=store.avisos.find(x=>x.id===state.editAviso);if(!a)return;const t=(document.getElementById('avTit').value||'').trim();const c=(document.getElementById('avCuerpo').value||'').trim();if(t)a.titulo=t;a.cuerpo=c;state.editAviso=null;render();toast('Aviso actualizado');}
+function toggleAvisoPub(id){const a=store.avisos.find(x=>x.id===id);if(a){a.publicado=!a.publicado;render();toast(a.publicado?'Aviso publicado':'Aviso despublicado');}}
+function eliminarAviso(id){store.avisos=store.avisos.filter(x=>x.id!==id);render();toast('Aviso eliminado');}
+function avisosInicio(){
+  const av=store.avisos.filter(a=>a.publicado).slice(0,2);
+  if(!av.length) return '';
+  return `<div class="sec-title" style="margin-top:0">Avisos</div>`
+   + av.map(a=>`<div class="row" style="align-items:flex-start;padding:13px 15px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0"></div><div class="rinfo"><div class="t" style="font-size:14px">${a.titulo}</div><div class="d" style="color:var(--dim);font-size:13px;margin-top:3px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:5px">${a.autor} · ${a.cuando}</div></div></div>`).join('');
+}
+function darAlta(){
+  const n=(document.getElementById('alNombre').value||'').trim();
+  const em=(document.getElementById('alEmail').value||'').trim();
+  const pf=document.getElementById('alPerfil').value;
+  const grupoSel=document.getElementById('alGrupo'); const grupo=grupoSel?grupoSel.value:'';
+  if(!n)return toast('Escribe el nombre');
+  const parts=n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').split(/\s+/);
+  const user=(parts[0]+'.'+(parts[1]||'navi')).replace(/[^a-z.]/g,'');
+  const clave=Math.random().toString(36).slice(2,6)+Math.floor(1000+Math.random()*9000);
+  const id='u'+(store.usuarios.length+1);
+  store.usuarios.push({id,nombre:n,usuario:user,rol:'participante',perfil:pf,estatus:'activo',insc:'preinscrito',email:em,grupo});
+  if(grupo){const g=store.grupos.find(x=>x.nombre===grupo); if(g&&g.inscritos<g.cupo)g.inscritos++;}
+  document.getElementById('altaResult').innerHTML=`<div class="sec-title" style="margin-top:0">Acceso generado</div>
+    <p style="font-size:13.5px;color:var(--dim);margin-bottom:10px">Entrega estos datos a <b style="color:var(--cream)">${n}</b>${grupo?', asignado al <b style="color:var(--cream)">'+grupo+'</b>':''}. La inscripción queda como <b>preinscrita</b> hasta confirmarla.</p>
+    <label style="font-size:12px;color:var(--soft)">Usuario</label><div class="cred">${user}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+    <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+    <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
+  toast('Participante dado de alta');
+}
+function confirmarInsc(uid){const u=store.usuarios.find(x=>x.id===uid);u.insc=(u.insc==='preinscrito')?'confirmado':'activo';render();toast('Inscripción actualizada: '+u.insc);}
+/* grupos */
+const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function fmtHora(h){let[H,M]=(h||'19:00').split(':').map(Number);const ap=H>=12?'pm':'am';H=H%12||12;return H+':'+String(M).padStart(2,'0')+' '+ap;}
+function fmtFechaCorta(iso){const p=(iso||'').split('-').map(Number);if(p.length<3)return iso;const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return p[2]+' '+mes[p[1]-1]+' '+p[0];}
+function formNuevoGrupo(){
+  const ciclos=[...new Set(DB.grupos().map(g=>g.ciclo))];
+  return `<div class="card glass" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Nuevo grupo</div>
+    <div class="form" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+      <div><label>Nombre del grupo</label><input id="ngNombre" placeholder="Ej. Grupo C"></div>
+      <div><label>Generación (ciclo)</label><input id="ngCiclo" list="ciclosList" placeholder="Ej. 2026–2027"><datalist id="ciclosList">${ciclos.map(c=>`<option value="${c}">`).join('')}</datalist></div>
+      <div><label>Día de sesión</label><select id="ngDia">${DIAS.map(d=>`<option ${d==='Jueves'?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div><label>Hora</label><input id="ngHora" type="time" value="19:00"></div>
+      <div><label>Fecha de inicio</label><input id="ngInicio" type="date" value="2026-09-17"></div>
+      <div><label>Cupo máximo (máx. 12)</label><input id="ngCupo" type="number" value="12" min="1" max="12"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-accent" onclick="crearGrupo()">Crear grupo</button><button class="btn" onclick="state.showNuevoGrupo=false;render()">Cancelar</button></div>
+    <p style="font-size:12px;color:var(--soft);margin-top:8px">El máximo por grupo es 12 personas. Escribe un ciclo nuevo en Generación para abrir otra generación.</p></div>`;
+}
+function grupoCard(g){
+  const pct=Math.min(100,Math.round(g.inscritos/g.cupo*100));const lleno=g.inscritos>=g.cupo;const editing=state.editGrupo===g.id;
+  let c=`<div class="card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div><b style="font-size:16px">${g.nombre}</b> <span style="color:var(--soft);font-size:12.5px">· ${g.ciclo}</span>
+        <div style="font-size:12.5px;color:var(--dim);margin-top:3px">${g.dia} ${fmtHora(g.hora)} · inicia ${fmtFechaCorta(g.inicio)} · quincenal</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${g.estatus==='abierto'?pill('Abierto','pill-ok'):pill('Cerrado','pill-wait')}
+        <button class="btn btn-sm" onclick="toggleGrupo(${g.id})">${g.estatus==='abierto'?'Cerrar':'Abrir'}</button>
+        <button class="btn btn-sm" onclick="state.editGrupo=${editing?'null':g.id};render()">${editing?'Cerrar':'Editar horario'}</button></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+      <div style="flex:1"><div class="progress-track"><div class="progress-fill" style="width:${pct}%${lleno?';background:var(--coral)':''}"></div></div></div>
+      <div style="font-size:12.5px;color:var(--dim);white-space:nowrap">${g.inscritos}/${g.cupo}${lleno?' · lleno':''}</div>
+    </div>`;
+  if(editing){
+    c+=`<div class="form" style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px;border-top:1px solid var(--line);padding-top:12px">
+      <div><label>Día</label><select id="egDia">${DIAS.map(d=>`<option ${d===g.dia?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div><label>Hora</label><input id="egHora" type="time" value="${g.hora}"></div>
+      <div><label>Fecha de inicio</label><input id="egInicio" type="date" value="${g.inicio}"></div>
+    </div><button class="btn btn-accent btn-sm" style="margin-top:12px" onclick="guardarHorario(${g.id})">Guardar horario</button>`;
+  }
+  return c+`</div>`;
+}
+function crearGrupo(){
+  const n=(document.getElementById('ngNombre').value||'').trim();
+  const ciclo=(document.getElementById('ngCiclo').value||'').trim()||'2026–2027';
+  const dia=document.getElementById('ngDia').value, hora=document.getElementById('ngHora').value||'19:00', inicio=document.getElementById('ngInicio').value||'2026-09-17';
+  let cupo=parseInt(document.getElementById('ngCupo').value)||12; cupo=Math.max(1,Math.min(12,cupo));
+  if(!n)return toast('Escribe el nombre del grupo');
+  const id=Math.max(0,...store.grupos.map(g=>g.id))+1;
+  store.grupos.push({id,nombre:n,ciclo,cupo,inscritos:0,estatus:'abierto',dia,hora,inicio});
+  state.showNuevoGrupo=false; render(); toast('Grupo creado: '+n);
+}
+function toggleGrupo(id){const g=store.grupos.find(x=>x.id===id);g.estatus=g.estatus==='abierto'?'cerrado':'abierto';render();toast(g.nombre+': '+g.estatus);}
+function guardarHorario(id){const g=store.grupos.find(x=>x.id===id);g.dia=document.getElementById('egDia').value;g.hora=document.getElementById('egHora').value;g.inicio=document.getElementById('egInicio').value;state.editGrupo=null;render();toast('Horario actualizado');}
+/* mentores (CRUD director) */
+let _mentorFotoURL=null;
+function mentorForm(){
+  const nuevo=state.editMentor==='nuevo';
+  const m=nuevo?{id:'',nombre:'',materia:'',expediente:'',ingreso:'2026',formacion:'',experiencia:'',frase:'',bio:'',foto:'',publicado:false}:(store.mentores.find(x=>x.id===state.editMentor)||{});
+  const q=s=>(s||'').replace(/"/g,'&quot;'); const t=s=>(s||'').replace(/</g,'&lt;');
+  const fotoInner=m.foto?`<img src="${m.foto}" style="width:100%;height:100%;object-fit:cover" alt="">`:`<span style="font-family:'Courier New',monospace;color:rgba(238,239,236,.5);font-size:44px">${initials(m.nombre||'NV')}</span>`;
+  return `<div class="card glass"><div class="sec-title" style="margin-top:0">${nuevo?'Nuevo mentor':'Editar mentor'}</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="width:150px;flex-shrink:0">
+        <div id="meFotoPrev" style="width:150px;height:186px;border-radius:8px;overflow:hidden;background:#0A1426;filter:grayscale(1);border:1px solid rgba(238,239,236,.25);display:flex;align-items:center;justify-content:center">${fotoInner}</div>
+        <label class="btn btn-sm" style="cursor:pointer;margin-top:10px;width:100%">Subir foto<input type="file" accept="image/png,image/jpeg" style="display:none" onchange="subirMentorFoto(event)"></label>
+        <p style="font-size:11.5px;color:var(--soft);margin-top:6px">Retrato vertical ~800×1000 px. Se muestra en blanco y negro.</p>
+      </div>
+      <div class="form" style="flex:1;min-width:260px;display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+        <div style="grid-column:1/-1"><label>Nombre</label><input id="meNombre" value="${q(m.nombre)}"></div>
+        <div><label>Área / materia</label><input id="meMateria" value="${q(m.materia)}" placeholder="Ej. Economía · Trimestre 3"></div>
+        <div><label>Expediente</label><input id="meExp" value="${q(m.expediente)}" placeholder="NV-Mx-2026"></div>
+        <div><label>Formación</label><input id="meForm" value="${q(m.formacion)}"></div>
+        <div><label>Ingreso</label><input id="meIng" value="${q(m.ingreso)}" placeholder="2026"></div>
+        <div style="grid-column:1/-1"><label>Experiencia</label><input id="meExpr" value="${q(m.experiencia)}"></div>
+        <div style="grid-column:1/-1"><label>Frase (declaración en archivo)</label><input id="meFrase" value="${q(m.frase)}"></div>
+        <div style="grid-column:1/-1"><label>Biografía / notas</label><textarea id="meBio" style="min-height:70px">${t(m.bio)}</textarea></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-accent" onclick="guardarMentor(false)">Guardar como borrador</button>
+      <button class="btn btn-solid" onclick="guardarMentor(true)">Guardar y publicar</button>
+      <button class="btn" onclick="state.editMentor=null;_mentorFotoURL=null;render()">Cancelar</button>
+    </div></div>`;
+}
+function subirMentorFoto(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;_mentorFotoURL=URL.createObjectURL(f);const p=document.getElementById('meFotoPrev');if(p)p.innerHTML=`<img src="${_mentorFotoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;}
+function guardarMentor(publicar){
+  const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  const nombre=g('meNombre'); if(!nombre)return toast('Escribe el nombre del mentor');
+  const data={nombre,materia:g('meMateria'),expediente:g('meExp')||('NV-'+String(Date.now()).slice(-4)),ingreso:g('meIng')||'2026',formacion:g('meForm'),experiencia:g('meExpr'),frase:g('meFrase'),bio:(document.getElementById('meBio')||{value:''}).value};
+  if(state.editMentor==='nuevo'){
+    const nums=store.mentores.map(x=>parseInt(String(x.id).replace(/\D/g,''))||0);
+    const id='m'+((nums.length?Math.max(...nums):0)+1);
+    store.mentores.push(Object.assign({id,foto:_mentorFotoURL||'',publicado:!!publicar},data));
+  } else {
+    const m=store.mentores.find(x=>x.id===state.editMentor); if(m){Object.assign(m,data); if(_mentorFotoURL)m.foto=_mentorFotoURL; if(publicar)m.publicado=true;}
+  }
+  _mentorFotoURL=null; state.editMentor=null; render(); toast(publicar?'Mentor guardado y publicado':'Mentor guardado');
+}
+function eliminarMentor(id){store.mentores=store.mentores.filter(x=>x.id!==id);render();toast('Mentor eliminado');}
+function toggleMentorPub(id){const m=store.mentores.find(x=>x.id===id);if(m){m.publicado=!m.publicado;render();toast(m.publicado?'Mentor publicado':'Mentor despublicado');}}
+/* revista */
+function setRevEdicion(v){store.revista.edicion=v;}
+function subirRevistaPDF(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;try{if(store.revista.pdf&&store.revista.pdf.startsWith('blob:'))URL.revokeObjectURL(store.revista.pdf);}catch(e){}store.revista.pdf=URL.createObjectURL(f);store.revista.nombre=f.name;render();toast('Revista PDF cargada');}
+let _artImgURL='';
+function previewArtImg(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;_artImgURL=URL.createObjectURL(f);const el=document.getElementById('artImgName');if(el)el.textContent=f.name;}
+function crearArticulo(){
+  const t=(document.getElementById('artTit').value||'').trim();
+  const a=(document.getElementById('artAut').value||'').trim()||'Nación Viva';
+  if(!t)return toast('Escribe el título del artículo');
+  const id=Math.max(0,...store.articulos.map(x=>x.id))+1;
+  const ed=(document.getElementById('artEd')||{}).value||'1ª edición';
+  store.articulos.push({id,titulo:t,autor:a,edicion:ed,img:_artImgURL||'',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)',publicado:true});
+  _artImgURL=''; render(); toast('Artículo agregado y publicado');
+}
+function guardarArtEdit(){const a=store.articulos.find(x=>x.id===state.editArt);if(!a)return;const t=(document.getElementById('artTit').value||'').trim();const au=(document.getElementById('artAut').value||'').trim();const e=(document.getElementById('artEd')||{}).value;if(t)a.titulo=t;if(au)a.autor=au;if(e)a.edicion=e;if(_artImgURL){a.img=_artImgURL;_artImgURL='';}state.editArt=null;render();toast('Artículo actualizado');}
+function toggleArtPub(id){const a=store.articulos.find(x=>x.id===id);if(a){a.publicado=!a.publicado;render();toast(a.publicado?'Artículo publicado':'Artículo despublicado');}}
+function borrarArticulo(id){store.articulos=store.articulos.filter(x=>x.id!==id);render();toast('Artículo eliminado');}
+function aplicarLogo(src){store.config.logo=src;const sl=document.getElementById('sideLogoImg');if(sl)sl.src=src;const pv=document.getElementById('logoPreview');if(pv)pv.src=src;toast('Logo actualizado');}
+function elegirLogo(src){aplicarLogo(src);}
+function restablecerLogo(){aplicarLogo('assets/logo_edificadores_navi_transp.png');}
+function subirLogo(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>aplicarLogo(e.target.result);r.readAsDataURL(f);}
+function setMonto(v){const el=document.getElementById('donMonto');if(el)el.value=v;}
+function hoyStr(){const m=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];const d=new Date();return d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear();}
+function registrarDonativoPropio(){
+  const el=document.getElementById('donMonto'); const v=parseInt(el&&el.value)||0; const min=store.donativoInfo.min;
+  if(v<min){toast('El donativo mínimo es $'+min);return;}
+  store.donativos.unshift({id:Date.now(),usuario:state.user.nombre,monto:v,fecha:hoyStr(),metodo:'Transferencia',estatus:'registrado'});
+  render(); toast('¡Gracias! Tu donativo de $'+v.toLocaleString('es-MX')+' quedó registrado');
+}
+
+/* contador regresivo (demo: sesión dentro de ~3 h) */
+const NEXT=new Date(Date.now()+(3*60+12)*60000);
+function tick(){const H=document.getElementById('cdH');if(!H)return;let d=NEXT-Date.now();if(d<0)d=0;
+  H.textContent=String(Math.floor(d/3600000)).padStart(2,'0');
+  const M=document.getElementById('cdM'),S=document.getElementById('cdS');
+  if(M)M.textContent=String(Math.floor(d%3600000/60000)).padStart(2,'0');
+  if(S)S.textContent=String(Math.floor(d%60000/1000)).padStart(2,'0');}
+setInterval(tick,1000);
+</script>
+</body>
+</html>
