@@ -11,9 +11,9 @@
   // MODO DEMO por ahora: cuando tengas la cuenta de Supabase EXCLUSIVA de la
   // plataforma, pega aquí la URL y el anon key de ESE proyecto y pon live:true.
   window.NAVI_CFG = {
-    url:  '',   // ej. https://TU-PROYECTO.supabase.co
-    anon: '',   // anon key del proyecto nuevo de Nación Viva
-    live: false
+    url:  'https://cyiwuolmjihdrhdagrgk.supabase.co',
+    anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5aXd1b2xtamloZHJoZGFncmdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzMTYxOTAsImV4cCI6MjEwMzg5MjE5MH0.nCpQHzODl7f-Y0lywLAAIyiL2hqQycJSJDJzMKNIpjk',
+    live: true
   };
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,13 +35,25 @@
   --glass:rgba(255,255,255,.06);--glassline:rgba(255,255,255,.16);--glasshi:inset 0 1px 0 rgba(255,255,255,.18);
   --ease:cubic-bezier(.22,1,.36,1);--font:'Roundelay',system-ui,-apple-system,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--navy);color:var(--cream);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:
+    radial-gradient(1100px 640px at 82% -8%,rgba(127,168,214,.12),transparent 60%),
+    radial-gradient(900px 700px at 4% 112%,rgba(127,168,214,.06),transparent 55%),
+    linear-gradient(165deg,#12203c 0%,var(--navy) 45%,var(--navy-deep) 100%);
+  background-attachment:fixed;color:var(--cream);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+/* Textura: plano de arquitecto (igual que el landing) */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(560px 420px at 12% -6%,rgba(127,168,214,.10),transparent 70%),
-    radial-gradient(640px 480px at 105% 108%,rgba(255,145,77,.08),transparent 70%),
-    repeating-linear-gradient(45deg,rgba(255,255,255,.016) 0,rgba(255,255,255,.016) 1px,transparent 1px,transparent 7px),
-    repeating-linear-gradient(-45deg,rgba(255,255,255,.011) 0,rgba(255,255,255,.011) 1px,transparent 1px,transparent 7px)}
+  background-image:
+    linear-gradient(rgba(127,168,214,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.04) 1px, transparent 1px),
+    linear-gradient(rgba(127,168,214,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.07) 1px, transparent 1px);
+  background-size:44px 44px,44px 44px,220px 220px,220px 220px;
+  -webkit-mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
+          mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
+  animation:planDrift 26s linear infinite; will-change:background-position}
+@keyframes planDrift{from{background-position:0 0,0 0,0 0,0 0} to{background-position:220px 220px,220px 220px,220px 220px,220px 220px}}
+#welcome,#login,#app{position:relative;z-index:1}
+@media (prefers-reduced-motion: reduce){body::before{animation:none}}
 button{font-family:inherit;cursor:pointer}
 a{color:var(--accent)}
 .hidden{display:none!important}
