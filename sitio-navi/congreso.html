@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congreso Nación Viva 2026 · Ponencias</title>
+<style>
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Regular.ttf');font-weight:400}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-SemiBold.ttf');font-weight:600}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-Bold.ttf');font-weight:700}
+@font-face{font-family:'Roundelay';src:url('assets/fonts/Roundelay-ExtraBold.ttf');font-weight:800}
+:root{
+  --bg:#0A0E1A; --bg2:#0D1428; --ink:#F3F5FA; --dim:#AEB6C6; --soft:#7C879B;
+  --mag:#E6127D; --lime:#C3D64A; --orange:#F6A01E; --navy:#22344F; --hair:rgba(255,255,255,.12);
+  --disp:'Roundelay',Georgia,serif; --sans:'Inter','Helvetica Neue',Arial,system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);color:var(--ink);line-height:1.6;
+  background:
+    radial-gradient(900px 520px at 88% -6%, rgba(230,18,125,.14), transparent 60%),
+    radial-gradient(760px 520px at 6% 6%, rgba(195,214,74,.10), transparent 58%),
+    radial-gradient(900px 700px at 50% 120%, rgba(246,160,30,.10), transparent 60%),
+    linear-gradient(170deg,#0D1428 0%, var(--bg) 55%, #070A12 100%);
+  background-attachment:fixed}
+.wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+.topbar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:22px 26px;max-width:1120px;margin:0 auto}
+.topbar a{color:var(--dim);text-decoration:none;font-size:13px;letter-spacing:.04em}
+.topbar a:hover{color:var(--ink)}
+.chip{display:inline-flex;gap:8px;align-items:center;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--bg);background:var(--lime);padding:6px 12px;border-radius:999px}
+
+/* HERO */
+.hero{position:relative;text-align:center;padding:26px 20px 70px}
+.hero .logo{height:210px;width:auto;filter:drop-shadow(0 18px 50px rgba(0,0,0,.5));margin-bottom:6px}
+.hero .date{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.28em;text-transform:uppercase;color:var(--orange)}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(34px,6vw,68px);letter-spacing:-.02em;line-height:1;margin:14px 0 0}
+.hero h1 .a{color:var(--lime)} .hero h1 .b{color:var(--orange)}
+.hero .sub{margin-top:18px;font-size:clamp(16px,2vw,20px);color:var(--dim);max-width:620px;margin-left:auto;margin-right:auto}
+.rule{display:flex;gap:6px;justify-content:center;margin-top:26px}
+.rule i{width:44px;height:5px;border-radius:3px;display:block}
+
+/* SECTION HEAD */
+.sec{padding:20px 0 40px}
+.eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;font-weight:800;color:var(--mag)}
+.sec h2{font-family:var(--disp);font-weight:800;font-size:clamp(26px,3.6vw,40px);letter-spacing:-.01em;margin:8px 0 6px}
+.sec .lead{color:var(--dim);font-size:17px;max-width:720px;margin-bottom:28px}
+
+/* PONENCIAS */
+.ponen{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.card{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--hair);background:var(--bg2);cursor:pointer;transition:transform .18s,border-color .18s}
+.card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.25)}
+.card .poster{position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
+.card .play{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;transition:transform .18s,background .18s}
+.card:hover .play{transform:scale(1.08);background:rgba(255,255,255,.28)}
+.card .play svg{width:24px;height:24px;fill:#fff;margin-left:3px}
+.card .badge{position:absolute;top:12px;left:12px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);padding:5px 10px;border-radius:999px}
+.card .body{padding:16px 18px 18px}
+.card .name{font-family:var(--disp);font-size:21px;font-weight:800}
+.card .topic{color:var(--dim);font-size:14.5px;margin-top:3px}
+.card .soon{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:rgba(0,0,0,.45);border:1px solid var(--hair);padding:5px 9px;border-radius:999px}
+
+/* GALERÍA */
+.gallery{columns:3;column-gap:14px}
+.gallery img{width:100%;display:block;border-radius:12px;margin-bottom:14px;break-inside:avoid;
+  box-shadow:0 14px 30px rgba(0,0,0,.4);filter:saturate(.96) contrast(1.02);transition:transform .25s,filter .25s}
+.gallery img:hover{transform:scale(1.015);filter:saturate(1.05) contrast(1.03)}
+
+/* CIERRE */
+.closer{text-align:center;padding:64px 20px 30px;border-top:1px solid var(--hair);margin-top:40px}
+.closer h2{font-family:var(--disp);font-weight:800;font-size:clamp(24px,3.4vw,36px);letter-spacing:-.01em}
+.closer p{color:var(--dim);font-size:17px;margin:12px auto 26px;max-width:640px}
+.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;font-size:15px;font-weight:700;padding:13px 30px;border-radius:999px;text-decoration:none;transition:transform .12s,box-shadow .18s}
+.btn-p{color:#0A0E1A;background:linear-gradient(180deg,#FFD05B,var(--orange));box-shadow:0 10px 26px rgba(246,160,30,.32)}
+.btn-s{color:var(--ink);border:1px solid var(--hair)}
+.btn:hover{transform:translateY(-2px)}
+.foot{text-align:center;color:var(--soft);font-size:13px;padding:26px 20px 46px}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(5,7,14,.9);display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+.lb.on{display:flex}
+.lb .box{width:min(960px,100%);aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;position:relative}
+.lb iframe{width:100%;height:100%;border:0}
+.lb .x{position:absolute;top:-42px;right:0;color:#fff;font-size:26px;cursor:pointer;background:none;border:0}
+.lb .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:16px;text-align:center;padding:20px}
+
+@media (max-width:820px){.ponen{grid-template-columns:1fr}.gallery{columns:2}}
+@media (max-width:520px){.gallery{columns:1}.hero .logo{height:150px}}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="chip">Nación Viva</span>
+    <a href="/plataforma">← Volver al portal</a>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <img class="logo" src="assets/logo_congreso.png" alt="Congreso Nación Viva 2026">
+    <div class="date">28 · 29 de agosto · 2026</div>
+    <h1>Congreso <span class="a">Nación</span> <span class="b">Viva</span> 2026</h1>
+    <p class="sub">Las ponencias sobre el gobierno que Dios estableció, con voces que marcaron el rumbo de esta generación.</p>
+    <div class="rule"><i style="background:var(--mag)"></i><i style="background:var(--lime)"></i><i style="background:var(--orange)"></i></div>
+  </header>
+
+  <!-- PONENCIAS -->
+  <section class="wrap sec">
+    <div class="eyebrow">Las conferencias</div>
+    <h2>Voces del Congreso</h2>
+    <div class="lead">Cada conferencista abordó, desde su experiencia, el diseño de Dios para el gobierno civil, la ley y el servicio público.</div>
+    <div class="ponen" id="ponen"></div>
+  </section>
+
+  <!-- GALERÍA -->
+  <section class="wrap sec">
+    <div class="eyebrow">Así se vivió</div>
+    <h2>Momentos del Congreso</h2>
+    <div class="gallery">
+      <img src="assets/fotos/foto2.jpg" alt="Ponencia"><img src="assets/fotos/foto7.jpg" alt="Asistente">
+      <img src="assets/fotos/foto1.jpg" alt="Ponente"><img src="assets/fotos/foto6.jpg" alt="Tomando notas">
+      <img src="assets/fotos/foto4.jpg" alt="Participantes"><img src="assets/fotos/foto8.jpg" alt="Grabando">
+      <img src="assets/fotos/foto5.jpg" alt="Ponente"><img src="assets/fotos/foto3.jpg" alt="Manos">
+    </div>
+  </section>
+
+  <!-- CIERRE -->
+  <div class="wrap">
+    <div class="foot" style="border-top:1px solid var(--hair);margin-top:30px">Congreso Nación Viva 2026 · Nación Viva, A.C.</div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lb" id="lb" onclick="if(event.target===this)cerrarLB()">
+    <div class="box">
+      <button class="x" onclick="cerrarLB()" aria-label="Cerrar">✕</button>
+      <div id="lbcontent"></div>
+    </div>
+  </div>
+
+<script>
+  // Ponentes del Congreso. Pega el ID de YouTube en "yt" cuando lo tengas (ej. yt:'dQw4w9WgXcQ').
+  const PONENTES = [
+    { name:'David Barton',        topic:'Fundamento de los diseños universales según el Génesis', color:'var(--mag)',    yt:'' },
+    { name:'Dr. Alfredo Serés',   topic:'Gobierno civil a partir de Hechos', color:'var(--lime)', yt:'' },
+    { name:'Dr. Richard Hays',    topic:'El despertar de una iglesia con gobierno', color:'var(--orange)', yt:'' },
+    { name:'Dr. Natividad Ramos', topic:'Los mecanismos que conforman una Nación Viva', color:'var(--mag)', yt:'' },
+  ];
+  const play='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  const cont=document.getElementById('ponen');
+  cont.innerHTML=PONENTES.map((p,i)=>`
+    <div class="card" onclick="abrirLB(${i})">
+      <div class="poster" style="background:linear-gradient(135deg, ${p.color} 0%, rgba(10,14,26,.85) 70%)">
+        <div class="play">${play}</div>
+        ${p.yt?'':'<span class="soon">Video próximamente</span>'}
+      </div>
+      <div class="body"><div class="name">${p.name}</div><div class="topic">${p.topic}</div></div>
+    </div>`).join('');
+
+  const lb=document.getElementById('lb'), lbc=document.getElementById('lbcontent');
+  function abrirLB(i){
+    const p=PONENTES[i];
+    if(p.yt){ lbc.innerHTML=`<iframe src="https://www.youtube.com/embed/${p.yt}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; }
+    else{ lbc.innerHTML=`<div class="msg">La grabación de “${p.name}” estará disponible muy pronto.</div>`; }
+    lb.classList.add('on');
+  }
+  function cerrarLB(){ lb.classList.remove('on'); lbc.innerHTML=''; }
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') cerrarLB(); });
+</script>
+</body>
+</html>
