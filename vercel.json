@@ -4,6 +4,9 @@
     { "source": "/", "destination": "/home.html", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/plataforma", "destination": "/index.html" }
+    { "source": "/inscripcion", "destination": "/inscripcion.html" },
+    { "source": "/plataforma", "destination": "/index.html" },
+    { "source": "/aviso-privacidad", "destination": "/aviso-privacidad.html" },
+    { "source": "/congreso", "destination": "/congreso.html" }
   ]
 }
