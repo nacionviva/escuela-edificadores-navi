@@ -246,7 +246,11 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl .nm{color:var(--cream);font-weight:600}
-.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#101f3b}
+.tbl td,.tbl th{white-space:nowrap}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.tbl td{color:var(--cream)}
+.mini-in{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;color:var(--cream);font:inherit;font-size:12.5px;padding:6px 9px;min-width:110px}
 
 /* forms */
 .form label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:6px;font-weight:600;margin-top:14px}
@@ -552,11 +556,11 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
     <div class="topbar">
       <div class="crumb" id="crumb">Inicio</div>
       <div class="role-switch">
-        <span class="demo-tag">DEMO</span>
         <span class="lbl">Ver como</span>
         <select id="roleSel" onchange="switchRole(this.value)">
           <option value="participante">Participante</option>
           <option value="profesor">Mentor</option>
+          <option value="superadmin">Superadministrador</option>
           <option value="director">Director Académico</option>
           <option value="inscripciones">Inscripciones</option>
         </select>
@@ -758,12 +762,13 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['idonativos','heart','Donativos'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
 };
-const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones'};
-const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1'};
-const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta'};
+const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
+const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1',superadmin:'d1'};
+const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta',superadmin:'dpanel'};
 
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
 const ICONS={
@@ -813,7 +818,7 @@ const NAVI = {
     'registro':'inscripciones@edificadores.navi',
     'inscripciones':'inscripciones@edificadores.navi'
   },
-  rolMap:{1:'director',2:'director',3:'director',4:'profesor',5:'participante',6:'inscripciones'},
+  rolMap:{1:'superadmin',2:'director',3:'director',4:'profesor',5:'participante',6:'inscripciones'},
   get activo(){ return !!this.sb; },
   async cargarPerfilYDatos(){
     const sb=this.sb;
@@ -823,7 +828,7 @@ const NAVI = {
       .select('nombre,rol_id,roles(codigo)').eq('auth_uid', user.id).single();
     if(me){
       const cod = me.roles && me.roles.codigo;
-      const codeMap={superadmin:'director',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
+      const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
       state.role = codeMap[cod] || this.rolMap[me.rol_id] || 'participante';
       const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
       if(du) du.nombre = me.nombre;
@@ -1245,19 +1250,17 @@ dpanel:{title:'Panel',html(){
 }},
 
 dgrupos:{title:'Grupos',html(){
-  const gs=DB.grupos();
-  const abiertos=gs.filter(g=>g.estatus==='abierto').length;
-  const cupoTot=gs.reduce((a,g)=>a+g.cupo,0), ocup=gs.reduce((a,g)=>a+g.inscritos,0);
-  let h=head('Dirección Académica','Grupos y generaciones','Crea grupos (máximo 12 personas), abre o cierra la inscripción y define el horario de cada uno.')
-   + `<div class="grid g4" style="margin-bottom:20px">
-       <div class="card"><div class="stat-n">${gs.length}</div><div class="stat-l">Grupos</div></div>
-       <div class="card"><div class="stat-n">${abiertos}</div><div class="stat-l">Abiertos</div></div>
-       <div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div>
-       <div class="card"><div class="stat-n">${ocup}/${cupoTot}</div><div class="stat-l">Ocupación total</div></div></div>`;
-  h+= state.showNuevoGrupo ? formNuevoGrupo() : `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.showNuevoGrupo=true;render()">＋ Crear grupo</button>`;
-  h+= gs.map(g=>grupoCard(g)).join('');
+  const on=!!(NAVI&&NAVI.sb);
+  const al=(store.alumnos||[]).filter(a=>a.activado);
+  const g={}; al.forEach(a=>{ if(a.grupo){ (g[a.grupo]=g[a.grupo]||[]).push(a); } });
+  const conM=GRUPOS.filter(k=>(g[k]||[]).length);
+  let h=head('Dirección Académica','Grupos','Grupos de máximo 12 alumnos, cada uno con su mentor. La asignación se hace en la pestaña Alumnos.');
+  if(!on) return h+`<div class="card"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver los grupos.</div></div>`;
+  h+=`<div class="grid g4" style="margin-bottom:20px"><div class="card"><div class="stat-n">${conM.length}</div><div class="stat-l">Grupos con alumnos</div></div><div class="card"><div class="stat-n">${al.length}</div><div class="stat-l">Alumnos</div></div><div class="card"><div class="stat-n">${al.filter(a=>!a.grupo).length}</div><div class="stat-l">Sin grupo</div></div><div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div></div>`;
+  const cards=GRUPOS.map(name=>{ const m=g[name]||[]; if(!m.length) return ''; const mentor=(m.find(x=>x.mentor)||{}).mentor; return `<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="sec-title" style="margin:0">${name} · ${m.length}/12</div><div style="font-size:13px;color:var(--dim)">Mentor: <b style="color:var(--cream)">${mentor?up(mentor):'sin asignar'}</b></div></div><div style="display:flex;flex-wrap:wrap;gap:6px">`+m.map(a=>`<span class="pill pill-info">${up(a.nombre)}</span>`).join('')+`</div></div>`; }).join('');
+  h+= cards || `<div class="empty">Aún no hay alumnos asignados a grupos. Ve a Alumnos y asígnalos.</div>`;
   return h;
-}},
+}, after(){ if(NAVI&&NAVI.sb) cargarAlumnos(); }},
 
 dparticipantes:{title:'Participantes',html(){
   return head('Dirección Académica','Participantes','Padrón de la generación 2026–2027.')
@@ -1373,27 +1376,33 @@ ialta:{title:'Alta de participante',html(){
 iregistros:{title:'Registros',html(){
   const rs=store.registros||[];
   const on=!!(NAVI&&NAVI.sb);
+  const amap={}; (store.alumnos||[]).forEach(a=>{ if(a.email) amap[a.email.toLowerCase()]=a; });
   const banner = on
-    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b> (Supabase). Cada nuevo registro genera su acceso automáticamente.</div><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="cargarRegistros(true)">Actualizar</button><button class="btn btn-sm btn-accent" onclick="procesarPendientes()">Generar accesos pendientes</button></div></div>`
+    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div>`
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
+  const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
-    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Estatus</th></tr></thead><tbody>`
-        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${r.nombre||''}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td>${r.procesado?pill('Alumno','pill-ok'):pill('Pendiente','pill-wait')}</td></tr>`).join('')
+    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th style="text-align:right">Acceso</th></tr></thead><tbody>`
+        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td style="text-align:right">${rowAcc(r)}</td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
-  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. El sistema genera su acceso automáticamente.')+banner+body;
-}, after(){ if(NAVI&&NAVI.sb) cargarRegistros(); }},
+  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Activa su acceso para volverlas alumnos.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros en total</div>`:'')+body;
+}, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
 
 ialumnos:{title:'Alumnos',html(){
-  const al=store.alumnos||[];
   const on=!!(NAVI&&NAVI.sb);
+  const al=(store.alumnos||[]).filter(a=>a.activado);
   const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver a los alumnos reales.</div></div>`;
+  const opt=(cur)=>`<option value="">—</option>`+GRUPOS.map(g=>`<option ${cur===g?'selected':''}>${g}</option>`).join('');
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Estatus</th><th>Conferencias</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
-        + al.map(p=>`<tr><td class="nm">${p.nombre||''}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td><td>${pill(p.estatus||'activo',p.estatus==='activo'?'pill-ok':'pill-wait')}</td><td>${p.acceso_congreso?pill('Con acceso','pill-ok'):pill('Sin acceso','pill-wait')}</td><td style="text-align:right"><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar acceso':'Activar acceso'}</button></td></tr>`).join('')
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th></tr></thead><tbody>`
+        + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
+          +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
+          +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
+          +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td></tr>`).join('')
         + `</tbody></table></div>`
-      : `<div class="empty">Aún no hay alumnos. En cuanto lleguen registros, se crean solos.</div>`));
-  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Al confirmar su donativo, activa su acceso a las conferencias del Congreso.')+banner+body;
+      : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
 }, after(){ if(NAVI&&NAVI.sb) cargarAlumnos(); }},
 
 idonativos:{title:'Donativos',html(){
@@ -1699,6 +1708,8 @@ function darAlta(){
     <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
   toast('Participante dado de alta');
 }
+const GRUPOS=['Grupo 1','Grupo 2','Grupo 3','Grupo 4','Grupo 5','Grupo 6','Grupo 7','Grupo 8'];
+function up(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(); }
 function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
 async function cargarRegistros(force){
   if(!(NAVI&&NAVI.sb)) return;
@@ -1719,7 +1730,7 @@ async function cargarAlumnos(force){
   store._alLoaded=true; store._loadingAl=true; render();
   try{
     const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
-      .select('auth_uid,nombre,usuario,folio,estatus,acceso_congreso,roles(codigo)')
+      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,roles(codigo)')
       .order('folio');
     if(error) throw error;
     store.alumnos = (data||[]).filter(u=>!u.roles || u.roles.codigo==='participante');
@@ -1743,6 +1754,25 @@ async function procesarPendientes(){
     if(error) throw error;
     toast('Accesos generados: '+(data!=null?data:'')); cargarRegistros(true); cargarAlumnos(true);
   }catch(e){ toast('No se pudo procesar (revisa permisos).'); }
+}
+async function activarAcceso(email){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({activado:true}).eq('email',(email||'').toLowerCase()); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>(x.email||'').toLowerCase()===(email||'').toLowerCase()); if(a)a.activado=true;
+    toast('Acceso activado. Ya es alumno.'); render();
+  }catch(e){ toast('No se pudo activar (revisa el paso 11/13 y permisos).'); }
+}
+async function asignarGrupo(authUid,grupo){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({grupo:grupo||null}).eq('auth_uid',authUid); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.grupo=grupo; toast(grupo?('Asignado a '+grupo):'Grupo quitado');
+  }catch(e){ toast('No se pudo asignar el grupo.'); }
+}
+async function asignarMentor(authUid,mentor){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({mentor:mentor||null}).eq('auth_uid',authUid); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
+  }catch(e){ toast('No se pudo asignar el mentor.'); }
 }
 function confirmarInsc(uid){const u=store.usuarios.find(x=>x.id===uid);u.insc=(u.insc==='preinscrito')?'confirmado':'activo';render();toast('Inscripción actualizada: '+u.insc);}
 /* grupos */
