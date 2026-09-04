@@ -119,7 +119,8 @@ a{color:var(--accent)}
 .wl-doc{display:grid;grid-template-columns:minmax(300px,0.92fr) 1.08fr;min-height:100vh;max-width:1200px;margin:0 auto;width:100%}
 .wl-rail{display:flex;flex-direction:column;justify-content:center;padding:56px 46px;border-right:1px solid var(--line)}
 .wl-mast{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px}
-.wl-logo{height:90px;width:auto;margin-bottom:16px;align-self:flex-start}
+.wl-logo{height:104px;width:auto;margin-bottom:16px;align-self:flex-start}
+.wl-sustain{font-family:var(--gov);font-size:13.5px;color:var(--dim);line-height:1.55;max-width:42ch;margin:0 0 22px;padding-top:20px;border-top:1px solid var(--line)}
 .wl-def{font-family:var(--gov);font-style:italic;font-size:16px;color:var(--dim);line-height:1.45;max-width:32ch;margin-bottom:26px}
 .wl-meta{display:flex;flex-direction:column;margin-bottom:28px}
 .wl-meta>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
@@ -437,6 +438,47 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   .main{padding:20px 16px}
 }
 </style>
+<style>
+.revista-hero{display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:26px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:22px;background:rgba(255,255,255,.02)}
+.revista-cover{aspect-ratio:3/4;border-radius:10px;background:#0A1426 center/cover no-repeat;box-shadow:0 16px 40px rgba(0,0,0,.4);border:1px solid var(--line);cursor:pointer;transition:transform .18s}
+.revista-cover:hover{transform:translateY(-3px)}
+.revista-tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.revista-title{font-family:var(--gov);font-size:26px;font-weight:800;color:var(--cream);margin-bottom:8px}
+.revista-desc{font-family:var(--gov);font-size:14.5px;color:var(--dim);line-height:1.6;max-width:52ch;margin-bottom:16px}
+.revista-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.revista-note{font-family:var(--gov);font-size:12.5px;color:var(--soft)}
+.pdf-ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,16,.86);display:none;align-items:center;justify-content:center;padding:24px}
+.pdf-ov.on{display:flex}
+.pdf-box{width:min(940px,100%);height:min(90vh,1150px);background:#0A1426;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.pdf-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-family:var(--gov);font-size:13px;color:var(--cream)}
+.pdf-x{background:none;border:0;color:var(--soft);font-size:20px;cursor:pointer;line-height:1}
+.pdf-x:hover{color:var(--cream)}
+.pdf-frame{flex:1;width:100%;border:0;background:#0A1426}
+.cngr{--mag:#E6127D;--lime:#C3D64A;--orange:#F6A01E}
+.cngr-head{text-align:center;padding:4px 0 14px}
+.cngr-logo{height:118px;width:auto;max-width:88%;filter:drop-shadow(0 14px 34px rgba(0,0,0,.5))}
+.cngr-sub{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-top:6px}
+.cngr-video{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(135deg,#2a0f22,#0b1120)}
+.cngr-video iframe{width:100%;height:100%;border:0;display:block}
+.cngr-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cngr-play{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.42);display:flex;align-items:center;justify-content:center}
+.cngr-play svg{width:29px;height:29px;fill:#fff;margin-left:4px}
+.cngr-soon span{font-family:var(--gov);font-size:13px;color:#E7EAF2}
+.cngr-secttl{font-family:var(--gov);font-weight:800;font-size:20px;color:var(--cream);margin:24px 0 12px}
+.cngr-acc{font-size:13px;padding:11px 15px;border-radius:12px;margin-bottom:14px;border:1px solid var(--line)}
+.cngr-acc.lock{background:rgba(246,160,30,.10);color:#F6C97a}
+.cngr-acc.open{background:rgba(195,214,74,.12);color:#D7E67e}
+.cngr-acc a{color:var(--orange);cursor:pointer;text-decoration:underline}
+.cngr-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:rgba(255,255,255,.02)}
+.cngr-ph{width:56px;height:56px;border-radius:12px;background:#0A1426 center/cover no-repeat;flex-shrink:0;border:1px solid var(--line)}
+.cngr-info{flex:1;min-width:0}
+.cngr-cf{font-family:var(--gov);font-weight:800;font-size:15.5px;color:var(--cream);line-height:1.2}
+.cngr-nm{font-size:13px;color:var(--dim);margin-top:2px}
+.cngr-pill{font-family:var(--gov);font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.cngr-pill.lock{background:rgba(246,160,30,.14);color:#F6C97a;border:1px solid rgba(246,160,30,.3)}
+.cngr-pill.open{background:linear-gradient(180deg,#FFD05B,var(--orange));color:#0A0E1A;border:0;cursor:pointer}
+@media(max-width:640px){.revista-hero{grid-template-columns:1fr}.revista-cover{max-width:190px}}
+</style>
 </head>
 <body>
 
@@ -470,6 +512,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
         <div><dt>Duración</dt><dd>Tres trimestres · sep 2026 a jul 2027</dd></div>
         <div><dt>Aporte</dt><dd>Donativo voluntario, desde $200</dd></div>
       </dl>
+      <p class="wl-sustain">No cobramos inscripción. La Escuela se sostiene con un donativo mensual voluntario, desde $200, y solo si tú lo decides.</p>
       <button class="wl-cta" onclick="doEnterWelcome()">Entrar a la plataforma →</button>
       <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
     </aside>
@@ -482,9 +525,6 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
         <li><span class="n">02</span><div><b>Educación</b><p>Ciudadanos con pensamiento crítico, valores sólidos y visión de largo plazo.</p></div></li>
         <li><span class="n">03</span><div><b>Economía</b><p>Los fundamentos de una economía al servicio de la persona y del bien común.</p></div></li>
       </ol>
-      <div class="wl-rule"></div>
-      <h2 class="wl-h">Cómo se sostiene</h2>
-      <p class="wl-note">No cobramos inscripción. La Escuela se mantiene con un donativo mensual voluntario, desde $200, la cantidad que tú decidas. Con tu primer donativo entras; los meses siguientes puedes aportar o no, y tu apoyo nos ayuda a seguir formando edificadores.</p>
     </section>
   </div>
 </div>
@@ -633,7 +673,8 @@ const store = {
     {id:2,titulo:'Requisitos para ser un buen gobernante',autor:'Dr. Alfredo Serés',edicion:'1ª edición',img:'assets/revista/art2.png',bg:'linear-gradient(135deg,#15243C,#4A3358)'},
     {id:3,titulo:'La mujer en su papel trascendental dentro de la política mexicana',autor:'Lic. Gamaliela Tan',edicion:'1ª edición',img:'assets/revista/art3.png',bg:'linear-gradient(135deg,#13233D,#8E4D3E)'}
   ],
-  revista:{edicion:'Julio 2025 · 1ª edición',pdf:'',nombre:''},
+  revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/art1.png',nombre:'La Antorcha'},
+  congresoIntro:{id:''},
   // Donativo mensual voluntario
   donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'812 332 6119'},
@@ -1025,16 +1066,24 @@ avisos:{title:'Avisos',html(){
 
 revista:{title:'Revista',html(){
   const r=store.revista;
-  let h=`<div class="page-head"><div class="eyebrow">Nación Viva</div><h1 class="page">La Antorcha</h1><div class="page-sub">Revista digital de Nación Viva · ${r.edicion}. Léela aquí, dentro de la Escuela.</div></div>`;
+  let h=`<div class="page-head"><div class="eyebrow">Nación Viva</div><h1 class="page">La Antorcha</h1><div class="page-sub">Revista digital de Nación Viva. Léela completa aquí, dentro de la Escuela.</div></div>`;
   if(r.pdf){
-    h+=`<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><a class="btn btn-sm" href="${r.pdf}" target="_blank" rel="noopener">Abrir en pantalla completa</a><a class="btn btn-sm" href="${r.pdf}" download="La-Antorcha.pdf">Descargar</a></div>`
-      + `<div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0A1426"><iframe src="${r.pdf}" style="width:100%;height:76vh;border:0;display:block" title="La Antorcha"></iframe></div>`;
+    h+=`<div class="revista-hero">
+        <div class="revista-cover" style="background-image:url('${r.portada}')" onclick="abrirRevista()"></div>
+        <div class="revista-meta">
+          <div class="revista-tag">Primera edición</div>
+          <div class="revista-title">La Antorcha</div>
+          <p class="revista-desc">La revista de Nación Viva: ideas, entrevistas y reflexiones para edificar México. Ábrela y léela completa en pantalla, sin salir de la Escuela.</p>
+          <div class="revista-actions">
+            <button class="btn btn-accent" onclick="abrirRevista()">Leer la revista</button>
+            <a class="btn btn-sm" href="${r.pdf}" download="La-Antorcha-1a-edicion.pdf">Descargar PDF</a>
+          </div>
+          <div class="revista-note">Próximamente publicaremos la segunda edición.</div>
+        </div>
+      </div>`;
   } else {
     h+=`<div class="empty">La revista se publicará muy pronto. Cuando esté lista, la leerás aquí mismo, sin salir de la Escuela.</div>`;
   }
-  h+=`<div class="sec-title">Artículos de este número</div><div class="grid g3">`
-    + DB.articulos().filter(a=>a.publicado).map(a=>`<div class="card" style="overflow:hidden;padding:0;cursor:pointer" onclick="${r.pdf?"document.querySelector('.main').scrollTo(0,0)":"toast('Se abrirá con el artículo en la revista.')"}"><div style="height:120px;background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div><div style="padding:14px 15px"><div style="font-weight:700;font-size:14px;line-height:1.25">${a.titulo}</div><div style="font-size:12px;color:var(--soft);margin-top:4px">Por ${a.autor}</div></div></div>`).join('')
-    + `</div>`;
   return h;
 }},
 
@@ -1391,7 +1440,7 @@ if (PRELANZAMIENTO) {
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
-      +(hayRev?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
+      +'<div class="sec-title" style="margin-top:0">La Antorcha</div>'+'<div class="card" style="display:flex;gap:16px;align-items:center"><div style="width:68px;height:90px;border-radius:8px;background:url(assets/revista/art1.png) center/cover;border:1px solid var(--line);flex-shrink:0;cursor:pointer" onclick="abrirRevista()"></div><div style="flex:1"><div style="font-weight:700;color:var(--cream)">La Antorcha · 1ª edición</div><div style="font-size:13px;color:var(--dim);margin:4px 0 10px">La revista de Nación Viva. Léela completa aquí.</div><button class="btn btn-accent btn-sm" onclick="abrirRevista()">Leer la revista</button></div></div>'
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
@@ -1402,12 +1451,28 @@ if (PRELANZAMIENTO) {
       + ejesPL(true);
   }};
   VIEWS.congreso = {title:'Congreso', html:function(){
-    return head('Congreso Nación Viva 2026','Las conferencias','Estas son las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.')
-      + CONF_PL.map(function(c){
-        return '<div class="row" style="margin-bottom:8px"><div style="width:48px;height:48px;border-radius:10px;background:url(\''+c.ph+'\') center/cover;flex-shrink:0;border:1px solid var(--line)"></div>'
-          +'<div class="rinfo"><div class="t">'+c.cf+'</div><div class="d">'+c.nm+'</div></div>'
-          +pill('Grabación próximamente','pill-wait')+'</div>';
-      }).join('');
+    var u=state.user||{}; var activo=!!u.acceso_congreso;
+    var intro=store.congresoIntro;
+    var introHtml = (intro&&intro.id)
+      ? '<div class="cngr-video"><iframe src="https://www.youtube.com/embed/'+intro.id+'" title="Video introductorio del Congreso" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'
+      : '<div class="cngr-video cngr-soon"><div class="cngr-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span>Video introductorio del Congreso · muy pronto</span></div>';
+    var banner = activo
+      ? '<div class="cngr-acc open">Tus conferencias están desbloqueadas. Que las disfrutes.</div>'
+      : '<div class="cngr-acc lock">Las conferencias se habilitan al confirmar tu donativo. <a onclick="nav(\'midonativo\')">Realizar mi donativo</a></div>';
+    var cards = CONF_PL.map(function(c){
+      var right = activo
+        ? '<button class="cngr-pill open" onclick="toast(\'Reproduciendo la conferencia…\')">Ver ahora</button>'
+        : '<span class="cngr-pill lock">Se habilita con tu donativo</span>';
+      return '<div class="cngr-row"><div class="cngr-ph" style="background-image:url(\''+c.ph+'\')"></div>'
+        +'<div class="cngr-info"><div class="cngr-cf">'+c.cf+'</div><div class="cngr-nm">'+c.nm+'</div></div>'+right+'</div>';
+    }).join('');
+    return '<div class="cngr">'
+      +'<div class="cngr-head"><img class="cngr-logo" src="assets/logo_congreso.png" onerror="this.style.display=\'none\'" alt="Congreso Nación Viva 2026"><div class="cngr-sub">28 y 29 de agosto · Monterrey</div></div>'
+      +introHtml
+      +'<div class="cngr-secttl">Las conferencias</div>'
+      +banner
+      +cards
+      +'</div>';
   }};
   var _goModule_orig = goModule;
   goModule = function(id){ if(state.role==='participante'){ toast('Tus clases se abrirán muy pronto.'); return; } _goModule_orig(id); };
@@ -1418,6 +1483,19 @@ if (PRELANZAMIENTO) {
 /* ============================================================
    HELPERS DE VISTA + ACCIONES (mutan el store y re-renderizan)
    ============================================================ */
+function abrirRevista(){
+  var r=store.revista; if(!r||!r.pdf) return;
+  var ov=document.getElementById('pdfModal');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='pdfModal'; ov.className='pdf-ov';
+    ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>La Antorcha · '+r.edicion+'</span><button class="pdf-x" onclick="cerrarRevista()" aria-label="Cerrar">\u2715</button></div><iframe class="pdf-frame" src="'+r.pdf+'#view=FitH" title="La Antorcha"></iframe></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) cerrarRevista(); });
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('on'); document.body.style.overflow='hidden';
+}
+function cerrarRevista(){ var ov=document.getElementById('pdfModal'); if(ov) ov.classList.remove('on'); document.body.style.overflow=''; }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarRevista(); });
 function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
 function heroProxima(mod){
   const m=mod||DB.proximaSesion();
