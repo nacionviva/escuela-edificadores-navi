@@ -102,16 +102,49 @@ a{color:var(--accent)}
 .wl-seal{height:122px;width:auto;display:block;margin-bottom:22px}
 .wl-eyebrow{font-family:var(--gov);font-size:13px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--accent)}
 .wl-title{font-family:var(--gov);font-size:clamp(34px,6vw,58px);font-weight:900;letter-spacing:-.02em;line-height:1.03;margin:12px 0 20px;color:var(--cream);text-wrap:balance}
-.wl-lead{font-family:var(--gov);font-size:16px;font-weight:400;color:var(--dim);line-height:1.72;max-width:62ch;margin:0 auto 34px}
+.wl-lead{font-family:var(--gov);font-size:16px;font-weight:400;color:var(--dim);line-height:1.72;max-width:64ch;margin:6px auto 30px;text-align:justify;text-justify:inter-word;hyphens:auto}
 .wl-brief{display:grid;grid-template-columns:1fr 1fr;width:100%;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.02);text-align:left;margin-bottom:34px;overflow:hidden}
 .wl-col{padding:22px 26px}
 .wl-col:first-child{border-right:1px solid var(--line)}
 .wl-k{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-.wl-col p{font-family:var(--gov);font-size:14px;color:var(--dim);line-height:1.62}
+.wl-col p{font-family:var(--gov);font-size:14px;color:var(--dim);line-height:1.62;text-align:justify;text-justify:inter-word;hyphens:auto}
+.wl-start{font-family:var(--gov);font-size:14.5px;color:var(--cream);background:rgba(127,168,214,.12);border:1px solid rgba(127,168,214,.32);border-radius:999px;padding:9px 22px;margin-bottom:20px}
+.wl-start b{color:var(--accent);font-weight:800}
 .wl-cta{font-family:var(--gov);font-size:16px;font-weight:800;letter-spacing:.01em;color:var(--navy-darker);background:var(--accent);border:none;border-radius:6px;padding:15px 34px;cursor:pointer;transition:transform .18s var(--ease),box-shadow .18s var(--ease)}
 .wl-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(127,168,214,.34)}
 .wl-cta:active{transform:translateY(0)}
 .wl-foot{font-family:var(--mono);font-size:12px;color:var(--soft);margin-top:22px;letter-spacing:.04em}
+/* Portada rediseñada: documento editorial en dos columnas */
+#welcome{min-height:100vh}
+.wl-doc{display:grid;grid-template-columns:minmax(300px,0.92fr) 1.08fr;min-height:100vh;max-width:1200px;margin:0 auto;width:100%}
+.wl-rail{display:flex;flex-direction:column;justify-content:center;padding:56px 46px;border-right:1px solid var(--line)}
+.wl-mast{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px}
+.wl-logo{height:90px;width:auto;margin-bottom:16px;align-self:flex-start}
+.wl-def{font-family:var(--gov);font-style:italic;font-size:16px;color:var(--dim);line-height:1.45;max-width:32ch;margin-bottom:26px}
+.wl-meta{display:flex;flex-direction:column;margin-bottom:28px}
+.wl-meta>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
+.wl-meta>div:last-child{border-bottom:1px solid var(--line)}
+.wl-meta dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.wl-meta dd{font-family:var(--gov);font-size:14px;color:var(--cream);text-align:right}
+.wl-rail .wl-cta{align-self:flex-start}
+.wl-rail .wl-foot{margin-top:18px;max-width:42ch;text-align:left}
+.wl-body{display:flex;flex-direction:column;justify-content:center;padding:60px 58px}
+.wl-intro{font-family:var(--gov);font-size:19px;line-height:1.62;color:var(--cream);max-width:60ch;text-wrap:pretty}
+.wl-rule{height:1px;background:var(--line);margin:28px 0}
+.wl-h{font-family:var(--gov);font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--cream);margin-bottom:16px}
+.wl-ejes{list-style:none;display:flex;flex-direction:column}
+.wl-ejes li{display:flex;gap:18px;padding:14px 0;border-top:1px solid var(--line)}
+.wl-ejes li:first-child{border-top:none;padding-top:0}
+.wl-ejes .n{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);min-width:26px;padding-top:2px}
+.wl-ejes b{font-family:var(--gov);font-size:16px;color:var(--cream);display:block;margin-bottom:3px}
+.wl-ejes p{font-family:var(--gov);font-size:14px;color:var(--dim);line-height:1.5;max-width:52ch}
+.wl-note{font-family:var(--gov);font-size:15px;color:var(--dim);line-height:1.62;max-width:58ch}
+@media(max-width:880px){
+  .wl-doc{grid-template-columns:1fr;max-width:660px}
+  .wl-rail{border-right:none;border-bottom:1px solid var(--line);padding:38px 26px;justify-content:flex-start}
+  .wl-body{padding:34px 26px}
+  .wl-intro{font-size:17px}
+}
 @media(max-width:640px){.wl-brief{grid-template-columns:1fr}.wl-col:first-child{border-right:none;border-bottom:1px solid var(--line)}}
 
 /* SHELL */
@@ -426,18 +459,33 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 
 <!-- WELCOME / INGRESO (se muestra primero) -->
 <div id="welcome">
-  <div class="wl-strip">Escuela de Edificadores NAVI · Nación Viva — Documento de bienvenida</div>
-  <div class="wl-inner">
-    <img class="wl-seal" src="assets/logo_edificadores_navi_transp.png" alt="Nación Viva" onerror="this.style.display='none'">
-    <div class="wl-eyebrow">Una iniciativa de Nación Viva</div>
-    <h1 class="wl-title">Escuela de Edificadores NAVI</h1>
-    <p class="wl-lead">Formamos liderazgos —sociales, docentes, empresariales y de servidores públicos— para gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de los individuos que la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores. No para un partido ni un movimiento, sino para el propósito de Dios para México, sin importar tu color ni tu bandera.</p>
-    <div class="wl-brief">
-      <div class="wl-col"><div class="wl-k">En qué consiste</div><p>Tres trimestres —Gobierno Civil, Educación y Economía— con clases quincenales en video, reuniones mensuales en vivo, lecturas, comunidad y mentores que te acompañan.</p></div>
-      <div class="wl-col"><div class="wl-k">Cómo se sostiene</div><p>No cobramos inscripción. Se mantiene con un donativo mensual voluntario, desde $200, la cantidad que tú decidas. Con tu primer donativo entras; los meses siguientes puedes aportar o no —no pasa nada—, pero tu apoyo nos ayuda a seguir.</p></div>
-    </div>
-    <button class="wl-cta" onclick="doEnterWelcome()">Entrar a la plataforma →</button>
-    <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
+  <div class="wl-doc">
+    <aside class="wl-rail">
+      <div class="wl-mast">Documento de bienvenida · Generación 2026–2027</div>
+      <img class="wl-logo" src="assets/logo_edificadores_navi_transp.png" alt="Escuela de Edificadores NAVI" onerror="this.style.display='none'">
+      <p class="wl-def">Criterio y carácter para la vida pública de México.</p>
+      <dl class="wl-meta">
+        <div><dt>Inicio</dt><dd>17 de septiembre de 2026</dd></div>
+        <div><dt>Modalidad</dt><dd>En línea, a tu ritmo</dd></div>
+        <div><dt>Duración</dt><dd>Tres trimestres · sep 2026 a jul 2027</dd></div>
+        <div><dt>Aporte</dt><dd>Donativo voluntario, desde $200</dd></div>
+      </dl>
+      <button class="wl-cta" onclick="doEnterWelcome()">Entrar a la plataforma →</button>
+      <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
+    </aside>
+    <section class="wl-body">
+      <p class="wl-intro">Formamos liderazgos sociales, docentes, empresariales y de servidores públicos para gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de quienes la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores. No para un partido ni un movimiento, sino para el propósito de Dios para México, sin importar tu color ni tu bandera.</p>
+      <div class="wl-rule"></div>
+      <h2 class="wl-h">El programa</h2>
+      <ol class="wl-ejes">
+        <li><span class="n">01</span><div><b>Gobierno Civil</b><p>El propósito del gobierno civil ante Dios y el lugar del cristiano dentro del Estado.</p></div></li>
+        <li><span class="n">02</span><div><b>Educación</b><p>Ciudadanos con pensamiento crítico, valores sólidos y visión de largo plazo.</p></div></li>
+        <li><span class="n">03</span><div><b>Economía</b><p>Los fundamentos de una economía al servicio de la persona y del bien común.</p></div></li>
+      </ol>
+      <div class="wl-rule"></div>
+      <h2 class="wl-h">Cómo se sostiene</h2>
+      <p class="wl-note">No cobramos inscripción. La Escuela se mantiene con un donativo mensual voluntario, desde $200, la cantidad que tú decidas. Con tu primer donativo entras; los meses siguientes puedes aportar o no, y tu apoyo nos ayuda a seguir formando edificadores.</p>
+    </section>
   </div>
 </div>
 
