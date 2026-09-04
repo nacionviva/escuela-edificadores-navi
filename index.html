@@ -43,13 +43,13 @@ body{background:
 /* Textura: plano de arquitecto (igual que el landing) */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(rgba(127,168,214,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(127,168,214,.04) 1px, transparent 1px),
-    linear-gradient(rgba(127,168,214,.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(127,168,214,.07) 1px, transparent 1px);
+    linear-gradient(rgba(127,168,214,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.06) 1px, transparent 1px),
+    linear-gradient(rgba(127,168,214,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.11) 1px, transparent 1px);
   background-size:44px 44px,44px 44px,220px 220px,220px 220px;
-  -webkit-mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
-          mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
+  -webkit-mask-image:radial-gradient(150% 135% at 50% 12%, #000 72%, transparent 100%);
+          mask-image:radial-gradient(150% 135% at 50% 12%, #000 72%, transparent 100%);
   animation:planDrift 26s linear infinite; will-change:background-position}
 @keyframes planDrift{from{background-position:0 0,0 0,0 0,0 0} to{background-position:220px 220px,220px 220px,220px 220px,220px 220px}}
 #welcome,#login,#app{position:relative;z-index:1}
@@ -120,7 +120,7 @@ a{color:var(--accent)}
 .wl-rail{display:flex;flex-direction:column;justify-content:center;padding:56px 46px;border-right:1px solid var(--line)}
 .wl-mast{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px}
 .wl-logo{height:104px;width:auto;margin-bottom:16px;align-self:flex-start}
-.wl-sustain{font-family:var(--gov);font-size:13.5px;color:var(--dim);line-height:1.55;max-width:42ch;margin:0 0 22px;padding-top:20px;border-top:1px solid var(--line)}
+.wl-brief-intro{font-family:var(--gov);font-size:13.5px;color:var(--dim);line-height:1.55;max-width:44ch;margin:2px 0 24px;padding-bottom:22px;border-bottom:1px solid var(--line)}
 .wl-def{font-family:var(--gov);font-style:italic;font-size:16px;color:var(--dim);line-height:1.45;max-width:32ch;margin-bottom:26px}
 .wl-meta{display:flex;flex-direction:column;margin-bottom:28px}
 .wl-meta>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
@@ -210,6 +210,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .pill{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap;display:inline-block}
 .pill-ok{background:rgba(209,217,114,.15);color:var(--lime)}
 .pill-wait{background:rgba(255,255,255,.08);color:var(--soft)}
+.pill-soon{background:rgba(230,18,125,.16);color:#F48FBE;border:1px solid rgba(230,18,125,.36);font-weight:700}
 .pill-info{background:var(--accent-tint);color:var(--accent)}
 .pill-warn{background:rgba(255,145,77,.15);color:var(--coral)}
 
@@ -506,25 +507,26 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
       <div class="wl-mast">Documento de bienvenida · Generación 2026–2027</div>
       <img class="wl-logo" src="assets/logo_edificadores_navi_transp.png" alt="Escuela de Edificadores NAVI" onerror="this.style.display='none'">
       <p class="wl-def">Criterio y carácter para la vida pública de México.</p>
+      <p class="wl-brief-intro">Formamos liderazgos sociales, docentes, empresariales y de servidores públicos para gestar instituciones fuertes, con formación académica y espiritual. No para un partido ni un movimiento, sino para el propósito de Dios para México.</p>
       <dl class="wl-meta">
         <div><dt>Inicio</dt><dd>17 de septiembre de 2026</dd></div>
         <div><dt>Modalidad</dt><dd>En línea, a tu ritmo</dd></div>
         <div><dt>Duración</dt><dd>Tres trimestres · sep 2026 a jul 2027</dd></div>
         <div><dt>Aporte</dt><dd>Donativo voluntario, desde $200</dd></div>
       </dl>
-      <p class="wl-sustain">No cobramos inscripción. La Escuela se sostiene con un donativo mensual voluntario, desde $200, y solo si tú lo decides.</p>
       <button class="wl-cta" onclick="doEnterWelcome()">Entrar a la plataforma →</button>
       <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
     </aside>
     <section class="wl-body">
-      <p class="wl-intro">Formamos liderazgos sociales, docentes, empresariales y de servidores públicos para gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de quienes la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores. No para un partido ni un movimiento, sino para el propósito de Dios para México, sin importar tu color ni tu bandera.</p>
-      <div class="wl-rule"></div>
       <h2 class="wl-h">El programa</h2>
       <ol class="wl-ejes">
         <li><span class="n">01</span><div><b>Gobierno Civil</b><p>El propósito del gobierno civil ante Dios y el lugar del cristiano dentro del Estado.</p></div></li>
         <li><span class="n">02</span><div><b>Educación</b><p>Ciudadanos con pensamiento crítico, valores sólidos y visión de largo plazo.</p></div></li>
         <li><span class="n">03</span><div><b>Economía</b><p>Los fundamentos de una economía al servicio de la persona y del bien común.</p></div></li>
       </ol>
+      <div class="wl-rule"></div>
+      <h2 class="wl-h">Cómo se sostiene</h2>
+      <p class="wl-note">No cobramos inscripción. La Escuela se mantiene con un donativo mensual voluntario, desde $200, la cantidad que tú decidas. Con tu primer donativo entras; los meses siguientes puedes aportar o no, y tu apoyo nos ayuda a seguir formando edificadores.</p>
     </section>
   </div>
 </div>
@@ -674,7 +676,7 @@ const store = {
     {id:3,titulo:'La mujer en su papel trascendental dentro de la política mexicana',autor:'Lic. Gamaliela Tan',edicion:'1ª edición',img:'assets/revista/art3.png',bg:'linear-gradient(135deg,#13233D,#8E4D3E)'}
   ],
   revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/art1.png',nombre:'La Antorcha'},
-  congresoIntro:{id:''},
+  congresoIntro:{id:'C_tyhek0xt0'},
   // Donativo mensual voluntario
   donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'812 332 6119'},
@@ -1429,7 +1431,7 @@ if (PRELANZAMIENTO) {
       return '<div class="row locked" style="margin-bottom:10px;align-items:flex-start"><div class="rnum">'+t.numero+'</div>'
         +'<div class="rinfo"><div class="t">'+t.nombre+'</div><div class="d">'+t.rango+'</div>'
         +(extra?('<div class="d" style="margin-top:4px;color:var(--soft)">'+t.pregunta+'</div>'):'')
-        +'</div>'+pill('Próximamente','pill-wait')+'</div>';
+        +'</div>'+pill('Próximamente','pill-soon')+'</div>';
     }).join('');
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
