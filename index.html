@@ -647,28 +647,9 @@ const store = {
     {id:1,titulo:'Bienvenidos a la generación 2026–2027',cuerpo:'La sesión inaugural es el jueves 10 de septiembre a las 7 pm. Revisen que su acceso funcione.',autor:'Dirección Académica',cuando:'hace 3 días',alcance:'generación'},
     {id:2,titulo:'Lecturas del Módulo 1 disponibles',cuerpo:'Ya pueden descargar los textos del Módulo 1. Lleguen con la aplicación prudencial resuelta.',autor:'Prof. Roberto Hernández',cuando:'hace 1 día',alcance:'módulo'}
   ],
-  donativos:[
-    {id:1,usuario:'María González',monto:500,fecha:'12 sep 2026',metodo:'Transferencia',estatus:'confirmado'},
-    {id:2,usuario:'Patricia Lira',monto:1000,fecha:'14 sep 2026',metodo:'Tarjeta',estatus:'registrado'}
-  ],
+  donativos:[],
   // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
-  mentores:[
-    {id:'m1',nombre:'Roberto Hernández',materia:'Gobierno Civil · Trimestre 1',foto:'',expediente:'NV-M1-2026',ingreso:'2026',
-     frase:'“El poder que no se somete a Dios termina sometiendo al hombre.”',
-     formacion:'Derecho y Filosofía Política',
-     experiencia:'Administración pública; organizaciones de sociedad civil (Estado de Derecho y rendición de cuentas).',
-     bio:'Biografía de ejemplo (se reemplaza con la real). Formación en Derecho y Filosofía Política, con experiencia en administración pública y en organizaciones de sociedad civil enfocadas en Estado de Derecho y rendición de cuentas.'},
-    {id:'m2',nombre:'Ana Ruiz',materia:'Educación Pública · Trimestre 2',foto:'',expediente:'NV-M2-2026',ingreso:'2026',
-     frase:'“Toda educación forma un tipo de persona; la pregunta es cuál.”',
-     formacion:'Ciencias de la Educación',
-     experiencia:'Diseño curricular, formación cívica y acompañamiento a escuelas públicas y privadas.',
-     bio:'Biografía de ejemplo. Pedagoga y formadora de docentes; ha trabajado en diseño curricular, formación cívica y acompañamiento a escuelas.'},
-    {id:'m3',nombre:'Carlos Mendoza',materia:'Economía · Trimestre 3',foto:'',expediente:'NV-M3-2026',ingreso:'2026',
-     frase:'“La economía empieza en el trabajo como vocación, no en el mercado.”',
-     formacion:'Economía',
-     experiencia:'Desarrollo regional, análisis de política pública y proyectos productivos comunitarios.',
-     bio:'Biografía de ejemplo. Economista con trayectoria en desarrollo regional y análisis de política pública; ha asesorado proyectos productivos comunitarios.'}
-  ],
+  mentores:[],
   // ARTÍCULOS de la revista/blog Nación Viva (se conectará al blog real). img: placeholder con degradado.
   articulos:[
     {id:1,titulo:'¿Cuál es el mejor modelo para desarrollar liderazgo?',autor:'Dr. Jorge Salcedo Mireles',edicion:'1ª edición',img:'assets/revista/art1.png',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)'},
@@ -839,9 +820,11 @@ const NAVI = {
     const { data:{ user } } = await sb.auth.getUser();
     // Perfil propio -> rol + nombre real
     const { data:me } = await sb.schema('navi').from('usuarios')
-      .select('nombre,rol_id').eq('auth_uid', user.id).single();
+      .select('nombre,rol_id,roles(codigo)').eq('auth_uid', user.id).single();
     if(me){
-      state.role = this.rolMap[me.rol_id] || 'participante';
+      const cod = me.roles && me.roles.codigo;
+      const codeMap={superadmin:'director',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
+      state.role = codeMap[cod] || this.rolMap[me.rol_id] || 'participante';
       const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
       if(du) du.nombre = me.nombre;
     }
@@ -1251,16 +1234,14 @@ pmateriales:{title:'Materiales',html(){
 dpanel:{title:'Panel',html(){
   const parts=DB.participantes(); const activos=parts.filter(p=>p.insc==='activo').length;
   return head('Dirección Académica','Panel de la generación','Generación 2026–2027 · resumen general.')
-   + `<div class="grid g4" style="margin-bottom:22px">
+   + `<div class="grid g3" style="margin-bottom:22px">
        <div class="card"><div class="stat-n">${parts.length}</div><div class="stat-l">Participantes inscritos</div></div>
        <div class="card"><div class="stat-n">${activos}</div><div class="stat-l">Con acceso activo</div></div>
-       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div>
-       <div class="card"><div class="stat-n">${DB.donativos().reduce((a,d)=>a+d.monto,0).toLocaleString('es-MX')}</div><div class="stat-l">Donativos (MXN)</div></div></div>`
+       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div></div>`
    + `<div class="grid g2">
        <div class="card"><div class="sec-title" style="margin-top:0">Perfil de los participantes</div>${perfilResumen()}</div>
        <div class="card"><div class="sec-title" style="margin-top:0">Próximas sesiones</div>${store.modulos.slice(0,4).map(m=>`<div class="row" style="margin-bottom:7px;padding:10px 13px"><div class="rinfo"><div class="t" style="font-size:13.5px">M${m.num} · ${m.titulo}</div><div class="d">${fmtFecha(m.fecha)}</div></div></div>`).join('')}</div></div>`
-   + `<div class="sec-title">Transparencia de donativos</div><div class="page-sub" style="margin:-6px 0 12px">Esto es lo que ven los participantes en su sección de Donativo, sobre en qué se usan los fondos.</div>`
-   + transparenciaEditor();
+   ;
 }},
 
 dgrupos:{title:'Grupos',html(){
