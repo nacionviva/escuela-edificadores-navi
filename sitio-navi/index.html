@@ -43,13 +43,13 @@ body{background:
 /* Textura: plano de arquitecto (igual que el landing) */
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background-image:
-    linear-gradient(rgba(127,168,214,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(127,168,214,.04) 1px, transparent 1px),
-    linear-gradient(rgba(127,168,214,.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(127,168,214,.07) 1px, transparent 1px);
+    linear-gradient(rgba(127,168,214,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.06) 1px, transparent 1px),
+    linear-gradient(rgba(127,168,214,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(127,168,214,.11) 1px, transparent 1px);
   background-size:44px 44px,44px 44px,220px 220px,220px 220px;
-  -webkit-mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
-          mask-image:radial-gradient(135% 120% at 50% 0%, #000 55%, transparent 100%);
+  -webkit-mask-image:radial-gradient(150% 135% at 50% 12%, #000 72%, transparent 100%);
+          mask-image:radial-gradient(150% 135% at 50% 12%, #000 72%, transparent 100%);
   animation:planDrift 26s linear infinite; will-change:background-position}
 @keyframes planDrift{from{background-position:0 0,0 0,0 0,0 0} to{background-position:220px 220px,220px 220px,220px 220px,220px 220px}}
 #welcome,#login,#app{position:relative;z-index:1}
@@ -117,17 +117,18 @@ a{color:var(--accent)}
 /* Portada rediseñada: documento editorial en dos columnas */
 #welcome{min-height:100vh}
 .wl-doc{display:grid;grid-template-columns:minmax(300px,0.92fr) 1.08fr;min-height:100vh;max-width:1200px;margin:0 auto;width:100%}
-.wl-rail{display:flex;flex-direction:column;justify-content:center;padding:56px 46px;border-right:1px solid var(--line)}
+.wl-rail{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:56px 46px;border-right:1px solid var(--line)}
 .wl-mast{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px}
-.wl-logo{height:90px;width:auto;margin-bottom:16px;align-self:flex-start}
-.wl-def{font-family:var(--gov);font-style:italic;font-size:16px;color:var(--dim);line-height:1.45;max-width:32ch;margin-bottom:26px}
-.wl-meta{display:flex;flex-direction:column;margin-bottom:28px}
+.wl-logo{height:110px;width:auto;margin-bottom:16px;align-self:center}
+.wl-brief-intro{font-family:var(--gov);font-size:13.5px;color:var(--dim);line-height:1.55;max-width:44ch;margin:0 auto 24px;padding-bottom:22px;border-bottom:1px solid var(--line);width:100%}
+.wl-def{font-family:var(--gov);font-style:italic;font-size:16px;color:var(--dim);line-height:1.45;max-width:34ch;margin:0 auto 22px}
+.wl-meta{display:flex;flex-direction:column;margin-bottom:28px;width:100%;max-width:380px}
 .wl-meta>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
 .wl-meta>div:last-child{border-bottom:1px solid var(--line)}
 .wl-meta dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
 .wl-meta dd{font-family:var(--gov);font-size:14px;color:var(--cream);text-align:right}
-.wl-rail .wl-cta{align-self:flex-start}
-.wl-rail .wl-foot{margin-top:18px;max-width:42ch;text-align:left}
+.wl-rail .wl-cta{align-self:center}
+.wl-rail .wl-foot{margin-top:18px;max-width:42ch;text-align:center}
 .wl-body{display:flex;flex-direction:column;justify-content:center;padding:60px 58px}
 .wl-intro{font-family:var(--gov);font-size:19px;line-height:1.62;color:var(--cream);max-width:60ch;text-wrap:pretty}
 .wl-rule{height:1px;background:var(--line);margin:28px 0}
@@ -209,6 +210,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .pill{font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:99px;white-space:nowrap;display:inline-block}
 .pill-ok{background:rgba(209,217,114,.15);color:var(--lime)}
 .pill-wait{background:rgba(255,255,255,.08);color:var(--soft)}
+.pill-soon{background:rgba(230,18,125,.16);color:#F48FBE;border:1px solid rgba(230,18,125,.36);font-weight:700}
 .pill-info{background:var(--accent-tint);color:var(--accent)}
 .pill-warn{background:rgba(255,145,77,.15);color:var(--coral)}
 
@@ -244,7 +246,11 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl .nm{color:var(--cream);font-weight:600}
-.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#101f3b}
+.tbl td,.tbl th{white-space:nowrap}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.tbl td{color:var(--cream)}
+.mini-in{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;color:var(--cream);font:inherit;font-size:12.5px;padding:6px 9px;min-width:110px}
 
 /* forms */
 .form label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:6px;font-weight:600;margin-top:14px}
@@ -437,6 +443,47 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   .main{padding:20px 16px}
 }
 </style>
+<style>
+.revista-hero{display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:26px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:22px;background:rgba(255,255,255,.02)}
+.revista-cover{aspect-ratio:3/4;border-radius:10px;background:#0A1426 center/cover no-repeat;box-shadow:0 16px 40px rgba(0,0,0,.4);border:1px solid var(--line);cursor:pointer;transition:transform .18s}
+.revista-cover:hover{transform:translateY(-3px)}
+.revista-tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.revista-title{font-family:var(--gov);font-size:26px;font-weight:800;color:var(--cream);margin-bottom:8px}
+.revista-desc{font-family:var(--gov);font-size:14.5px;color:var(--dim);line-height:1.6;max-width:52ch;margin-bottom:16px}
+.revista-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.revista-note{font-family:var(--gov);font-size:12.5px;color:var(--soft)}
+.pdf-ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,16,.86);display:none;align-items:center;justify-content:center;padding:24px}
+.pdf-ov.on{display:flex}
+.pdf-box{width:min(940px,100%);height:min(90vh,1150px);background:#0A1426;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.pdf-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-family:var(--gov);font-size:13px;color:var(--cream)}
+.pdf-x{background:none;border:0;color:var(--soft);font-size:20px;cursor:pointer;line-height:1}
+.pdf-x:hover{color:var(--cream)}
+.pdf-frame{flex:1;width:100%;border:0;background:#0A1426}
+.cngr{--mag:#E6127D;--lime:#C3D64A;--orange:#F6A01E}
+.cngr-head{text-align:center;padding:4px 0 14px}
+.cngr-logo{height:118px;width:auto;max-width:88%;filter:drop-shadow(0 14px 34px rgba(0,0,0,.5))}
+.cngr-sub{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-top:6px}
+.cngr-video{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(135deg,#2a0f22,#0b1120)}
+.cngr-video iframe{width:100%;height:100%;border:0;display:block}
+.cngr-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cngr-play{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.42);display:flex;align-items:center;justify-content:center}
+.cngr-play svg{width:29px;height:29px;fill:#fff;margin-left:4px}
+.cngr-soon span{font-family:var(--gov);font-size:13px;color:#E7EAF2}
+.cngr-secttl{font-family:var(--gov);font-weight:800;font-size:20px;color:var(--cream);margin:24px 0 12px}
+.cngr-acc{font-size:13px;padding:11px 15px;border-radius:12px;margin-bottom:14px;border:1px solid var(--line)}
+.cngr-acc.lock{background:rgba(246,160,30,.10);color:#F6C97a}
+.cngr-acc.open{background:rgba(195,214,74,.12);color:#D7E67e}
+.cngr-acc a{color:var(--orange);cursor:pointer;text-decoration:underline}
+.cngr-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:rgba(255,255,255,.02)}
+.cngr-ph{width:56px;height:56px;border-radius:12px;background:#0A1426 center/cover no-repeat;flex-shrink:0;border:1px solid var(--line)}
+.cngr-info{flex:1;min-width:0}
+.cngr-cf{font-family:var(--gov);font-weight:800;font-size:15.5px;color:var(--cream);line-height:1.2}
+.cngr-nm{font-size:13px;color:var(--dim);margin-top:2px}
+.cngr-pill{font-family:var(--gov);font-size:12px;font-weight:700;padding:8px 14px;border-radius:999px;white-space:nowrap}
+.cngr-pill.lock{background:rgba(246,160,30,.14);color:#F6C97a;border:1px solid rgba(246,160,30,.3)}
+.cngr-pill.open{background:linear-gradient(180deg,#FFD05B,var(--orange));color:#0A0E1A;border:0;cursor:pointer}
+@media(max-width:640px){.revista-hero{grid-template-columns:1fr}.revista-cover{max-width:190px}}
+</style>
 </head>
 <body>
 
@@ -464,6 +511,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
       <div class="wl-mast">Documento de bienvenida · Generación 2026–2027</div>
       <img class="wl-logo" src="assets/logo_edificadores_navi_transp.png" alt="Escuela de Edificadores NAVI" onerror="this.style.display='none'">
       <p class="wl-def">Criterio y carácter para la vida pública de México.</p>
+      <p class="wl-brief-intro">Formamos liderazgos sociales, docentes, empresariales y de servidores públicos para gestar instituciones fuertes, con formación académica y espiritual. No para un partido ni un movimiento, sino para el propósito de Dios para México.</p>
       <dl class="wl-meta">
         <div><dt>Inicio</dt><dd>17 de septiembre de 2026</dd></div>
         <div><dt>Modalidad</dt><dd>En línea, a tu ritmo</dd></div>
@@ -474,8 +522,6 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
       <div class="wl-foot">Al entrar te comprometes a estudiar con humildad intelectual y a servir con integridad.</div>
     </aside>
     <section class="wl-body">
-      <p class="wl-intro">Formamos liderazgos sociales, docentes, empresariales y de servidores públicos para gestar instituciones fuertes. La fortaleza de una institución depende de la fortaleza de quienes la gobiernan; por eso buscamos la formación académica y también espiritual de nuestros edificadores. No para un partido ni un movimiento, sino para el propósito de Dios para México, sin importar tu color ni tu bandera.</p>
-      <div class="wl-rule"></div>
       <h2 class="wl-h">El programa</h2>
       <ol class="wl-ejes">
         <li><span class="n">01</span><div><b>Gobierno Civil</b><p>El propósito del gobierno civil ante Dios y el lugar del cristiano dentro del Estado.</p></div></li>
@@ -510,11 +556,11 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
     <div class="topbar">
       <div class="crumb" id="crumb">Inicio</div>
       <div class="role-switch">
-        <span class="demo-tag">DEMO</span>
         <span class="lbl">Ver como</span>
         <select id="roleSel" onchange="switchRole(this.value)">
           <option value="participante">Participante</option>
           <option value="profesor">Mentor</option>
+          <option value="superadmin">Superadministrador</option>
           <option value="director">Director Académico</option>
           <option value="inscripciones">Inscripciones</option>
         </select>
@@ -605,35 +651,19 @@ const store = {
     {id:1,titulo:'Bienvenidos a la generación 2026–2027',cuerpo:'La sesión inaugural es el jueves 10 de septiembre a las 7 pm. Revisen que su acceso funcione.',autor:'Dirección Académica',cuando:'hace 3 días',alcance:'generación'},
     {id:2,titulo:'Lecturas del Módulo 1 disponibles',cuerpo:'Ya pueden descargar los textos del Módulo 1. Lleguen con la aplicación prudencial resuelta.',autor:'Prof. Roberto Hernández',cuando:'hace 1 día',alcance:'módulo'}
   ],
-  donativos:[
-    {id:1,usuario:'María González',monto:500,fecha:'12 sep 2026',metodo:'Transferencia',estatus:'confirmado'},
-    {id:2,usuario:'Patricia Lira',monto:1000,fecha:'14 sep 2026',metodo:'Tarjeta',estatus:'registrado'}
-  ],
+  donativos:[],
   // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
-  mentores:[
-    {id:'m1',nombre:'Roberto Hernández',materia:'Gobierno Civil · Trimestre 1',foto:'',expediente:'NV-M1-2026',ingreso:'2026',
-     frase:'“El poder que no se somete a Dios termina sometiendo al hombre.”',
-     formacion:'Derecho y Filosofía Política',
-     experiencia:'Administración pública; organizaciones de sociedad civil (Estado de Derecho y rendición de cuentas).',
-     bio:'Biografía de ejemplo (se reemplaza con la real). Formación en Derecho y Filosofía Política, con experiencia en administración pública y en organizaciones de sociedad civil enfocadas en Estado de Derecho y rendición de cuentas.'},
-    {id:'m2',nombre:'Ana Ruiz',materia:'Educación Pública · Trimestre 2',foto:'',expediente:'NV-M2-2026',ingreso:'2026',
-     frase:'“Toda educación forma un tipo de persona; la pregunta es cuál.”',
-     formacion:'Ciencias de la Educación',
-     experiencia:'Diseño curricular, formación cívica y acompañamiento a escuelas públicas y privadas.',
-     bio:'Biografía de ejemplo. Pedagoga y formadora de docentes; ha trabajado en diseño curricular, formación cívica y acompañamiento a escuelas.'},
-    {id:'m3',nombre:'Carlos Mendoza',materia:'Economía · Trimestre 3',foto:'',expediente:'NV-M3-2026',ingreso:'2026',
-     frase:'“La economía empieza en el trabajo como vocación, no en el mercado.”',
-     formacion:'Economía',
-     experiencia:'Desarrollo regional, análisis de política pública y proyectos productivos comunitarios.',
-     bio:'Biografía de ejemplo. Economista con trayectoria en desarrollo regional y análisis de política pública; ha asesorado proyectos productivos comunitarios.'}
-  ],
+  mentores:[],
   // ARTÍCULOS de la revista/blog Nación Viva (se conectará al blog real). img: placeholder con degradado.
   articulos:[
     {id:1,titulo:'¿Cuál es el mejor modelo para desarrollar liderazgo?',autor:'Dr. Jorge Salcedo Mireles',edicion:'1ª edición',img:'assets/revista/art1.png',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)'},
     {id:2,titulo:'Requisitos para ser un buen gobernante',autor:'Dr. Alfredo Serés',edicion:'1ª edición',img:'assets/revista/art2.png',bg:'linear-gradient(135deg,#15243C,#4A3358)'},
     {id:3,titulo:'La mujer en su papel trascendental dentro de la política mexicana',autor:'Lic. Gamaliela Tan',edicion:'1ª edición',img:'assets/revista/art3.png',bg:'linear-gradient(135deg,#13233D,#8E4D3E)'}
   ],
-  revista:{edicion:'Julio 2025 · 1ª edición',pdf:'',nombre:''},
+  revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/antorcha-portada.png',nombre:'La Antorcha'},
+  congresoIntro:{id:'C_tyhek0xt0'},
+  registros:[],
+  alumnos:[],
   // Donativo mensual voluntario
   donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'812 332 6119'},
@@ -666,6 +696,7 @@ const store = {
 
 // Asignar por defecto los participantes de ejemplo al Grupo A
 store.usuarios.forEach(u=>{ if(u.rol==='participante'&&!u.grupo) u.grupo='Grupo A'; });
+store.usuarios.forEach((u,i)=>{ if(u.rol==='participante'){ u.folio=String(i+1).padStart(4,'0'); if(u.acceso===undefined) u.acceso=(u.insc==='activo'); } });
 // Estado de publicación (borrador/publicado) para el contenido que ven los participantes
 store.mentores.forEach(m=>{ if(m.publicado===undefined) m.publicado=true; });
 store.avisos.forEach(a=>{ if(a.publicado===undefined) a.publicado=true; });
@@ -731,12 +762,13 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['dgrupos','layers','Grupos'],['dparticipantes','users','Participantes'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  inscripciones:[['ialta','userplus','Alta de participante'],['iinscripciones','list','Inscripciones'],['idonativos','heart','Donativos']]
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
 };
-const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones'};
-const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1'};
-const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta'};
+const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
+const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1',superadmin:'d1'};
+const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta',superadmin:'dpanel'};
 
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
 const ICONS={
@@ -786,16 +818,18 @@ const NAVI = {
     'registro':'inscripciones@edificadores.navi',
     'inscripciones':'inscripciones@edificadores.navi'
   },
-  rolMap:{1:'director',2:'director',3:'director',4:'profesor',5:'participante',6:'inscripciones'},
+  rolMap:{1:'superadmin',2:'director',3:'director',4:'profesor',5:'participante',6:'inscripciones'},
   get activo(){ return !!this.sb; },
   async cargarPerfilYDatos(){
     const sb=this.sb;
     const { data:{ user } } = await sb.auth.getUser();
     // Perfil propio -> rol + nombre real
     const { data:me } = await sb.schema('navi').from('usuarios')
-      .select('nombre,rol_id').eq('auth_uid', user.id).single();
+      .select('nombre,rol_id,roles(codigo)').eq('auth_uid', user.id).single();
     if(me){
-      state.role = this.rolMap[me.rol_id] || 'participante';
+      const cod = me.roles && me.roles.codigo;
+      const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
+      state.role = codeMap[cod] || this.rolMap[me.rol_id] || 'participante';
       const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
       if(du) du.nombre = me.nombre;
     }
@@ -1025,16 +1059,24 @@ avisos:{title:'Avisos',html(){
 
 revista:{title:'Revista',html(){
   const r=store.revista;
-  let h=`<div class="page-head"><div class="eyebrow">Nación Viva</div><h1 class="page">La Antorcha</h1><div class="page-sub">Revista digital de Nación Viva · ${r.edicion}. Léela aquí, dentro de la Escuela.</div></div>`;
+  let h=`<div class="page-head"><div class="eyebrow">Nación Viva</div><h1 class="page">La Antorcha</h1><div class="page-sub">Revista digital de Nación Viva. Léela completa aquí, dentro de la Escuela.</div></div>`;
   if(r.pdf){
-    h+=`<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><a class="btn btn-sm" href="${r.pdf}" target="_blank" rel="noopener">Abrir en pantalla completa</a><a class="btn btn-sm" href="${r.pdf}" download="La-Antorcha.pdf">Descargar</a></div>`
-      + `<div style="border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0A1426"><iframe src="${r.pdf}" style="width:100%;height:76vh;border:0;display:block" title="La Antorcha"></iframe></div>`;
+    h+=`<div class="revista-hero">
+        <div class="revista-cover" style="background-image:url('${r.portada}')" onclick="abrirRevista()"></div>
+        <div class="revista-meta">
+          <div class="revista-tag">Primera edición</div>
+          <div class="revista-title">La Antorcha</div>
+          <p class="revista-desc">La revista de Nación Viva: ideas, entrevistas y reflexiones para edificar México. Ábrela y léela completa en pantalla, sin salir de la Escuela.</p>
+          <div class="revista-actions">
+            <button class="btn btn-accent" onclick="abrirRevista()">Leer la revista</button>
+            <a class="btn btn-sm" href="${r.pdf}" download="La-Antorcha-1a-edicion.pdf">Descargar PDF</a>
+          </div>
+          <div class="revista-note">Próximamente publicaremos la segunda edición.</div>
+        </div>
+      </div>`;
   } else {
     h+=`<div class="empty">La revista se publicará muy pronto. Cuando esté lista, la leerás aquí mismo, sin salir de la Escuela.</div>`;
   }
-  h+=`<div class="sec-title">Artículos de este número</div><div class="grid g3">`
-    + DB.articulos().filter(a=>a.publicado).map(a=>`<div class="card" style="overflow:hidden;padding:0;cursor:pointer" onclick="${r.pdf?"document.querySelector('.main').scrollTo(0,0)":"toast('Se abrirá con el artículo en la revista.')"}"><div style="height:120px;background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div><div style="padding:14px 15px"><div style="font-weight:700;font-size:14px;line-height:1.25">${a.titulo}</div><div style="font-size:12px;color:var(--soft);margin-top:4px">Por ${a.autor}</div></div></div>`).join('')
-    + `</div>`;
   return h;
 }},
 
@@ -1197,32 +1239,35 @@ pmateriales:{title:'Materiales',html(){
 dpanel:{title:'Panel',html(){
   const parts=DB.participantes(); const activos=parts.filter(p=>p.insc==='activo').length;
   return head('Dirección Académica','Panel de la generación','Generación 2026–2027 · resumen general.')
-   + `<div class="grid g4" style="margin-bottom:22px">
+   + `<div class="grid g3" style="margin-bottom:22px">
        <div class="card"><div class="stat-n">${parts.length}</div><div class="stat-l">Participantes inscritos</div></div>
        <div class="card"><div class="stat-n">${activos}</div><div class="stat-l">Con acceso activo</div></div>
-       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div>
-       <div class="card"><div class="stat-n">${DB.donativos().reduce((a,d)=>a+d.monto,0).toLocaleString('es-MX')}</div><div class="stat-l">Donativos (MXN)</div></div></div>`
+       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div></div>`
    + `<div class="grid g2">
        <div class="card"><div class="sec-title" style="margin-top:0">Perfil de los participantes</div>${perfilResumen()}</div>
        <div class="card"><div class="sec-title" style="margin-top:0">Próximas sesiones</div>${store.modulos.slice(0,4).map(m=>`<div class="row" style="margin-bottom:7px;padding:10px 13px"><div class="rinfo"><div class="t" style="font-size:13.5px">M${m.num} · ${m.titulo}</div><div class="d">${fmtFecha(m.fecha)}</div></div></div>`).join('')}</div></div>`
-   + `<div class="sec-title">Transparencia de donativos</div><div class="page-sub" style="margin:-6px 0 12px">Esto es lo que ven los participantes en su sección de Donativo, sobre en qué se usan los fondos.</div>`
-   + transparenciaEditor();
+   ;
 }},
 
 dgrupos:{title:'Grupos',html(){
-  const gs=DB.grupos();
-  const abiertos=gs.filter(g=>g.estatus==='abierto').length;
-  const cupoTot=gs.reduce((a,g)=>a+g.cupo,0), ocup=gs.reduce((a,g)=>a+g.inscritos,0);
-  let h=head('Dirección Académica','Grupos y generaciones','Crea grupos (máximo 12 personas), abre o cierra la inscripción y define el horario de cada uno.')
-   + `<div class="grid g4" style="margin-bottom:20px">
-       <div class="card"><div class="stat-n">${gs.length}</div><div class="stat-l">Grupos</div></div>
-       <div class="card"><div class="stat-n">${abiertos}</div><div class="stat-l">Abiertos</div></div>
-       <div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div>
-       <div class="card"><div class="stat-n">${ocup}/${cupoTot}</div><div class="stat-l">Ocupación total</div></div></div>`;
-  h+= state.showNuevoGrupo ? formNuevoGrupo() : `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.showNuevoGrupo=true;render()">＋ Crear grupo</button>`;
-  h+= gs.map(g=>grupoCard(g)).join('');
+  const on=!!(NAVI&&NAVI.sb);
+  const al=(store.alumnos||[]).filter(a=>a.activado);
+  const grupos=(store.naviGrupos||[]);
+  const g={}; al.forEach(a=>{ if(a.grupo){ (g[a.grupo]=g[a.grupo]||[]).push(a); } });
+  const conM=grupos.filter(gr=>(g[gr.nombre]||[]).length);
+  let h=head('Dirección Académica','Grupos','Crea grupos de máximo 12 alumnos, cada uno con su mentor. La asignación de cada alumno se hace en la pestaña Alumnos.');
+  if(!on) return h+`<div class="card"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver los grupos.</div></div>`;
+  h+=`<div class="card glass" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Crear grupo</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:160px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Nombre del grupo</label><input id="ngNombre2" class="mini-in" style="width:100%" placeholder="Ej. Grupo 1"></div>
+      <div style="flex:1;min-width:160px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Mentor (opcional)</label><input id="ngMentor2" class="mini-in" style="width:100%" placeholder="Nombre del mentor"></div>
+      <button class="btn btn-accent" onclick="crearGrupo()">＋ Crear grupo</button>
+    </div></div>`;
+  h+=`<div class="grid g4" style="margin-bottom:20px"><div class="card"><div class="stat-n">${grupos.length}</div><div class="stat-l">Grupos creados</div></div><div class="card"><div class="stat-n">${al.length}</div><div class="stat-l">Alumnos</div></div><div class="card"><div class="stat-n">${al.filter(a=>!a.grupo).length}</div><div class="stat-l">Sin grupo</div></div><div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div></div>`;
+  const cards=grupos.map(gr=>{ const name=gr.nombre; const m=g[name]||[]; const mentor=gr.mentor||(m.find(x=>x.mentor)||{}).mentor; return `<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div class="sec-title" style="margin:0">${up(name)} · ${m.length}/12</div><div style="display:flex;align-items:center;gap:12px"><div style="font-size:13px;color:var(--dim)">Mentor: <b style="color:var(--cream)">${mentor?up(mentor):'sin asignar'}</b></div><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" onclick="borrarGrupo('${gr.id}','${(name||'').replace(/'/g,'')}')">Borrar</button></div></div><div style="display:flex;flex-wrap:wrap;gap:6px">`+(m.length?m.map(a=>`<span class="pill pill-info">${up(a.nombre)}</span>`).join(''):`<span style="font-size:12.5px;color:var(--dim)">Sin alumnos asignados todavía. Ve a Alumnos y asígnalos a este grupo.</span>`)+`</div></div>`; }).join('');
+  h+= cards || `<div class="empty">Aún no has creado grupos. Usa el formulario de arriba para crear el primero.</div>`;
   return h;
-}},
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 dparticipantes:{title:'Participantes',html(){
   return head('Dirección Académica','Participantes','Padrón de la generación 2026–2027.')
@@ -1231,9 +1276,9 @@ dparticipantes:{title:'Participantes',html(){
    + `</tbody></table></div>`;
 }},
 
-dcontenido:{title:'Contenido',html(){
+dcontenido:{title:'Programa de estudio',html(){
   const mentores=store.mentores.map(x=>x.nombre);
-  return head('Dirección Académica','Contenido del programa','Edita el título, la pregunta formativa y el mentor asignado de cada módulo. Los cambios se reflejan al instante (el mentor personaliza su frase y sus preguntas desde "Mi clase").')
+  return head('Dirección Académica','Programa de estudio','Edita el título, la pregunta formativa y el mentor asignado de cada módulo. Los cambios se reflejan al instante (el mentor personaliza su frase y sus preguntas desde "Mi clase").')
    + DB.trimestres().map(t=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
        <div><b style="font-size:16px">Trimestre ${t.numero} · ${t.nombre}</b><div style="font-size:12.5px;color:var(--soft)">${t.rango}</div></div>${pill(DB.modulosDeTrimestre(t.id).length+' módulos','pill-info')}</div>`
        + DB.modulosDeTrimestre(t.id).map(m=>{
@@ -1335,13 +1380,41 @@ ialta:{title:'Alta de participante',html(){
      <div class="card" id="altaResult"><div class="empty">Al dar de alta, aquí aparecerá el usuario y la clave generados para entregar al participante.</div></div></div>`;
 }},
 
-iinscripciones:{title:'Inscripciones',html(){
-  return head('Coordinación de Inscripciones','Inscripciones','Confirma o activa las inscripciones de la generación.')
-   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Perfil</th><th>Estatus</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
-   + DB.participantes().map(p=>`<tr><td class="nm">${p.nombre}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario}</td><td>${perfilLabel(p.perfil)}</td><td>${inscPill(p.insc)}</td>
-       <td style="text-align:right">${p.insc==='activo'?'<span style="color:var(--soft);font-size:12px">—</span>':`<button class="btn btn-sm btn-accent" onclick="confirmarInsc('${p.id}')">${p.insc==='preinscrito'?'Confirmar':'Activar acceso'}</button>`}</td></tr>`).join('')
-   + `</tbody></table></div>`;
-}},
+iregistros:{title:'Registros',html(){
+  const rs=store.registros||[];
+  const on=!!(NAVI&&NAVI.sb);
+  const amap={}; (store.alumnos||[]).forEach(a=>{ if(a.email) amap[a.email.toLowerCase()]=a; });
+  const banner = on
+    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div>`
+    : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
+  const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
+  const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
+    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th style="text-align:right">Acceso</th><th></th></tr></thead><tbody>`
+        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td style="text-align:right">${rowAcc(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
+        + `</tbody></table></div>`
+      : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
+  const nAl=(store.alumnos||[]).filter(a=>a.activado).length;
+  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Activa su acceso para volverlas alumnos.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros · <b style="color:var(--cream)">${nAl}</b> alumnos activados</div>`:'')+body;
+}, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
+
+ialumnos:{title:'Alumnos',html(){
+  const on=!!(NAVI&&NAVI.sb);
+  const al=(store.alumnos||[]).filter(a=>a.activado);
+  const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver a los alumnos reales.</div></div>`;
+  const grupos=(store.naviGrupos||[]);
+  const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
+  const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
+  const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th></th></tr></thead><tbody>`
+        + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
+          +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
+          +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
+          +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
+          +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
+        + `</tbody></table></div>`
+      : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 idonativos:{title:'Donativos',html(){
   const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
@@ -1380,7 +1453,7 @@ if (PRELANZAMIENTO) {
       return '<div class="row locked" style="margin-bottom:10px;align-items:flex-start"><div class="rnum">'+t.numero+'</div>'
         +'<div class="rinfo"><div class="t">'+t.nombre+'</div><div class="d">'+t.rango+'</div>'
         +(extra?('<div class="d" style="margin-top:4px;color:var(--soft)">'+t.pregunta+'</div>'):'')
-        +'</div>'+pill('Próximamente','pill-wait')+'</div>';
+        +'</div>'+pill('Próximamente','pill-soon')+'</div>';
     }).join('');
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
@@ -1391,7 +1464,7 @@ if (PRELANZAMIENTO) {
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
-      +(hayRev?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
+      +(DB.articulos().filter(function(a){return a.publicado;}).length?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
@@ -1402,12 +1475,28 @@ if (PRELANZAMIENTO) {
       + ejesPL(true);
   }};
   VIEWS.congreso = {title:'Congreso', html:function(){
-    return head('Congreso Nación Viva 2026','Las conferencias','Estas son las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.')
-      + CONF_PL.map(function(c){
-        return '<div class="row" style="margin-bottom:8px"><div style="width:48px;height:48px;border-radius:10px;background:url(\''+c.ph+'\') center/cover;flex-shrink:0;border:1px solid var(--line)"></div>'
-          +'<div class="rinfo"><div class="t">'+c.cf+'</div><div class="d">'+c.nm+'</div></div>'
-          +pill('Grabación próximamente','pill-wait')+'</div>';
-      }).join('');
+    var u=state.user||{}; var activo=!!u.acceso_congreso;
+    var intro=store.congresoIntro;
+    var introHtml = (intro&&intro.id)
+      ? '<div class="cngr-video"><iframe src="https://www.youtube.com/embed/'+intro.id+'" title="Video introductorio del Congreso" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'
+      : '<div class="cngr-video cngr-soon"><div class="cngr-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span>Video introductorio del Congreso · muy pronto</span></div>';
+    var banner = activo
+      ? '<div class="cngr-acc open">Tus conferencias están desbloqueadas. Que las disfrutes.</div>'
+      : '<div class="cngr-acc lock">Las conferencias se habilitan al confirmar tu donativo. <a onclick="nav(\'midonativo\')">Realizar mi donativo</a></div>';
+    var cards = CONF_PL.map(function(c){
+      var right = activo
+        ? '<button class="cngr-pill open" onclick="toast(\'Reproduciendo la conferencia…\')">Ver ahora</button>'
+        : '<span class="cngr-pill lock">Se habilita con tu donativo</span>';
+      return '<div class="cngr-row"><div class="cngr-ph" style="background-image:url(\''+c.ph+'\')"></div>'
+        +'<div class="cngr-info"><div class="cngr-cf">'+c.cf+'</div><div class="cngr-nm">'+c.nm+'</div></div>'+right+'</div>';
+    }).join('');
+    return '<div class="cngr">'
+      +'<div class="cngr-head"><img class="cngr-logo" src="assets/logo_congreso.png" onerror="this.style.display=\'none\'" alt="Congreso Nación Viva 2026"><div class="cngr-sub">28 y 29 de agosto · Monterrey</div></div>'
+      +introHtml
+      +'<div class="cngr-secttl">Las conferencias</div>'
+      +banner
+      +cards
+      +'</div>';
   }};
   var _goModule_orig = goModule;
   goModule = function(id){ if(state.role==='participante'){ toast('Tus clases se abrirán muy pronto.'); return; } _goModule_orig(id); };
@@ -1418,6 +1507,19 @@ if (PRELANZAMIENTO) {
 /* ============================================================
    HELPERS DE VISTA + ACCIONES (mutan el store y re-renderizan)
    ============================================================ */
+function abrirRevista(){
+  var r=store.revista; if(!r||!r.pdf) return;
+  var ov=document.getElementById('pdfModal');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='pdfModal'; ov.className='pdf-ov';
+    ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>La Antorcha · '+r.edicion+'</span><span style="display:flex;gap:8px;align-items:center"><a class="btn btn-sm" href="'+r.pdf+'" download="La-Antorcha-1a-edicion.pdf">Descargar</a><button class="pdf-x" onclick="cerrarRevista()" aria-label="Cerrar">\u2715</button></span></div><iframe class="pdf-frame" src="'+r.pdf+'#view=FitH" title="La Antorcha"></iframe></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) cerrarRevista(); });
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('on'); document.body.style.overflow='hidden';
+}
+function cerrarRevista(){ var ov=document.getElementById('pdfModal'); if(ov) ov.classList.remove('on'); document.body.style.overflow=''; }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarRevista(); });
 function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
 function heroProxima(mod){
   const m=mod||DB.proximaSesion();
@@ -1616,6 +1718,127 @@ function darAlta(){
     <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
     <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
   toast('Participante dado de alta');
+}
+const GRUPOS=['Grupo 1','Grupo 2','Grupo 3','Grupo 4','Grupo 5','Grupo 6','Grupo 7','Grupo 8'];
+function up(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(); }
+function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
+async function cargarRegistros(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._regLoaded && !force) return;
+  store._regLoaded=true; store._loadingReg=true; render();
+  try{
+    const { data, error } = await NAVI.sb.from('inscripciones')
+      .select('id,created_at,nombre,correo,whatsapp,entidad,municipio,perfil,estado,procesado,usuario_generado')
+      .order('created_at',{ascending:false});
+    if(error) throw error;
+    store.registros = data||[];
+  }catch(e){ store._regLoaded=false; toast('No pude cargar registros. ¿Corriste el paso 11 (permiso de lectura)?'); }
+  store._loadingReg=false; render();
+}
+async function cargarAlumnos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._alLoaded && !force) return;
+  store._alLoaded=true; store._loadingAl=true; render();
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
+      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,roles(codigo)')
+      .order('folio');
+    if(error) throw error;
+    store.alumnos = (data||[]).filter(u=>!u.roles || u.roles.codigo==='participante');
+  }catch(e){ store._alLoaded=false; toast('No pude cargar alumnos. ¿Corriste el paso 11 (permiso de lectura)?'); }
+  store._loadingAl=false; render();
+}
+async function toggleAcceso(authUid, current){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const nuevo = !current;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('usuarios').update({acceso_congreso:nuevo}).eq('auth_uid',authUid);
+    if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a) a.acceso_congreso=nuevo;
+    toast(nuevo?'Acceso a conferencias activado':'Acceso retirado'); render();
+  }catch(e){ toast('No se pudo cambiar el acceso (revisa permisos RLS).'); }
+}
+async function procesarPendientes(){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').rpc('procesar_registros');
+    if(error) throw error;
+    toast('Accesos generados: '+(data!=null?data:'')); cargarRegistros(true); cargarAlumnos(true);
+  }catch(e){ toast('No se pudo procesar (revisa permisos).'); }
+}
+async function activarAcceso(email){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({activado:true}).eq('email',(email||'').toLowerCase()); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>(x.email||'').toLowerCase()===(email||'').toLowerCase()); if(a)a.activado=true;
+    toast('Acceso activado. Ya es alumno.'); render();
+  }catch(e){ toast('No se pudo activar (revisa el paso 11/13 y permisos).'); }
+}
+async function asignarGrupo(authUid,grupo){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({grupo:grupo||null}).eq('auth_uid',authUid); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.grupo=grupo; toast(grupo?('Asignado a '+grupo):'Grupo quitado');
+  }catch(e){ toast('No se pudo asignar el grupo.'); }
+}
+async function asignarMentor(authUid,mentor){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({mentor:mentor||null}).eq('auth_uid',authUid); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
+  }catch(e){ toast('No se pudo asignar el mentor.'); }
+}
+async function cargarGrupos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._grpLoaded && !force) return;
+  store._grpLoaded=true;
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor').order('nombre');
+    if(error) throw error;
+    store.naviGrupos = data||[];
+  }catch(e){ store._grpLoaded=false; }
+  render();
+}
+async function crearGrupo(){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const ni=document.getElementById('ngNombre2'), mi=document.getElementById('ngMentor2');
+  const nombre=(ni&&ni.value||'').trim(); const mentor=(mi&&mi.value||'').trim();
+  if(!nombre){ toast('Escribe el nombre del grupo.'); return; }
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('grupos').insert({nombre,mentor:mentor||null}).select('id,nombre,mentor');
+    if(error) throw error;
+    store.naviGrupos = (store.naviGrupos||[]).concat(data||[]).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+    if(ni)ni.value=''; if(mi)mi.value=''; toast('Grupo creado'); render();
+  }catch(e){ toast('No se pudo crear el grupo (¿corriste el paso 14? ¿nombre repetido?).'); }
+}
+async function borrarGrupo(id,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar el grupo "'+nombre+'"? Los alumnos quedarán sin grupo.')) return;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('grupos').delete().eq('id',id);
+    if(error) throw error;
+    store.naviGrupos=(store.naviGrupos||[]).filter(g=>g.id!==id);
+    // desasignar alumnos localmente
+    (store.alumnos||[]).forEach(a=>{ if(a.grupo===nombre) a.grupo=null; });
+    toast('Grupo borrado'); render();
+  }catch(e){ toast('No se pudo borrar el grupo.'); }
+}
+async function borrarAlumno(authUid,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar a "'+(nombre||'este alumno')+'"? Esta acción no se puede deshacer.')) return;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('usuarios').delete().eq('auth_uid',authUid);
+    if(error) throw error;
+    store.alumnos=(store.alumnos||[]).filter(a=>a.auth_uid!==authUid);
+    toast('Alumno borrado'); render();
+  }catch(e){ toast('No se pudo borrar (revisa el paso 14 / permisos RLS).'); }
+}
+async function borrarRegistro(id,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar el registro de "'+(nombre||'esta persona')+'"?')) return;
+  try{
+    const { error } = await NAVI.sb.from('inscripciones').delete().eq('id',id);
+    if(error) throw error;
+    store.registros=(store.registros||[]).filter(r=>r.id!==id);
+    toast('Registro borrado'); render();
+  }catch(e){ toast('No se pudo borrar el registro (revisa el paso 14 / permisos RLS).'); }
 }
 function confirmarInsc(uid){const u=store.usuarios.find(x=>x.id===uid);u.insc=(u.insc==='preinscrito')?'confirmado':'activo';render();toast('Inscripción actualizada: '+u.insc);}
 /* grupos */
