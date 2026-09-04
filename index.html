@@ -762,8 +762,8 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['didentidad','image','Identidad']],
-  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['idonativos','heart','Donativos'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
 };
 const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
@@ -994,6 +994,7 @@ mentorDetalle:{title:'Expediente',html(){
        <div class="dz-statement">${x.frase}</div>
        <div class="dz-section">Notas del expediente</div>
        <div class="dz-notes">${x.bio}</div>
+       ${x.cvPdf?`<div style="padding:12px 16px 4px"><a href="${x.cvPdf}" download="${(x.cvName||('CV-'+x.nombre+'.pdf')).replace(/"/g,'')}" class="btn btn-sm">Descargar CV (PDF)</a></div>`:''}
      </div>`;
 }},
 
@@ -1237,30 +1238,40 @@ pmateriales:{title:'Materiales',html(){
 
 /* ---------- DIRECTOR ---------- */
 dpanel:{title:'Panel',html(){
-  const parts=DB.participantes(); const activos=parts.filter(p=>p.insc==='activo').length;
-  return head('Dirección Académica','Panel de la generación','Generación 2026–2027 · resumen general.')
+  const on=!!(NAVI&&NAVI.sb);
+  const nReg=(store.registros||[]).length;
+  const nIns=(store.alumnos||[]).filter(a=>a.activado).length;
+  const nAcc=(store.alumnos||[]).filter(a=>a.activado&&a.acceso_congreso).length;
+  const h=head('Dirección Académica','Panel de la generación','Generación 2026–2027 · resumen general.');
+  const nota=on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver los datos reales de tu formulario y de la plataforma.</div></div>`;
+  return h + nota
    + `<div class="grid g3" style="margin-bottom:22px">
-       <div class="card"><div class="stat-n">${parts.length}</div><div class="stat-l">Participantes inscritos</div></div>
-       <div class="card"><div class="stat-n">${activos}</div><div class="stat-l">Con acceso activo</div></div>
-       <div class="card"><div class="stat-n">18</div><div class="stat-l">Módulos programados</div></div></div>`
-   + `<div class="grid g2">
-       <div class="card"><div class="sec-title" style="margin-top:0">Perfil de los participantes</div>${perfilResumen()}</div>
-       <div class="card"><div class="sec-title" style="margin-top:0">Próximas sesiones</div>${store.modulos.slice(0,4).map(m=>`<div class="row" style="margin-bottom:7px;padding:10px 13px"><div class="rinfo"><div class="t" style="font-size:13.5px">M${m.num} · ${m.titulo}</div><div class="d">${fmtFecha(m.fecha)}</div></div></div>`).join('')}</div></div>`
-   ;
-}},
+       <div class="card"><div class="stat-n">${nReg}</div><div class="stat-l">Registrados (formulario)</div></div>
+       <div class="card"><div class="stat-n">${nIns}</div><div class="stat-l">Inscritos (con acceso)</div></div>
+       <div class="card"><div class="stat-n">${nAcc}</div><div class="stat-l">Con acceso a conferencias</div></div></div>`
+   + `<div class="card"><div class="sec-title" style="margin-top:0">¿Cómo se cuentan?</div>
+       <p style="font-size:13px;color:var(--dim);line-height:1.6"><b style="color:var(--cream)">Registrados</b>: personas que llenaron el formulario de inscripción. <b style="color:var(--cream)">Inscritos</b>: registros a los que ya les activaste el acceso (aparecen en Alumnos). <b style="color:var(--cream)">Con acceso a conferencias</b>: alumnos con las conferencias del Congreso desbloqueadas tras confirmar su donativo.</p></div>`;
+}, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
 
 dgrupos:{title:'Grupos',html(){
   const on=!!(NAVI&&NAVI.sb);
   const al=(store.alumnos||[]).filter(a=>a.activado);
+  const grupos=(store.naviGrupos||[]);
   const g={}; al.forEach(a=>{ if(a.grupo){ (g[a.grupo]=g[a.grupo]||[]).push(a); } });
-  const conM=GRUPOS.filter(k=>(g[k]||[]).length);
-  let h=head('Dirección Académica','Grupos','Grupos de máximo 12 alumnos, cada uno con su mentor. La asignación se hace en la pestaña Alumnos.');
+  const conM=grupos.filter(gr=>(g[gr.nombre]||[]).length);
+  let h=head('Dirección Académica','Grupos','Crea grupos de máximo 12 alumnos, cada uno con su mentor. La asignación de cada alumno se hace en la pestaña Alumnos.');
   if(!on) return h+`<div class="card"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver los grupos.</div></div>`;
-  h+=`<div class="grid g4" style="margin-bottom:20px"><div class="card"><div class="stat-n">${conM.length}</div><div class="stat-l">Grupos con alumnos</div></div><div class="card"><div class="stat-n">${al.length}</div><div class="stat-l">Alumnos</div></div><div class="card"><div class="stat-n">${al.filter(a=>!a.grupo).length}</div><div class="stat-l">Sin grupo</div></div><div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div></div>`;
-  const cards=GRUPOS.map(name=>{ const m=g[name]||[]; if(!m.length) return ''; const mentor=(m.find(x=>x.mentor)||{}).mentor; return `<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="sec-title" style="margin:0">${name} · ${m.length}/12</div><div style="font-size:13px;color:var(--dim)">Mentor: <b style="color:var(--cream)">${mentor?up(mentor):'sin asignar'}</b></div></div><div style="display:flex;flex-wrap:wrap;gap:6px">`+m.map(a=>`<span class="pill pill-info">${up(a.nombre)}</span>`).join('')+`</div></div>`; }).join('');
-  h+= cards || `<div class="empty">Aún no hay alumnos asignados a grupos. Ve a Alumnos y asígnalos.</div>`;
+  h+=`<div class="card glass" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Crear grupo</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:160px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Nombre del grupo</label><input id="ngNombre2" class="mini-in" style="width:100%" placeholder="Ej. Grupo 1"></div>
+      <div style="flex:1;min-width:160px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Mentor (opcional)</label><input id="ngMentor2" class="mini-in" style="width:100%" placeholder="Nombre del mentor"></div>
+      <button class="btn btn-accent" onclick="crearGrupo()">＋ Crear grupo</button>
+    </div></div>`;
+  h+=`<div class="grid g4" style="margin-bottom:20px"><div class="card"><div class="stat-n">${grupos.length}</div><div class="stat-l">Grupos creados</div></div><div class="card"><div class="stat-n">${al.length}</div><div class="stat-l">Alumnos</div></div><div class="card"><div class="stat-n">${al.filter(a=>!a.grupo).length}</div><div class="stat-l">Sin grupo</div></div><div class="card"><div class="stat-n">12</div><div class="stat-l">Cupo por grupo</div></div></div>`;
+  const cards=grupos.map(gr=>{ const name=gr.nombre; const m=g[name]||[]; const mentor=gr.mentor||(m.find(x=>x.mentor)||{}).mentor; return `<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div class="sec-title" style="margin:0">${up(name)} · ${m.length}/12</div><div style="display:flex;align-items:center;gap:12px"><div style="font-size:13px;color:var(--dim)">Mentor: <b style="color:var(--cream)">${mentor?up(mentor):'sin asignar'}</b></div><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" onclick="borrarGrupo('${gr.id}','${(name||'').replace(/'/g,'')}')">Borrar</button></div></div><div style="display:flex;flex-wrap:wrap;gap:6px">`+(m.length?m.map(a=>`<span class="pill pill-info">${up(a.nombre)}</span>`).join(''):`<span style="font-size:12.5px;color:var(--dim)">Sin alumnos asignados todavía. Ve a Alumnos y asígnalos a este grupo.</span>`)+`</div></div>`; }).join('');
+  h+= cards || `<div class="empty">Aún no has creado grupos. Usa el formulario de arriba para crear el primero.</div>`;
   return h;
-}, after(){ if(NAVI&&NAVI.sb) cargarAlumnos(); }},
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 dparticipantes:{title:'Participantes',html(){
   return head('Dirección Académica','Participantes','Padrón de la generación 2026–2027.')
@@ -1269,9 +1280,9 @@ dparticipantes:{title:'Participantes',html(){
    + `</tbody></table></div>`;
 }},
 
-dcontenido:{title:'Contenido',html(){
+dcontenido:{title:'Programa de estudio',html(){
   const mentores=store.mentores.map(x=>x.nombre);
-  return head('Dirección Académica','Contenido del programa','Edita el título, la pregunta formativa y el mentor asignado de cada módulo. Los cambios se reflejan al instante (el mentor personaliza su frase y sus preguntas desde "Mi clase").')
+  return head('Dirección Académica','Programa de estudio','Edita el título, la pregunta formativa y el mentor asignado de cada módulo. Los cambios se reflejan al instante (el mentor personaliza su frase y sus preguntas desde "Mi clase").')
    + DB.trimestres().map(t=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
        <div><b style="font-size:16px">Trimestre ${t.numero} · ${t.nombre}</b><div style="font-size:12.5px;color:var(--soft)">${t.rango}</div></div>${pill(DB.modulosDeTrimestre(t.id).length+' módulos','pill-info')}</div>`
        + DB.modulosDeTrimestre(t.id).map(m=>{
@@ -1382,28 +1393,32 @@ iregistros:{title:'Registros',html(){
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
   const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
-    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th style="text-align:right">Acceso</th></tr></thead><tbody>`
-        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td style="text-align:right">${rowAcc(r)}</td></tr>`).join('')
+    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th style="text-align:right">Acceso</th><th></th></tr></thead><tbody>`
+        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td style="text-align:right">${rowAcc(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
-  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Activa su acceso para volverlas alumnos.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros en total</div>`:'')+body;
+  const nAl=(store.alumnos||[]).filter(a=>a.activado).length;
+  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Activa su acceso para volverlas alumnos. Registro e inscripción son distintos: un registro es una solicitud del formulario; un inscrito es un registro con acceso ya activado.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros · <b style="color:var(--cream)">${nAl}</b> inscritos</div>`:'')+body;
 }, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
 
 ialumnos:{title:'Alumnos',html(){
   const on=!!(NAVI&&NAVI.sb);
   const al=(store.alumnos||[]).filter(a=>a.activado);
   const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver a los alumnos reales.</div></div>`;
-  const opt=(cur)=>`<option value="">—</option>`+GRUPOS.map(g=>`<option ${cur===g?'selected':''}>${g}</option>`).join('');
+  const grupos=(store.naviGrupos||[]);
+  const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
+  const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th></tr></thead><tbody>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
-          +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td></tr>`).join('')
+          +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
+          +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
-  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
-}, after(){ if(NAVI&&NAVI.sb) cargarAlumnos(); }},
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 idonativos:{title:'Donativos',html(){
   const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
@@ -1774,6 +1789,61 @@ async function asignarMentor(authUid,mentor){
     const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
   }catch(e){ toast('No se pudo asignar el mentor.'); }
 }
+async function cargarGrupos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._grpLoaded && !force) return;
+  store._grpLoaded=true;
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor').order('nombre');
+    if(error) throw error;
+    store.naviGrupos = data||[];
+  }catch(e){ store._grpLoaded=false; }
+  render();
+}
+async function crearGrupo(){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const ni=document.getElementById('ngNombre2'), mi=document.getElementById('ngMentor2');
+  const nombre=(ni&&ni.value||'').trim(); const mentor=(mi&&mi.value||'').trim();
+  if(!nombre){ toast('Escribe el nombre del grupo.'); return; }
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('grupos').insert({nombre,mentor:mentor||null}).select('id,nombre,mentor');
+    if(error) throw error;
+    store.naviGrupos = (store.naviGrupos||[]).concat(data||[]).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+    if(ni)ni.value=''; if(mi)mi.value=''; toast('Grupo creado'); render();
+  }catch(e){ toast('No se pudo crear el grupo (¿corriste el paso 14? ¿nombre repetido?).'); }
+}
+async function borrarGrupo(id,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar el grupo "'+nombre+'"? Los alumnos quedarán sin grupo.')) return;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('grupos').delete().eq('id',id);
+    if(error) throw error;
+    store.naviGrupos=(store.naviGrupos||[]).filter(g=>g.id!==id);
+    // desasignar alumnos localmente
+    (store.alumnos||[]).forEach(a=>{ if(a.grupo===nombre) a.grupo=null; });
+    toast('Grupo borrado'); render();
+  }catch(e){ toast('No se pudo borrar el grupo.'); }
+}
+async function borrarAlumno(authUid,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar a "'+(nombre||'este alumno')+'"? Esta acción no se puede deshacer.')) return;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('usuarios').delete().eq('auth_uid',authUid);
+    if(error) throw error;
+    store.alumnos=(store.alumnos||[]).filter(a=>a.auth_uid!==authUid);
+    toast('Alumno borrado'); render();
+  }catch(e){ toast('No se pudo borrar (revisa el paso 14 / permisos RLS).'); }
+}
+async function borrarRegistro(id,nombre){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(!confirm('¿Borrar el registro de "'+(nombre||'esta persona')+'"?')) return;
+  try{
+    const { error } = await NAVI.sb.from('inscripciones').delete().eq('id',id);
+    if(error) throw error;
+    store.registros=(store.registros||[]).filter(r=>r.id!==id);
+    toast('Registro borrado'); render();
+  }catch(e){ toast('No se pudo borrar el registro (revisa el paso 14 / permisos RLS).'); }
+}
 function confirmarInsc(uid){const u=store.usuarios.find(x=>x.id===uid);u.insc=(u.insc==='preinscrito')?'confirmado':'activo';render();toast('Inscripción actualizada: '+u.insc);}
 /* grupos */
 const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -1845,25 +1915,39 @@ function mentorForm(){
       <div class="form" style="flex:1;min-width:260px;display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
         <div style="grid-column:1/-1"><label>Nombre</label><input id="meNombre" value="${q(m.nombre)}"></div>
         <div><label>Área / materia</label><input id="meMateria" value="${q(m.materia)}" placeholder="Ej. Economía · Trimestre 3"></div>
-        <div><label>Expediente</label><input id="meExp" value="${q(m.expediente)}" placeholder="NV-Mx-2026"></div>
-        <div><label>Formación</label><input id="meForm" value="${q(m.formacion)}"></div>
         <div><label>Ingreso</label><input id="meIng" value="${q(m.ingreso)}" placeholder="2026"></div>
-        <div style="grid-column:1/-1"><label>Experiencia</label><input id="meExpr" value="${q(m.experiencia)}"></div>
+        <div style="grid-column:1/-1"><label>Expediente</label><input id="meExp" value="${q(m.expediente)}" placeholder="NV-Mx-2026"></div>
         <div style="grid-column:1/-1"><label>Frase (declaración en archivo)</label><input id="meFrase" value="${q(m.frase)}"></div>
-        <div style="grid-column:1/-1"><label>Biografía / notas</label><textarea id="meBio" style="min-height:70px">${t(m.bio)}</textarea></div>
+        <div style="grid-column:1/-1"><label>Currículum (PDF)</label>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <label class="btn btn-sm" style="cursor:pointer;margin:0">Subir CV en PDF<input type="file" accept="application/pdf" style="display:none" onchange="subirMentorCV(event)"></label>
+            <span id="meCVName" style="font-size:12px;color:var(--soft)">${m.cvName?('Archivo: '+m.cvName):'Sube el CV; de ahí se toma formación, experiencia y biografía.'}</span>
+          </div>
+          <div id="meCVStatus" style="font-size:12px;color:var(--accent-bright);margin-top:6px"></div>
+          <div id="meCVPrev" style="margin-top:8px">${(m.formacion||m.experiencia||m.bio)?mentorCVPreview(m):''}</div>
+          <p style="font-size:11.5px;color:var(--soft);margin-top:6px">La foto y la frase se ponen a mano; el resto de la ficha se llena con el CV.</p>
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
       <button class="btn btn-accent" onclick="guardarMentor(false)">Guardar como borrador</button>
       <button class="btn btn-solid" onclick="guardarMentor(true)">Guardar y publicar</button>
-      <button class="btn" onclick="state.editMentor=null;_mentorFotoURL=null;render()">Cancelar</button>
+      <button class="btn" onclick="state.editMentor=null;_mentorFotoURL=null;_mentorCV=null;render()">Cancelar</button>
     </div></div>`;
 }
 function subirMentorFoto(ev){const f=ev.target.files&&ev.target.files[0];if(!f)return;_mentorFotoURL=URL.createObjectURL(f);const p=document.getElementById('meFotoPrev');if(p)p.innerHTML=`<img src="${_mentorFotoURL}" style="width:100%;height:100%;object-fit:cover" alt="">`;}
 function guardarMentor(publicar){
   const g=id=>{const el=document.getElementById(id);return el?el.value.trim():'';};
   const nombre=g('meNombre'); if(!nombre)return toast('Escribe el nombre del mentor');
-  const data={nombre,materia:g('meMateria'),expediente:g('meExp')||('NV-'+String(Date.now()).slice(-4)),ingreso:g('meIng')||'2026',formacion:g('meForm'),experiencia:g('meExpr'),frase:g('meFrase'),bio:(document.getElementById('meBio')||{value:''}).value};
+  const data={nombre,materia:g('meMateria'),expediente:g('meExp')||('NV-'+String(Date.now()).slice(-4)),ingreso:g('meIng')||'2026',frase:g('meFrase')};
+  const prev=(state.editMentor==='nuevo')?{}:(store.mentores.find(x=>x.id===state.editMentor)||{});
+  const cv=_mentorCV||{};
+  // Formación/experiencia/biografía/CV: del PDF si se subió uno nuevo; si no, se conservan
+  data.formacion   = _mentorCV? (cv.formacion||'')   : (prev.formacion||'');
+  data.experiencia = _mentorCV? (cv.experiencia||'') : (prev.experiencia||'');
+  data.bio         = _mentorCV? (cv.bio||'')         : (prev.bio||'');
+  data.cvPdf       = _mentorCV? (cv.cvPdf||'')       : (prev.cvPdf||'');
+  data.cvName      = _mentorCV? (cv.cvName||'')      : (prev.cvName||'');
   if(state.editMentor==='nuevo'){
     const nums=store.mentores.map(x=>parseInt(String(x.id).replace(/\D/g,''))||0);
     const id='m'+((nums.length?Math.max(...nums):0)+1);
@@ -1871,7 +1955,69 @@ function guardarMentor(publicar){
   } else {
     const m=store.mentores.find(x=>x.id===state.editMentor); if(m){Object.assign(m,data); if(_mentorFotoURL)m.foto=_mentorFotoURL; if(publicar)m.publicado=true;}
   }
-  _mentorFotoURL=null; state.editMentor=null; render(); toast(publicar?'Mentor guardado y publicado':'Mentor guardado');
+  _mentorFotoURL=null; _mentorCV=null; state.editMentor=null; render(); toast(publicar?'Mentor guardado y publicado':'Mentor guardado');
+}
+let _mentorCV=null;
+function mentorCVPreview(m){
+  const row=(l,v)=>v?`<div style="margin-bottom:6px"><span style="font-size:11px;color:var(--soft);text-transform:uppercase;letter-spacing:.04em">${l}</span><div style="font-size:12.5px;color:var(--cream);line-height:1.5">${(v||'').replace(/</g,'&lt;')}</div></div>`:'';
+  const inner=row('Formación',m.formacion)+row('Experiencia',m.experiencia)+row('Biografía',m.bio);
+  if(!inner) return '';
+  return `<div style="border:1px solid var(--glassline);background:rgba(255,255,255,.03);border-radius:10px;padding:12px 14px">${inner}${m.cvName?`<div style="font-size:11px;color:var(--soft);margin-top:4px">Extraído de ${m.cvName}</div>`:''}</div>`;
+}
+function loadPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=()=>{ try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }catch(e){} res(window.pdfjsLib); };
+    s.onerror=()=>rej(new Error('No se pudo cargar el lector de PDF.'));
+    document.head.appendChild(s);
+  });
+}
+function parseCV(text){
+  const clean=(text||'').replace(/\r/g,'').replace(/ /g,' ');
+  const lines=clean.split('\n').map(l=>l.trim());
+  const heads={ formacion:/^(formaci[oó]n|educaci[oó]n|estudios|acad[eé]mic|formaci[oó]n acad)/i,
+                experiencia:/^(experiencia|trayectoria|experiencia (profesional|laboral)|historia laboral)/i,
+                bio:/^(perfil|resumen|acerca|semblanza|sobre m[ií]|biograf[ií]a|objetivo)/i };
+  const sec={formacion:[],experiencia:[],bio:[]}; let cur=null;
+  for(const ln of lines){
+    let matched=null;
+    for(const k in heads){ if(heads[k].test(ln.replace(/[:•\-\s]+$/,''))){ matched=k; break; } }
+    if(matched){ cur=matched; continue; }
+    if(cur && ln) sec[cur].push(ln);
+  }
+  const join=a=>a.join(' ').replace(/\s{2,}/g,' ').trim().slice(0,600);
+  let bio=join(sec.bio);
+  if(!bio){ // si no hay perfil, usa las primeras líneas con texto como semblanza
+    bio=lines.filter(Boolean).slice(0,6).join(' ').replace(/\s{2,}/g,' ').trim().slice(0,400);
+  }
+  return { formacion:join(sec.formacion), experiencia:join(sec.experiencia), bio };
+}
+function subirMentorCV(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  const st=document.getElementById('meCVStatus'); const nm=document.getElementById('meCVName');
+  if(st) st.textContent='Procesando CV…'; if(nm) nm.textContent='Archivo: '+f.name;
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const dataUrl=reader.result;
+    try{
+      const pdfjs=await loadPdfJs();
+      const buf=await f.arrayBuffer();
+      const pdf=await pdfjs.getDocument({data:buf}).promise;
+      let text='';
+      for(let i=1;i<=pdf.numPages;i++){ const pg=await pdf.getPage(i); const c=await pg.getTextContent(); text+=c.items.map(it=>it.str).join(' ')+'\n'; }
+      const parsed=parseCV(text);
+      _mentorCV={ formacion:parsed.formacion, experiencia:parsed.experiencia, bio:parsed.bio, cvPdf:dataUrl, cvName:f.name };
+      const prev=document.getElementById('meCVPrev'); if(prev) prev.innerHTML=mentorCVPreview({formacion:parsed.formacion,experiencia:parsed.experiencia,bio:parsed.bio,cvName:f.name});
+      if(st) st.textContent=(parsed.formacion||parsed.experiencia)?'CV leído. Revisa la ficha; se guardará al presionar Guardar.':'CV cargado. No detecté secciones claras (Formación/Experiencia); se usará el texto como semblanza. El PDF queda disponible para descarga.';
+    }catch(e){
+      // Aun si no se puede leer el texto, guardamos el PDF para descarga
+      _mentorCV={ formacion:'', experiencia:'', bio:'', cvPdf:dataUrl, cvName:f.name };
+      if(st) st.textContent='Guardé el PDF para descarga, pero no pude extraer el texto automáticamente.';
+    }
+  };
+  reader.readAsDataURL(f);
 }
 function eliminarMentor(id){store.mentores=store.mentores.filter(x=>x.id!==id);render();toast('Mentor eliminado');}
 function toggleMentorPub(id){const m=store.mentores.find(x=>x.id===id);if(m){m.publicado=!m.publicado;render();toast(m.publicado?'Mentor publicado':'Mentor despublicado');}}
