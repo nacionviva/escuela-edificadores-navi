@@ -677,6 +677,8 @@ const store = {
   ],
   revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/antorcha-portada.png',nombre:'La Antorcha'},
   congresoIntro:{id:'C_tyhek0xt0'},
+  registros:[],
+  alumnos:[],
   // Donativo mensual voluntario
   donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'812 332 6119'},
@@ -709,6 +711,7 @@ const store = {
 
 // Asignar por defecto los participantes de ejemplo al Grupo A
 store.usuarios.forEach(u=>{ if(u.rol==='participante'&&!u.grupo) u.grupo='Grupo A'; });
+store.usuarios.forEach((u,i)=>{ if(u.rol==='participante'){ u.folio=String(i+1).padStart(4,'0'); if(u.acceso===undefined) u.acceso=(u.insc==='activo'); } });
 // Estado de publicación (borrador/publicado) para el contenido que ven los participantes
 store.mentores.forEach(m=>{ if(m.publicado===undefined) m.publicado=true; });
 store.avisos.forEach(a=>{ if(a.publicado===undefined) a.publicado=true; });
@@ -774,8 +777,8 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['dgrupos','layers','Grupos'],['dparticipantes','users','Participantes'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  inscripciones:[['ialta','userplus','Alta de participante'],['iinscripciones','list','Inscripciones'],['idonativos','heart','Donativos']]
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Contenido'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
 };
 const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones'};
 const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1'};
@@ -1386,13 +1389,31 @@ ialta:{title:'Alta de participante',html(){
      <div class="card" id="altaResult"><div class="empty">Al dar de alta, aquí aparecerá el usuario y la clave generados para entregar al participante.</div></div></div>`;
 }},
 
-iinscripciones:{title:'Inscripciones',html(){
-  return head('Coordinación de Inscripciones','Inscripciones','Confirma o activa las inscripciones de la generación.')
-   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Perfil</th><th>Estatus</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
-   + DB.participantes().map(p=>`<tr><td class="nm">${p.nombre}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario}</td><td>${perfilLabel(p.perfil)}</td><td>${inscPill(p.insc)}</td>
-       <td style="text-align:right">${p.insc==='activo'?'<span style="color:var(--soft);font-size:12px">—</span>':`<button class="btn btn-sm btn-accent" onclick="confirmarInsc('${p.id}')">${p.insc==='preinscrito'?'Confirmar':'Activar acceso'}</button>`}</td></tr>`).join('')
-   + `</tbody></table></div>`;
-}},
+iregistros:{title:'Registros',html(){
+  const rs=store.registros||[];
+  const on=!!(window.NAVI&&NAVI.sb);
+  const banner = on
+    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b> (Supabase). Cada nuevo registro genera su acceso automáticamente.</div><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="cargarRegistros(true)">Actualizar</button><button class="btn btn-sm btn-accent" onclick="procesarPendientes()">Generar accesos pendientes</button></div></div>`
+    : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
+  const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
+    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Estatus</th></tr></thead><tbody>`
+        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${r.nombre||''}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td>${r.procesado?pill('Alumno','pill-ok'):pill('Pendiente','pill-wait')}</td></tr>`).join('')
+        + `</tbody></table></div>`
+      : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
+  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. El sistema genera su acceso automáticamente.')+banner+body;
+}, after(){ if(window.NAVI&&NAVI.sb) cargarRegistros(); }},
+
+ialumnos:{title:'Alumnos',html(){
+  const al=store.alumnos||[];
+  const on=!!(window.NAVI&&NAVI.sb);
+  const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver a los alumnos reales.</div></div>`;
+  const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Estatus</th><th>Conferencias</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
+        + al.map(p=>`<tr><td class="nm">${p.nombre||''}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td><td>${pill(p.estatus||'activo',p.estatus==='activo'?'pill-ok':'pill-wait')}</td><td>${p.acceso_congreso?pill('Con acceso','pill-ok'):pill('Sin acceso','pill-wait')}</td><td style="text-align:right"><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar acceso':'Activar acceso'}</button></td></tr>`).join('')
+        + `</tbody></table></div>`
+      : `<div class="empty">Aún no hay alumnos. En cuanto lleguen registros, se crean solos.</div>`));
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Al confirmar su donativo, activa su acceso a las conferencias del Congreso.')+banner+body;
+}, after(){ if(window.NAVI&&NAVI.sb) cargarAlumnos(); }},
 
 idonativos:{title:'Donativos',html(){
   const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
@@ -1696,6 +1717,49 @@ function darAlta(){
     <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
     <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
   toast('Participante dado de alta');
+}
+function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
+async function cargarRegistros(force){
+  if(!(window.NAVI&&NAVI.sb)) return;
+  if(force||!store.registros.length){ store._loadingReg=true; render(); }
+  try{
+    const { data, error } = await NAVI.sb.from('inscripciones')
+      .select('id,created_at,nombre,correo,whatsapp,entidad,municipio,perfil,estado,procesado,usuario_generado')
+      .order('created_at',{ascending:false});
+    if(error) throw error;
+    store.registros = data||[];
+  }catch(e){ toast('No pude cargar registros. ¿Iniciaste sesión como admin?'); }
+  store._loadingReg=false; render();
+}
+async function cargarAlumnos(force){
+  if(!(window.NAVI&&NAVI.sb)) return;
+  if(force||!store.alumnos.length){ store._loadingAl=true; render(); }
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
+      .select('auth_uid,nombre,usuario,folio,estatus,acceso_congreso,roles(codigo)')
+      .order('folio');
+    if(error) throw error;
+    store.alumnos = (data||[]).filter(u=>u.roles && u.roles.codigo==='participante');
+  }catch(e){ toast('No pude cargar alumnos. ¿Iniciaste sesión como admin?'); }
+  store._loadingAl=false; render();
+}
+async function toggleAcceso(authUid, current){
+  if(!(window.NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const nuevo = !current;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('usuarios').update({acceso_congreso:nuevo}).eq('auth_uid',authUid);
+    if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a) a.acceso_congreso=nuevo;
+    toast(nuevo?'Acceso a conferencias activado':'Acceso retirado'); render();
+  }catch(e){ toast('No se pudo cambiar el acceso (revisa permisos RLS).'); }
+}
+async function procesarPendientes(){
+  if(!(window.NAVI&&NAVI.sb)) return;
+  try{
+    const { data, error } = await NAVI.sb.schema('navi').rpc('procesar_registros');
+    if(error) throw error;
+    toast('Accesos generados: '+(data!=null?data:'')); cargarRegistros(true); cargarAlumnos(true);
+  }catch(e){ toast('No se pudo procesar (revisa permisos).'); }
 }
 function confirmarInsc(uid){const u=store.usuarios.find(x=>x.id===uid);u.insc=(u.insc==='preinscrito')?'confirmado':'activo';render();toast('Inscripción actualizada: '+u.insc);}
 /* grupos */
