@@ -1372,7 +1372,7 @@ ialta:{title:'Alta de participante',html(){
 
 iregistros:{title:'Registros',html(){
   const rs=store.registros||[];
-  const on=!!(window.NAVI&&NAVI.sb);
+  const on=!!(NAVI&&NAVI.sb);
   const banner = on
     ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b> (Supabase). Cada nuevo registro genera su acceso automáticamente.</div><div style="display:flex;gap:8px"><button class="btn btn-sm" onclick="cargarRegistros(true)">Actualizar</button><button class="btn btn-sm btn-accent" onclick="procesarPendientes()">Generar accesos pendientes</button></div></div>`
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
@@ -1382,11 +1382,11 @@ iregistros:{title:'Registros',html(){
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
   return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. El sistema genera su acceso automáticamente.')+banner+body;
-}, after(){ if(window.NAVI&&NAVI.sb) cargarRegistros(); }},
+}, after(){ if(NAVI&&NAVI.sb) cargarRegistros(); }},
 
 ialumnos:{title:'Alumnos',html(){
   const al=store.alumnos||[];
-  const on=!!(window.NAVI&&NAVI.sb);
+  const on=!!(NAVI&&NAVI.sb);
   const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver a los alumnos reales.</div></div>`;
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
     : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Estatus</th><th>Conferencias</th><th style="text-align:right">Acción</th></tr></thead><tbody>`
@@ -1394,7 +1394,7 @@ ialumnos:{title:'Alumnos',html(){
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos. En cuanto lleguen registros, se crean solos.</div>`));
   return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Al confirmar su donativo, activa su acceso a las conferencias del Congreso.')+banner+body;
-}, after(){ if(window.NAVI&&NAVI.sb) cargarAlumnos(); }},
+}, after(){ if(NAVI&&NAVI.sb) cargarAlumnos(); }},
 
 idonativos:{title:'Donativos',html(){
   const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
@@ -1701,31 +1701,33 @@ function darAlta(){
 }
 function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
 async function cargarRegistros(force){
-  if(!(window.NAVI&&NAVI.sb)) return;
-  if(force||!store.registros.length){ store._loadingReg=true; render(); }
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._regLoaded && !force) return;
+  store._regLoaded=true; store._loadingReg=true; render();
   try{
     const { data, error } = await NAVI.sb.from('inscripciones')
       .select('id,created_at,nombre,correo,whatsapp,entidad,municipio,perfil,estado,procesado,usuario_generado')
       .order('created_at',{ascending:false});
     if(error) throw error;
     store.registros = data||[];
-  }catch(e){ toast('No pude cargar registros. ¿Iniciaste sesión como admin?'); }
+  }catch(e){ store._regLoaded=false; toast('No pude cargar registros. ¿Corriste el paso 11 (permiso de lectura)?'); }
   store._loadingReg=false; render();
 }
 async function cargarAlumnos(force){
-  if(!(window.NAVI&&NAVI.sb)) return;
-  if(force||!store.alumnos.length){ store._loadingAl=true; render(); }
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._alLoaded && !force) return;
+  store._alLoaded=true; store._loadingAl=true; render();
   try{
     const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
       .select('auth_uid,nombre,usuario,folio,estatus,acceso_congreso,roles(codigo)')
       .order('folio');
     if(error) throw error;
-    store.alumnos = (data||[]).filter(u=>u.roles && u.roles.codigo==='participante');
-  }catch(e){ toast('No pude cargar alumnos. ¿Iniciaste sesión como admin?'); }
+    store.alumnos = (data||[]).filter(u=>!u.roles || u.roles.codigo==='participante');
+  }catch(e){ store._alLoaded=false; toast('No pude cargar alumnos. ¿Corriste el paso 11 (permiso de lectura)?'); }
   store._loadingAl=false; render();
 }
 async function toggleAcceso(authUid, current){
-  if(!(window.NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
   const nuevo = !current;
   try{
     const { error } = await NAVI.sb.schema('navi').from('usuarios').update({acceso_congreso:nuevo}).eq('auth_uid',authUid);
@@ -1735,7 +1737,7 @@ async function toggleAcceso(authUid, current){
   }catch(e){ toast('No se pudo cambiar el acceso (revisa permisos RLS).'); }
 }
 async function procesarPendientes(){
-  if(!(window.NAVI&&NAVI.sb)) return;
+  if(!(NAVI&&NAVI.sb)) return;
   try{
     const { data, error } = await NAVI.sb.schema('navi').rpc('procesar_registros');
     if(error) throw error;
