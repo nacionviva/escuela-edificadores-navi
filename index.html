@@ -1510,6 +1510,10 @@ if (PRELANZAMIENTO) {
     return '<div class="cngr">'
       +'<div class="cngr-head"><img class="cngr-logo" src="assets/logo_congreso.png" onerror="this.style.display=\'none\'" alt="Congreso Nación Viva 2026"><div class="cngr-sub">28 y 29 de agosto · Monterrey</div></div>'
       +introHtml
+      +'<div class="cngr-secttl">Galería del Congreso</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'
+      +[1,2,3,4,5,6,7,8].map(function(n){return '<div style="position:relative;padding-top:66%;border-radius:12px;overflow:hidden;border:1px solid var(--glassline);background:#0A1426 url(assets/fotos/foto'+n+'.jpg) center/cover no-repeat"></div>';}).join('')
+      +'</div>'
       +'<div class="cngr-secttl">Las conferencias</div>'
       +banner
       +cards
