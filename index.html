@@ -612,7 +612,7 @@ const store = {
     {id:15,tri:3,num:4,titulo:'Mercados y orden moral de la economía',pf:'¿Qué lugar deben ocupar los mercados en una visión cristiana de la economía?',fecha:iso(2027,6,10),prof:'Carlos Mendoza'},
     {id:16,tri:3,num:5,titulo:'Pobreza, riqueza, desigualdad y responsabilidad social',pf:'¿Cómo debe responder el cristiano ante la pobreza, la riqueza y la desigualdad?',fecha:iso(2027,6,24),prof:'Carlos Mendoza'},
     {id:17,tri:3,num:6,titulo:'Estado, mercado, sociedad civil y subsidiariedad',pf:'¿Qué responsabilidades corresponden al Estado, al mercado, a la familia y a la Iglesia?',fecha:iso(2027,7,8),prof:'Carlos Mendoza'},
-    {id:18,tri:3,num:7,titulo:'Política económica y prudencia cristiana',pf:'¿Cómo debe evaluar un cristiano las propuestas de política económica?',fecha:iso(2027,7,22),prof:'Carlos Mendoza'}
+    {id:18,tri:3,num:7,titulo:'Política económica y prudencia pública',pf:'¿Con qué criterios de prudencia deben evaluarse las propuestas de política económica?',fecha:iso(2027,7,22),prof:'Carlos Mendoza'}
   ],
   // materiales detallados para módulo 2 (ejemplo del documento); el resto se genera abajo
   materiales:[
@@ -1409,15 +1409,19 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th></th></tr></thead><tbody>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
           +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
+          +`<td>${p.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${p.auth_uid}',this)">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${p.auth_uid}',this)">Enviar bienvenida</button>`}</td>`
+          +`<td style="text-align:center"><input type="checkbox" ${p.respondio?'checked':''} onchange="toggleRespondio('${p.auth_uid}',${p.respondio?1:0})" title="Marcar si ya respondió"></td>`
           +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
-  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
+  const nEnv=al.filter(a=>a.bienvenida_enviada).length, nResp=al.filter(a=>a.respondio).length;
+  const cont = on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos · <b style="color:var(--cream)">${nEnv}</b> correos enviados · <b style="color:var(--cream)">${nResp}</b> respondieron</div>`:'';
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. Usa “Enviar bienvenida” para mandarles su acceso y la carta por correo.')+banner+noGrp+cont+body;
 }, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 idonativos:{title:'Donativos',html(){
@@ -1454,9 +1458,18 @@ if (PRELANZAMIENTO) {
   ];
   function ejesPL(extra){
     return store.trimestres.map(function(t){
+      var mods=store.modulos.filter(function(m){return m.tri===t.id;}).sort(function(a,b){return a.num-b.num;});
+      var reveal=(t.numero===1)?mods.slice(0,2):[];
+      var temasHtml='';
+      if(reveal.length){
+        temasHtml='<div style="margin-top:10px">'
+          +reveal.map(function(m){return '<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px solid var(--line)"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);min-width:54px">Tema '+t.numero+'.'+m.num+'</span><span style="font-size:13.5px;color:var(--cream)">'+m.titulo+'</span></div>';}).join('')
+          +'<div style="font-size:12px;color:var(--soft);margin-top:8px">Los demás temas de este eje se revelarán próximamente.</div></div>';
+      }
       return '<div class="row locked" style="margin-bottom:10px;align-items:flex-start"><div class="rnum">'+t.numero+'</div>'
         +'<div class="rinfo"><div class="t">'+t.nombre+'</div><div class="d">'+t.rango+'</div>'
         +(extra?('<div class="d" style="margin-top:4px;color:var(--soft)">'+t.pregunta+'</div>'):'')
+        +temasHtml
         +'</div>'+pill('Próximamente','pill-soon')+'</div>';
     }).join('');
   }
@@ -1745,7 +1758,7 @@ async function cargarAlumnos(force){
   store._alLoaded=true; store._loadingAl=true; render();
   try{
     const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
-      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,roles(codigo)')
+      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,respondio,roles(codigo)')
       .order('folio');
     if(error) throw error;
     store.alumnos = (data||[]).filter(u=>!u.roles || u.roles.codigo==='participante');
@@ -1788,6 +1801,31 @@ async function asignarMentor(authUid,mentor){
   try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({mentor:mentor||null}).eq('auth_uid',authUid); if(error) throw error;
     const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
   }catch(e){ toast('No se pudo asignar el mentor.'); }
+}
+async function enviarBienvenida(authUid, btn){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid);
+  if(a && a.bienvenida_enviada && !confirm('Ya se le envió la bienvenida. ¿Reenviar? Se generará una nueva contraseña temporal.')) return;
+  const original = btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  try{
+    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid: authUid } });
+    if(error) throw error;
+    if(data && data.ok===false) throw new Error(data.error||'Error al enviar');
+    if(a){ a.bienvenida_enviada=true; a.bienvenida_at=new Date().toISOString(); }
+    toast('Correo de bienvenida enviado'); render();
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent=original; }
+    toast('No se pudo enviar: '+((e&&e.message)||'revisa la función y los secrets de Resend').slice(0,120));
+  }
+}
+async function toggleRespondio(authUid, current){
+  if(!(NAVI&&NAVI.sb)) return;
+  const nuevo=!current;
+  try{
+    const { error } = await NAVI.sb.schema('navi').from('usuarios').update({respondio:nuevo}).eq('auth_uid',authUid);
+    if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a) a.respondio=nuevo; render();
+  }catch(e){ toast('No se pudo actualizar (revisa permisos).'); }
 }
 async function cargarGrupos(force){
   if(!(NAVI&&NAVI.sb)) return;
