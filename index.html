@@ -1392,7 +1392,7 @@ iregistros:{title:'Registros',html(){
     ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div>`
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
   const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
-  const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this)">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this)">Enviar bienvenida</button>`; };
+  const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); const ue=(r.usuario_generado||'').toLowerCase().replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Enviar bienvenida</button>`; };
   const rowResp=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return ''; return `<input type="checkbox" ${a.respondio?'checked':''} onchange="toggleRespondio('${a.auth_uid}',${a.respondio?1:0})" title="Marcar si ya respondió">`; };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
     : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Acceso</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
@@ -1802,20 +1802,23 @@ async function asignarMentor(authUid,mentor){
     const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
   }catch(e){ toast('No se pudo asignar el mentor.'); }
 }
-async function enviarBienvenida(authUid, toEmail, btn){
+async function enviarBienvenida(authUid, toEmail, btn, usuarioEmail){
   if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
   const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid);
   if(a && a.bienvenida_enviada && !confirm('Ya se le envió la bienvenida. ¿Reenviar? Se generará una nueva contraseña temporal.')) return;
   const original = btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
   try{
-    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid: authUid, to_email: toEmail } });
+    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid: authUid, usuario_email: usuarioEmail, to_email: toEmail } });
     if(error) throw error;
     if(data && data.ok===false) throw new Error(data.error||'Error al enviar');
     if(a){ a.bienvenida_enviada=true; a.bienvenida_at=new Date().toISOString(); }
     toast('Correo de bienvenida enviado'); render();
   }catch(e){
     if(btn){ btn.disabled=false; btn.textContent=original; }
-    toast('No se pudo enviar: '+((e&&e.message)||'revisa la función y los secrets de Resend').slice(0,120));
+    let msg=(e&&e.message)||'error';
+    try{ if(e&&e.context&&typeof e.context.json==='function'){ const j=await e.context.json(); if(j&&j.error) msg=j.error; } }catch(_){}
+    console.error('enviarBienvenida:', msg, e);
+    toast('No se pudo enviar: '+String(msg).slice(0,200));
   }
 }
 async function toggleRespondio(authUid, current){
