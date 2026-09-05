@@ -1392,13 +1392,17 @@ iregistros:{title:'Registros',html(){
     ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div>`
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
   const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
+  const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this)">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this)">Enviar bienvenida</button>`; };
+  const rowResp=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return ''; return `<input type="checkbox" ${a.respondio?'checked':''} onchange="toggleRespondio('${a.auth_uid}',${a.respondio?1:0})" title="Marcar si ya respondió">`; };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
-    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th style="text-align:right">Acceso</th><th></th></tr></thead><tbody>`
-        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td style="text-align:right">${rowAcc(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
+    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Acceso</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
+        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td>${rowAcc(r)}</td><td>${rowBienv(r)}</td><td style="text-align:center">${rowResp(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
   const nAl=(store.alumnos||[]).filter(a=>a.activado).length;
-  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Activa su acceso para volverlas alumnos. Registro e inscripción son distintos: un registro es una solicitud del formulario; un inscrito es un registro con acceso ya activado.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros · <b style="color:var(--cream)">${nAl}</b> inscritos</div>`:'')+body;
+  const nEnv=(store.alumnos||[]).filter(a=>a.bienvenida_enviada).length;
+  const nResp=(store.alumnos||[]).filter(a=>a.respondio).length;
+  return head('Coordinación de Inscripciones','Registros','Personas que llenaron el formulario. Envíales su bienvenida (acceso + carta) y activa su acceso para volverlas alumnos. Registro e inscripción son distintos: un registro es una solicitud del formulario; un inscrito es un registro con acceso ya activado.')+banner+(on&&rs.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${rs.length}</b> registros · <b style="color:var(--cream)">${nAl}</b> inscritos · <b style="color:var(--cream)">${nEnv}</b> correos enviados · <b style="color:var(--cream)">${nResp}</b> respondieron</div>`:'')+body;
 }, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
 
 ialumnos:{title:'Alumnos',html(){
@@ -1409,19 +1413,15 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
           +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
-          +`<td>${p.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${p.auth_uid}',this)">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${p.auth_uid}',this)">Enviar bienvenida</button>`}</td>`
-          +`<td style="text-align:center"><input type="checkbox" ${p.respondio?'checked':''} onchange="toggleRespondio('${p.auth_uid}',${p.respondio?1:0})" title="Marcar si ya respondió"></td>`
           +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
-  const nEnv=al.filter(a=>a.bienvenida_enviada).length, nResp=al.filter(a=>a.respondio).length;
-  const cont = on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos · <b style="color:var(--cream)">${nEnv}</b> correos enviados · <b style="color:var(--cream)">${nResp}</b> respondieron</div>`:'';
-  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. Usa “Enviar bienvenida” para mandarles su acceso y la carta por correo.')+banner+noGrp+cont+body;
+  return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
 }, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
 
 idonativos:{title:'Donativos',html(){
@@ -1802,13 +1802,13 @@ async function asignarMentor(authUid,mentor){
     const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
   }catch(e){ toast('No se pudo asignar el mentor.'); }
 }
-async function enviarBienvenida(authUid, btn){
+async function enviarBienvenida(authUid, toEmail, btn){
   if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
   const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid);
   if(a && a.bienvenida_enviada && !confirm('Ya se le envió la bienvenida. ¿Reenviar? Se generará una nueva contraseña temporal.')) return;
   const original = btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
   try{
-    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid: authUid } });
+    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid: authUid, to_email: toEmail } });
     if(error) throw error;
     if(data && data.ok===false) throw new Error(data.error||'Error al enviar');
     if(a){ a.bienvenida_enviada=true; a.bienvenida_at=new Date().toISOString(); }
