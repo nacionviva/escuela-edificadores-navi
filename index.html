@@ -762,8 +762,8 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['didentidad','image','Identidad']],
-  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
 };
 const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
@@ -1271,7 +1271,7 @@ dgrupos:{title:'Grupos',html(){
   const cards=grupos.map(gr=>{ const name=gr.nombre; const m=g[name]||[]; const mentor=gr.mentor||(m.find(x=>x.mentor)||{}).mentor; return `<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div class="sec-title" style="margin:0">${up(name)} · ${m.length}/12</div><div style="display:flex;align-items:center;gap:12px"><div style="font-size:13px;color:var(--dim)">Mentor: <b style="color:var(--cream)">${mentor?up(mentor):'sin asignar'}</b></div><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" onclick="borrarGrupo('${gr.id}','${(name||'').replace(/'/g,'')}')">Borrar</button></div></div><div style="display:flex;flex-wrap:wrap;gap:6px">`+(m.length?m.map(a=>`<span class="pill pill-info">${up(a.nombre)}</span>`).join(''):`<span style="font-size:12.5px;color:var(--dim)">Sin alumnos asignados todavía. Ve a Alumnos y asígnalos a este grupo.</span>`)+`</div></div>`; }).join('');
   h+= cards || `<div class="empty">Aún no has creado grupos. Usa el formulario de arriba para crear el primero.</div>`;
   return h;
-}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); cargarDonativos(); } }},
 
 dparticipantes:{title:'Participantes',html(){
   return head('Dirección Académica','Participantes','Padrón de la generación 2026–2027.')
@@ -1413,29 +1413,58 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th></th></tr></thead><tbody>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th><th>Desc. Congreso</th><th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
           +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
+          +`<td style="white-space:nowrap"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button> <b style="color:var(--cream)">${p.aguilas||0}</b> <span style="font-size:11px;color:var(--soft)">${nivelAguilas(p.aguilas)!=='—'?'· '+nivelAguilas(p.aguilas):''}</span> <button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></td>`
+          +`<td style="text-align:center"><b style="color:var(--cream)">${descuentoCongreso(p.auth_uid)}%</b> <span style="font-size:11px;color:var(--soft)">(${mesesDonados(p.auth_uid)} mes)</span></td>`
           +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
   return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
-}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); } }},
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); cargarDonativos(); } }},
 
 idonativos:{title:'Donativos',html(){
-  const tot=DB.donativos().reduce((a,d)=>a+d.monto,0);
-  return head('Coordinación de Inscripciones','Donativos','Registro y conciliación de donativos voluntarios (no condicionan el acceso).')
-   + `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line)"><div style="font-size:13px;color:var(--dim)">Los montos individuales son <b style="color:var(--cream)">confidenciales</b> y se usan solo para conciliación interna. La transparencia hacia los participantes es sobre el <b style="color:var(--cream)">uso de los fondos</b> (en qué se gastan), no sobre cuánto dona cada persona.</div></div>`
-   + `<div class="grid g3" style="margin-bottom:20px"><div class="card"><div class="stat-n">${tot.toLocaleString('es-MX')}</div><div class="stat-l">Total recibido (MXN)</div></div>
-       <div class="card"><div class="stat-n">${DB.donativos().length}</div><div class="stat-l">Donativos registrados</div></div>
-       <div class="card"><div class="stat-n">${DB.donativos().filter(d=>d.estatus==='confirmado').length}</div><div class="stat-l">Confirmados</div></div></div>`
-   + `<button class="btn btn-accent btn-sm" style="margin-bottom:14px" onclick="toast('Aquí se registra un donativo (demo).')">＋ Registrar donativo</button>`
-   + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Participante</th><th>Monto</th><th>Fecha</th><th>Método</th><th>Estatus</th></tr></thead><tbody>`
-   + DB.donativos().map(d=>`<tr><td class="nm">${d.usuario}</td><td>$${d.monto.toLocaleString('es-MX')}</td><td>${d.fecha}</td><td>${d.metodo}</td><td>${d.estatus==='confirmado'?pill('Confirmado','pill-ok'):pill('Registrado','pill-wait')}</td></tr>`).join('')
-   + `</tbody></table></div>`;
-}}
+  const on=!!(NAVI&&NAVI.sb);
+  const al=(store.alumnos||[]).filter(a=>a.activado);
+  const dons=store.donativosDB||[];
+  const tot=dons.reduce((a,d)=>a+Number(d.monto||0),0);
+  const nameOf=(uid)=>{ const a=(store.alumnos||[]).find(x=>x.auth_uid===uid); return a?up(a.nombre):'—'; };
+  const money=(n)=>'$'+Number(n||0).toLocaleString('es-MX');
+  const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para registrar y ver los donativos reales.</div></div>`;
+  const form = !on?'':`<div class="card glass" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Registrar donativo del mes</div>
+     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+       <div style="flex:2;min-width:240px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Alumno</label><select id="dnAlumno" class="mini-in" style="width:100%">${al.map(a=>`<option value="${a.auth_uid}">${up(a.nombre)} · ${a.usuario||''}</option>`).join('')}</select></div>
+       <div style="flex:1;min-width:120px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Monto (MXN)</label><input id="dnMonto" class="mini-in" type="number" placeholder="200" style="width:100%"></div>
+       <button class="btn btn-accent" onclick="registrarDonativo(document.getElementById('dnAlumno').value,document.getElementById('dnMonto').value)">＋ Registrar</button>
+     </div><p style="font-size:12px;color:var(--soft);margin-top:8px">Cada donativo mensual suma al descuento del Congreso del alumno (+5%) y a los ingresos de Finanzas.</p></div>`;
+  const kpis = !on?'':`<div class="grid g3" style="margin-bottom:18px"><div class="card"><div class="stat-n">${money(tot)}</div><div class="stat-l">Total recibido</div></div><div class="card"><div class="stat-n">${dons.length}</div><div class="stat-l">Donativos registrados</div></div><div class="card"><div class="stat-n">${new Set(dons.map(d=>d.auth_uid)).size}</div><div class="stat-l">Aportantes</div></div></div>`;
+  const table = !on?'':(dons.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Alumno</th><th>Monto</th><th>Mes</th><th>Registrado</th></tr></thead><tbody>`+dons.map(d=>`<tr><td class="nm">${nameOf(d.auth_uid)}</td><td>${money(d.monto)}</td><td>${String(d.mes).slice(0,7)}</td><td>${fmtFecha(d.created_at)}</td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty">Aún no hay donativos registrados.</div>`);
+  return head('Coordinación de Inscripciones','Donativos','Registro de donativos mensuales (ingresos). El monto individual es confidencial; alimenta el descuento del Congreso y las finanzas.')+banner+form+kpis+table;
+}, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarDonativos(); } }},
+
+dfinanzas:{title:'Finanzas',html(){
+  const on=!!(NAVI&&NAVI.sb);
+  const money=(n)=>'$'+Number(n||0).toLocaleString('es-MX');
+  const ing=(store.donativosDB||[]).reduce((a,d)=>a+Number(d.monto||0),0);
+  const gastos=store.gastosDB||[];
+  const gas=gastos.reduce((a,g)=>a+Number(g.monto||0),0);
+  const neto=ing-gas;
+  const catLabel={orador:'Apoyo a orador · Antorcha',recompensas:'Recompensas / souvenirs',plataforma:'Plataforma y operación',produccion:'Producción de clases',general:'General'};
+  const banner = on?'':`<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver las finanzas reales.</div></div>`;
+  const kpis = !on?'':`<div class="grid g3" style="margin-bottom:18px"><div class="card"><div class="stat-n" style="color:#7FE0A0">${money(ing)}</div><div class="stat-l">Ingresos (donativos)</div></div><div class="card"><div class="stat-n" style="color:#E9A3A2">${money(gas)}</div><div class="stat-l">Gastos</div></div><div class="card" style="border-color:var(--accent-line);background:var(--accent-tint)"><div class="stat-n">${money(neto)}</div><div class="stat-l">Resultado neto</div></div></div>`;
+  const form = !on?'':`<div class="card glass" style="margin-bottom:16px"><div class="sec-title" style="margin-top:0">Registrar gasto</div>
+     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+       <div style="flex:2;min-width:220px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Concepto</label><input id="gConcepto" class="mini-in" style="width:100%" placeholder="Ej. Apoyo orador Antorcha sep"></div>
+       <div style="flex:1;min-width:170px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Categoría</label><select id="gCat" class="mini-in" style="width:100%"><option value="orador">Apoyo a orador · Antorcha</option><option value="recompensas">Recompensas / souvenirs</option><option value="plataforma">Plataforma y operación</option><option value="produccion">Producción de clases</option><option value="general">General</option></select></div>
+       <div style="flex:1;min-width:120px"><label style="font-size:12px;color:var(--soft);display:block;margin-bottom:4px">Monto (MXN)</label><input id="gMonto" class="mini-in" type="number" placeholder="1250" style="width:100%"></div>
+       <button class="btn btn-accent" onclick="agregarGasto()">＋ Registrar</button>
+     </div></div>`;
+  const table = !on?'':(gastos.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Fecha</th><th></th></tr></thead><tbody>`+gastos.map(g=>`<tr><td class="nm">${up(g.concepto)}</td><td>${catLabel[g.categoria]||g.categoria}</td><td>${money(g.monto)}</td><td>${fmtFecha(g.fecha)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" onclick="borrarGasto('${g.id}')">Borrar</button></td></tr>`).join('')+`</tbody></table></div>`:`<div class="empty">Aún no hay gastos registrados. Usa el formulario para capturar el apoyo a oradores y demás egresos.</div>`);
+  return head('Dirección Académica','Finanzas y presupuesto','Ingresos por donativos, gastos (apoyo a oradores, recompensas, plataforma, producción) y resultado neto de la generación.')+banner+kpis+form+table;
+}, after(){ if(NAVI&&NAVI.sb){ cargarDonativos(); cargarGastos(); } }}
 
 };
 
@@ -1473,6 +1502,30 @@ if (PRELANZAMIENTO) {
         +'</div>'+pill('Próximamente','pill-soon')+'</div>';
     }).join('');
   }
+  store.miProgreso = store.miProgreso || {aguilas:0, meses:0};
+  async function cargarMiProgreso(){
+    if(!(NAVI&&NAVI.sb)) return;
+    try{
+      var res=await NAVI.sb.auth.getUser(); var user=res&&res.data&&res.data.user; if(!user) return;
+      var uid=user.id;
+      var r1=await NAVI.sb.schema('navi').from('usuarios').select('aguilas').eq('auth_uid',uid).maybeSingle();
+      var r2=await NAVI.sb.schema('navi').from('donativos').select('mes').eq('auth_uid',uid);
+      var meses=new Set((r2.data||[]).map(function(d){return String(d.mes).slice(0,7);})).size;
+      store.miProgreso={aguilas:(r1.data&&r1.data.aguilas)||0, meses:meses};
+      render();
+    }catch(e){}
+  }
+  function miProgresoHtml(){
+    var mp=store.miProgreso||{aguilas:0,meses:0};
+    var desc=Math.min(50,mp.meses*5);
+    var niv=mp.aguilas>=300?'C':mp.aguilas>=150?'B':mp.aguilas>=60?'A':'—';
+    return '<div class="sec-title" style="margin-top:0">Mi progreso</div>'
+      +'<div class="grid g3" style="margin-bottom:20px">'
+      +'<div class="card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" style="height:44px" onerror="this.style.display=\'none\'"><div><div class="stat-n" style="font-size:28px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver clases y con tu donativo mensual.</div></div>'
+      +'<div class="card"><div class="stat-n" style="font-size:28px">'+desc+'%</div><div class="stat-l">Mi descuento del Congreso</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">'+mp.meses+' mes'+(mp.meses===1?'':'es')+' de donativo · +5% cada mes, hasta 50%.</div></div>'
+      +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Eliges un souvenir por cada nivel que alcances; se entregan al graduarte.</div></div>'
+      +'</div>';
+  }
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
@@ -1481,12 +1534,13 @@ if (PRELANZAMIENTO) {
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
+      +miProgresoHtml()
       +(DB.articulos().filter(function(a){return a.publicado;}).length?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
       +'<button class="btn btn-accent" onclick="nav(\'congreso\')">Ver las conferencias</button></div>';
-  }, after:function(){ startCarousel(); }};
+  }, after:function(){ startCarousel(); cargarMiProgreso(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
       + ejesPL(true);
@@ -1762,7 +1816,7 @@ async function cargarAlumnos(force){
   store._alLoaded=true; store._loadingAl=true; render();
   try{
     const { data, error } = await NAVI.sb.schema('navi').from('usuarios')
-      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,respondio,roles(codigo)')
+      .select('auth_uid,email,nombre,usuario,folio,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,respondio,aguilas,roles(codigo)')
       .order('folio');
     if(error) throw error;
     store.alumnos = (data||[]).filter(u=>!u.roles || u.roles.codigo==='participante');
@@ -1805,6 +1859,53 @@ async function asignarMentor(authUid,mentor){
   try{ const {error}=await NAVI.sb.schema('navi').from('usuarios').update({mentor:mentor||null}).eq('auth_uid',authUid); if(error) throw error;
     const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a)a.mentor=mentor; toast('Mentor asignado');
   }catch(e){ toast('No se pudo asignar el mentor.'); }
+}
+/* ---- Finanzas · donativos · gastos · águilas (Supabase) ---- */
+async function cargarDonativos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._donLoaded && !force) return; store._donLoaded=true;
+  try{ const {data,error}=await NAVI.sb.schema('navi').from('donativos').select('id,auth_uid,monto,mes,metodo,nota,created_at').order('created_at',{ascending:false}); if(error) throw error; store.donativosDB=data||[]; }
+  catch(e){ store._donLoaded=false; }
+  render();
+}
+async function cargarGastos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._gasLoaded && !force) return; store._gasLoaded=true;
+  try{ const {data,error}=await NAVI.sb.schema('navi').from('gastos').select('id,concepto,categoria,monto,fecha,nota,created_at').order('fecha',{ascending:false}); if(error) throw error; store.gastosDB=data||[]; }
+  catch(e){ store._gasLoaded=false; }
+  render();
+}
+function donativosDe(authUid){ return (store.donativosDB||[]).filter(d=>d.auth_uid===authUid); }
+function mesesDonados(authUid){ const set=new Set(donativosDe(authUid).map(d=>String(d.mes).slice(0,7))); return set.size; }
+function descuentoCongreso(authUid){ return Math.min(50, mesesDonados(authUid)*5); }
+function nivelAguilas(a){ a=a||0; if(a>=300) return 'C'; if(a>=150) return 'B'; if(a>=60) return 'A'; return '—'; }
+async function registrarDonativo(authUid, monto){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const m=parseFloat(monto); if(!m||m<=0){ toast('Monto inválido'); return; }
+  try{ const {data,error}=await NAVI.sb.schema('navi').from('donativos').insert({auth_uid:authUid,monto:m}).select('id,auth_uid,monto,mes,metodo,created_at'); if(error) throw error;
+    store.donativosDB=(data||[]).concat(store.donativosDB||[]); toast('Donativo registrado ($'+m.toLocaleString('es-MX')+')'); render();
+  }catch(e){ toast('No se pudo registrar (¿corriste el paso 18?).'); }
+}
+async function agregarGasto(){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const c=(document.getElementById('gConcepto')||{}).value||'', cat=(document.getElementById('gCat')||{}).value||'general', mo=parseFloat((document.getElementById('gMonto')||{}).value||'0');
+  if(!c.trim()||!mo||mo<=0){ toast('Escribe concepto y monto'); return; }
+  try{ const {data,error}=await NAVI.sb.schema('navi').from('gastos').insert({concepto:c.trim(),categoria:cat,monto:mo}).select('id,concepto,categoria,monto,fecha,created_at'); if(error) throw error;
+    store.gastosDB=(data||[]).concat(store.gastosDB||[]);
+    var e1=document.getElementById('gConcepto'); if(e1)e1.value=''; var e2=document.getElementById('gMonto'); if(e2)e2.value='';
+    toast('Gasto registrado'); render();
+  }catch(e){ toast('No se pudo registrar el gasto (¿paso 18?).'); }
+}
+async function borrarGasto(id){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {error}=await NAVI.sb.schema('navi').from('gastos').delete().eq('id',id); if(error) throw error; store.gastosDB=(store.gastosDB||[]).filter(g=>g.id!==id); render(); }
+  catch(e){ toast('No se pudo borrar.'); }
+}
+async function ajustarAguilas(authUid, delta){
+  if(!(NAVI&&NAVI.sb)) return;
+  try{ const {data,error}=await NAVI.sb.schema('navi').rpc('sumar_aguilas',{p_auth_uid:authUid,p_puntos:delta}); if(error) throw error;
+    const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid); if(a) a.aguilas=(data!=null?data:((a.aguilas||0)+delta)); render();
+  }catch(e){ toast('No se pudo ajustar (revisa el paso 18).'); }
 }
 async function enviarBienvenida(authUid, toEmail, btn, usuarioEmail){
   if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
