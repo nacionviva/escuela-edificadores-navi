@@ -762,9 +762,9 @@ const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod
 const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['didentidad','image','Identidad']],
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['idonativos','heart','Donativos']]
+  inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos']]
 };
 const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
 const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1',superadmin:'d1'};
@@ -1413,13 +1413,13 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th><th>Desc. Congreso</th><th></th></tr></thead><tbody>`
+    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th>${state.role==='superadmin'?'<th>Desc. Congreso</th>':''}<th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
           +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
           +`<td style="white-space:nowrap"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button> <b style="color:var(--cream)">${p.aguilas||0}</b> <span style="font-size:11px;color:var(--soft)">${nivelAguilas(p.aguilas)!=='—'?'· '+nivelAguilas(p.aguilas):''}</span> <button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></td>`
-          +`<td style="text-align:center"><b style="color:var(--cream)">${descuentoCongreso(p.auth_uid)}%</b> <span style="font-size:11px;color:var(--soft)">(${mesesDonados(p.auth_uid)} mes)</span></td>`
+          +(state.role==='superadmin'?`<td style="text-align:center"><b style="color:var(--cream)">${descuentoCongreso(p.auth_uid)}%</b> <span style="font-size:11px;color:var(--soft)">(${mesesDonados(p.auth_uid)} mes)</span></td>`:'')
           +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
@@ -1520,10 +1520,9 @@ if (PRELANZAMIENTO) {
     var desc=Math.min(50,mp.meses*5);
     var niv=mp.aguilas>=300?'C':mp.aguilas>=150?'B':mp.aguilas>=60?'A':'—';
     return '<div class="sec-title" style="margin-top:0">Mi progreso</div>'
-      +'<div class="grid g3" style="margin-bottom:20px">'
-      +'<div class="card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" style="height:44px" onerror="this.style.display=\'none\'"><div><div class="stat-n" style="font-size:28px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver clases y con tu donativo mensual.</div></div>'
-      +'<div class="card"><div class="stat-n" style="font-size:28px">'+desc+'%</div><div class="stat-l">Mi descuento del Congreso</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">'+mp.meses+' mes'+(mp.meses===1?'':'es')+' de donativo · +5% cada mes, hasta 50%.</div></div>'
-      +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Eliges un souvenir por cada nivel que alcances; se entregan al graduarte.</div></div>'
+      +'<div class="grid g2" style="margin-bottom:20px">'
+      +'<div class="card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" style="height:48px" onerror="this.style.display=\'none\'"><div><div class="stat-n" style="font-size:32px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver tus clases y participar. ¡Sigue sumando!</div></div>'
+      +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
       +'</div>';
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
