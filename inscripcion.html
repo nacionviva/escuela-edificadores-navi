@@ -251,7 +251,7 @@
       const res = await fetch(SUPABASE_URL.replace(/\/+$/,'')+'/rest/v1/inscripciones',{
         method:'POST',
         headers:{ 'apikey':SUPABASE_ANON, 'Authorization':'Bearer '+SUPABASE_ANON,
-                  'Content-Type':'application/json', 'Prefer':'return=minimal' },
+                  'Content-Type':'application/json', 'Content-Profile':'public', 'Accept-Profile':'public', 'Prefer':'return=minimal' },
         body:JSON.stringify(payload)
       });
       if(res.ok){ show('msgOk'); }
