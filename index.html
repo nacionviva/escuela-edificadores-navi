@@ -1503,17 +1503,19 @@ if (PRELANZAMIENTO) {
     }).join('');
   }
   store.miProgreso = store.miProgreso || {aguilas:0, meses:0};
-  async function cargarMiProgreso(){
+  async function cargarMiProgreso(force){
     if(!(NAVI&&NAVI.sb)) return;
+    if(store._miProgLoaded && !force) return;
+    store._miProgLoaded=true;
     try{
-      var res=await NAVI.sb.auth.getUser(); var user=res&&res.data&&res.data.user; if(!user) return;
+      var res=await NAVI.sb.auth.getUser(); var user=res&&res.data&&res.data.user; if(!user){ store._miProgLoaded=false; return; }
       var uid=user.id;
       var r1=await NAVI.sb.schema('navi').from('usuarios').select('aguilas,grupo,mentor').eq('auth_uid',uid).maybeSingle();
       var r2=await NAVI.sb.schema('navi').from('donativos').select('mes').eq('auth_uid',uid);
       var meses=new Set((r2.data||[]).map(function(d){return String(d.mes).slice(0,7);})).size;
       store.miProgreso={aguilas:(r1.data&&r1.data.aguilas)||0, meses:meses, grupo:(r1.data&&r1.data.grupo)||'', mentor:(r1.data&&r1.data.mentor)||''};
       render();
-    }catch(e){}
+    }catch(e){ store._miProgLoaded=false; }
   }
   function miProgresoHtml(){
     var mp=store.miProgreso||{aguilas:0,meses:0};
