@@ -1510,12 +1510,55 @@ if (PRELANZAMIENTO) {
     try{
       var res=await NAVI.sb.auth.getUser(); var user=res&&res.data&&res.data.user; if(!user){ store._miProgLoaded=false; return; }
       var uid=user.id;
-      var r1=await NAVI.sb.schema('navi').from('usuarios').select('aguilas,grupo,mentor').eq('auth_uid',uid).maybeSingle();
+      var r1=await NAVI.sb.schema('navi').from('usuarios').select('aguilas,grupo,mentor,foto').eq('auth_uid',uid).maybeSingle();
       var r2=await NAVI.sb.schema('navi').from('donativos').select('mes').eq('auth_uid',uid);
       var meses=new Set((r2.data||[]).map(function(d){return String(d.mes).slice(0,7);})).size;
-      store.miProgreso={aguilas:(r1.data&&r1.data.aguilas)||0, meses:meses, grupo:(r1.data&&r1.data.grupo)||'', mentor:(r1.data&&r1.data.mentor)||''};
+      store.miProgreso={aguilas:(r1.data&&r1.data.aguilas)||0, meses:meses, grupo:(r1.data&&r1.data.grupo)||'', mentor:(r1.data&&r1.data.mentor)||'', foto:(r1.data&&r1.data.foto)||''};
       render();
     }catch(e){ store._miProgLoaded=false; }
+  }
+  function _resizeFoto(file, size, quality){
+    return new Promise(function(res,rej){
+      var img=new Image(); var url=URL.createObjectURL(file);
+      img.onload=function(){
+        var c=document.createElement('canvas'); c.width=size; c.height=size;
+        var ctx=c.getContext('2d');
+        var s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
+        ctx.drawImage(img, sx,sy,s,s, 0,0,size,size);
+        URL.revokeObjectURL(url);
+        try{ res(c.toDataURL('image/jpeg', quality)); }catch(e){ rej(e); }
+      };
+      img.onerror=function(){ URL.revokeObjectURL(url); rej(new Error('img')); };
+      img.src=url;
+    });
+  }
+  async function subirMiFoto(ev){
+    var f=ev.target&&ev.target.files&&ev.target.files[0]; if(!f) return;
+    if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión para cambiar tu foto.'); return; }
+    toast('Optimizando tu foto…');
+    try{
+      var dataUrl=await _resizeFoto(f, 400, 0.85);
+      // si aún es grande, baja calidad
+      if(dataUrl.length>250000) dataUrl=await _resizeFoto(f, 320, 0.75);
+      var r=await NAVI.sb.schema('navi').rpc('set_mi_foto',{p_foto:dataUrl});
+      if(r.error) throw r.error;
+      store.miProgreso=Object.assign(store.miProgreso||{}, {foto:dataUrl});
+      toast('¡Foto actualizada!'); render();
+    }catch(e){ toast('No se pudo guardar la foto (¿corriste el paso 20?).'); }
+  }
+  function miAvatarHtml(size){
+    var mp=store.miProgreso||{}; var u=state.user||{nombre:'NV'};
+    var ini=(u.nombre||'NV').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+    var inner = mp.foto ? ('<img src="'+mp.foto+'" style="width:100%;height:100%;object-fit:cover" alt="">') : ('<span style="font-family:var(--mono);color:var(--accent);font-size:'+Math.round(size/2.6)+'px">'+ini+'</span>');
+    return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;overflow:hidden;background:#0A1426;border:2px solid rgba(127,168,214,.35);display:flex;align-items:center;justify-content:center;flex:none">'+inner+'</div>';
+  }
+  function miPerfilHtml(){
+    var u=state.user||{nombre:'edificador'};
+    return '<div class="card" style="margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+      +miAvatarHtml(72)
+      +'<div style="flex:1;min-width:180px"><div style="font-family:var(--gov);font-size:19px;color:var(--cream)">'+u.nombre+'</div><div style="font-size:12.5px;color:var(--soft)">Edificador NAVI · Generación 2026–2027</div></div>'
+      +'<label class="btn btn-sm" style="cursor:pointer;margin:0">Cambiar foto<input type="file" accept="image/*" style="display:none" onchange="subirMiFoto(event)"></label>'
+      +'</div>';
   }
   function miProgresoHtml(){
     var mp=store.miProgreso||{aguilas:0,meses:0};
@@ -1537,6 +1580,7 @@ if (PRELANZAMIENTO) {
     return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+u.nombre.split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
+      +miPerfilHtml()
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
       +miProgresoHtml()
