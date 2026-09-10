@@ -1591,14 +1591,15 @@ if (PRELANZAMIENTO) {
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
-    return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
+    var antorcha = hayRev ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
+    return antorcha
+      +'<div class="page-head"'+(hayRev?' style="margin-top:24px"':'')+'><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+u.nombre.split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +miPerfilHtml()
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
       +miProgresoHtml()
-      +(DB.articulos().filter(function(a){return a.publicado;}).length?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
