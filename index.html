@@ -555,7 +555,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   <div class="main-wrap">
     <div class="topbar">
       <div class="crumb" id="crumb">Inicio</div>
-      <div class="role-switch">
+      <div class="role-switch" id="roleSwitch" style="display:none">
         <span class="lbl">Ver como</span>
         <select id="roleSel" onchange="switchRole(this.value)">
           <option value="participante">Participante</option>
@@ -858,6 +858,7 @@ const NAVI = {
 function enterApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
+  state.realRole=state.role;
   document.getElementById('roleSel').value=state.role;
   applyRole(true);
   window.scrollTo(0,0);
@@ -874,7 +875,7 @@ async function doLogin(e){
     state.role = found?found.rol:'participante';
     enterApp(); return;
   }
-  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || idf);
+  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || (idf + '@edificadoresnavi.mx'));
   const btn = e.target.querySelector('button[type=submit]');
   const label = btn ? btn.textContent : '';
   if(btn){ btn.disabled=true; btn.textContent='Entrando…'; }
@@ -902,8 +903,14 @@ async function doLogout(){
   try{ if(NAVI.activo) await NAVI.sb.auth.signOut(); }catch(_){}
   location.reload();
 }
-function switchRole(r){state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);}
+function switchRole(r){
+  if(state.realRole!=='superadmin'){ return; }  // solo el superadmin puede cambiar de vista
+  state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);
+}
 function applyRole(reset){
+  // El selector "Ver como" es solo para el superadmin (herramienta de revisión)
+  const rs=document.getElementById('roleSwitch');
+  if(rs) rs.style.display = (state.realRole==='superadmin') ? '' : 'none';
   state.user=store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
   if(reset) state.view=DEFVIEW[state.role];
   document.getElementById('sideAvatar').textContent=initials(state.user.nombre);
