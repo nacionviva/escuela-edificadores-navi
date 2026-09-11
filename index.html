@@ -495,12 +495,12 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
     <div class="login-title">Escuela de Edificadores NAVI</div>
     <div class="login-sub">Criterio y carácter para la vida pública de México</div>
     <form onsubmit="doLogin(event)">
-      <div class="field"><label for="inUser">Usuario</label><input id="inUser" type="text" placeholder="tunombre@edificadoresnavi.mx" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
-      <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" placeholder="Tu clave del correo de bienvenida" autocomplete="current-password"></div>
+      <div class="field"><label for="inUser">Usuario</label><input id="inUser" type="text" value="jose.sanchez" autocomplete="username"></div>
+      <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" value="Edificadores2026" autocomplete="current-password"></div>
       <button class="btn btn-solid btn-lg" type="submit">Ingresar a la Escuela</button>
     </form>
     <div style="margin-top:16px;font-size:12.5px;color:var(--dim);line-height:1.55">La Escuela no cobra inscripción. Se sostiene con un <b>donativo mensual voluntario</b> (desde $200), no obligatorio, para mantener la plataforma y seguir formando líderes para México.</div>
-    <div class="login-demo">Usa el <b>usuario</b> y la <b>clave</b> que te llegaron en tu correo de bienvenida. ¿Problemas para entrar? Escríbenos por WhatsApp al 812 332 6119.</div>
+    <div class="login-demo">Demo: entra con cualquier usuario. Dentro podrás cambiar de <b>rol</b> (participante, mentor, director, inscripciones) desde la barra superior.</div>
   </div>
 </div>
 
@@ -555,7 +555,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   <div class="main-wrap">
     <div class="topbar">
       <div class="crumb" id="crumb">Inicio</div>
-      <div class="role-switch" id="roleSwitch" style="display:none">
+      <div class="role-switch">
         <span class="lbl">Ver como</span>
         <select id="roleSel" onchange="switchRole(this.value)">
           <option value="participante">Participante</option>
@@ -824,19 +824,14 @@ const NAVI = {
     const sb=this.sb;
     const { data:{ user } } = await sb.auth.getUser();
     // Perfil propio -> rol + nombre real
-    const { data:me, error:eMe } = await sb.schema('navi').from('usuarios')
-      .select('nombre,usuario,email,foto,rol_id,roles(codigo)').eq('auth_uid', user.id).maybeSingle();
-    if(eMe) console.warn('[perfil] no pude leer mi fila:', eMe.message);
-    const cod = me && me.roles && me.roles.codigo;
-    const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
-    state.role = codeMap[cod] || (me && this.rolMap[me.rol_id]) || 'participante';
-    // Escribe el nombre/datos REALES sobre el usuario de la sesión (nunca deja el de ejemplo)
-    const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
-    if(du){
-      du.nombre = (me && me.nombre) || (user.email || '').split('@')[0] || du.nombre;
-      if(me && me.usuario) du.usuario = me.usuario;
-      du.email = (me && me.email) || user.email || du.email;
-      if(me && me.foto) du.foto = me.foto;
+    const { data:me } = await sb.schema('navi').from('usuarios')
+      .select('nombre,rol_id,roles(codigo)').eq('auth_uid', user.id).single();
+    if(me){
+      const cod = me.roles && me.roles.codigo;
+      const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
+      state.role = codeMap[cod] || this.rolMap[me.rol_id] || 'participante';
+      const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
+      if(du) du.nombre = me.nombre;
     }
     // Trimestres reales
     const { data:tr } = await sb.schema('navi').from('trimestres')
@@ -858,7 +853,6 @@ const NAVI = {
 function enterApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  state.realRole=state.role;
   document.getElementById('roleSel').value=state.role;
   applyRole(true);
   window.scrollTo(0,0);
@@ -866,16 +860,15 @@ function enterApp(){
 
 async function doLogin(e){
   e.preventDefault();
-  const idf = document.getElementById('inUser').value.trim();
-  const pass = document.getElementById('inPass').value.trim();
-  if(!idf || !pass){ if(typeof toast==='function') toast('Escribe tu usuario y tu clave.'); else alert('Escribe tu usuario y tu clave.'); return; }
+  const idf = document.getElementById('inUser').value.trim() || 'jose.sanchez';
+  const pass = document.getElementById('inPass').value;
   // MODO DEMO (sin conexión configurada): comportamiento de siempre
   if(!NAVI.activo){
     const found=DB.usuarioPorUser(idf);
     state.role = found?found.rol:'participante';
     enterApp(); return;
   }
-  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || (idf + '@edificadoresnavi.mx'));
+  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || idf);
   const btn = e.target.querySelector('button[type=submit]');
   const label = btn ? btn.textContent : '';
   if(btn){ btn.disabled=true; btn.textContent='Entrando…'; }
@@ -903,14 +896,8 @@ async function doLogout(){
   try{ if(NAVI.activo) await NAVI.sb.auth.signOut(); }catch(_){}
   location.reload();
 }
-function switchRole(r){
-  if(state.realRole!=='superadmin'){ return; }  // solo el superadmin puede cambiar de vista
-  state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);
-}
+function switchRole(r){state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);}
 function applyRole(reset){
-  // El selector "Ver como" es solo para el superadmin (herramienta de revisión)
-  const rs=document.getElementById('roleSwitch');
-  if(rs) rs.style.display = (state.realRole==='superadmin') ? '' : 'none';
   state.user=store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
   if(reset) state.view=DEFVIEW[state.role];
   document.getElementById('sideAvatar').textContent=initials(state.user.nombre);
@@ -1591,15 +1578,14 @@ if (PRELANZAMIENTO) {
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
-    var antorcha = hayRev ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
-    return antorcha
-      +'<div class="page-head"'+(hayRev?' style="margin-top:24px"':'')+'><div class="eyebrow">Generación 2026–2027</div>'
+    return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+u.nombre.split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +miPerfilHtml()
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
       +miProgresoHtml()
+      +(DB.articulos().filter(function(a){return a.publicado;}).length?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
@@ -1857,25 +1843,12 @@ function darAlta(){
   if(grupo){const g=store.grupos.find(x=>x.nombre===grupo); if(g&&g.inscritos<g.cupo)g.inscritos++;}
   document.getElementById('altaResult').innerHTML=`<div class="sec-title" style="margin-top:0">Acceso generado</div>
     <p style="font-size:13.5px;color:var(--dim);margin-bottom:10px">Entrega estos datos a <b style="color:var(--cream)">${n}</b>${grupo?', asignado al <b style="color:var(--cream)">'+grupo+'</b>':''}. La inscripción queda como <b>preinscrita</b> hasta confirmarla.</p>
-    <label style="font-size:12px;color:var(--soft)">Usuario</label><div class="cred">${user}<button class="btn btn-sm" onclick="copiar('${user}','Usuario copiado')">Copiar</button></div>
-    <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="copiar('${clave}','Clave copiada')">Copiar</button></div>
+    <label style="font-size:12px;color:var(--soft)">Usuario</label><div class="cred">${user}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+    <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
     <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
   toast('Participante dado de alta');
 }
 const GRUPOS=['Grupo 1','Grupo 2','Grupo 3','Grupo 4','Grupo 5','Grupo 6','Grupo 7','Grupo 8'];
-function copiar(txt,msg){
-  txt=String(txt);
-  function ok(){ if(typeof toast==='function') toast(msg||'Copiado'); }
-  try{
-    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,fallback); return; }
-  }catch(e){}
-  fallback();
-  function fallback(){
-    try{ var t=document.createElement('textarea'); t.value=txt; t.setAttribute('readonly',''); t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0,txt.length); document.execCommand('copy'); document.body.removeChild(t); ok(); }
-    catch(e){ if(typeof toast==='function') toast('Copia manual: '+txt); }
-  }
-}
-window.copiar=copiar;
 function up(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(); }
 function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
 async function cargarRegistros(force){
