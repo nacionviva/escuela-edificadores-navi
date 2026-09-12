@@ -987,11 +987,29 @@ function renderNow(){
    ============================================================ */
 function head(eyebrow,title,sub){return `<div class="page-head"><div class="eyebrow">${eyebrow}</div><h1 class="page">${title}</h1>${sub?`<div class="page-sub">${sub}</div>`:''}</div>`;}
 function pill(txt,cls){return `<span class="pill ${cls}">${txt}</span>`;}
+function buscarEnTabla(inputId, wrapId){
+  var q=(((document.getElementById(inputId)||{}).value)||'').trim().toLowerCase();
+  var wrap=document.getElementById(wrapId); if(!wrap) return;
+  var rows=wrap.querySelectorAll('tbody tr');
+  for(var i=0;i<rows.length;i++){ var t=(rows[i].textContent||'').toLowerCase(); rows[i].style.display=(!q||t.indexOf(q)>=0)?'':'none'; }
+}
 function ytEmbed(url){
   if(!url) return '';
   var m=String(url).match(/(?:v=|youtu\.be\/|youtube\.com\/live\/|embed\/)([A-Za-z0-9_-]{6,})/);
   return m?('https://www.youtube.com/embed/'+m[1]):'';
 }
+window.abrirVideoModal=function(idOrUrl, titulo){
+  var emb = /^[A-Za-z0-9_-]{6,15}$/.test(idOrUrl||'') ? ('https://www.youtube.com/embed/'+idOrUrl) : ytEmbed(idOrUrl);
+  var ov=document.getElementById('vidModal'); if(ov) ov.remove();
+  ov=document.createElement('div'); ov.id='vidModal'; ov.className='pdf-ov on';
+  var inner = emb
+    ? '<div style="position:relative;padding-top:56.25%;background:#000"><iframe src="'+emb+'?autoplay=1&rel=0" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>'
+    : '<div style="padding:54px 26px;text-align:center;color:var(--dim);font-size:14.5px">Esta grabación estará disponible muy pronto.</div>';
+  ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>'+(titulo||'Conferencia')+'</span><button class="pdf-x" onclick="cerrarVideoModal()" aria-label="Cerrar">✕</button></div>'+inner+'</div>';
+  ov.addEventListener('click',function(e){ if(e.target===ov) cerrarVideoModal(); });
+  document.body.appendChild(ov);
+};
+window.cerrarVideoModal=function(){ var o=document.getElementById('vidModal'); if(o) o.remove(); };
 function miClaseCard(){
   var u=state.user||{}; if(state.role!=='participante') return '';
   var gname=(u.grupo||'')||((store.miProgreso&&store.miProgreso.grupo)||'');
@@ -1478,7 +1496,7 @@ iregistros:{title:'Registros',html(){
   const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); const ue=(r.usuario_generado||'').toLowerCase().replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Enviar bienvenida</button>`; };
   const rowResp=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return ''; return `<input type="checkbox" ${a.respondio?'checked':''} onchange="toggleRespondio('${a.auth_uid}',${a.respondio?1:0})" title="Marcar si ya respondió">`; };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
-    : (rs.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Acceso</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
+    : (rs.length?`<input id="regSearch" class="mini-in" style="width:100%;max-width:380px;margin-bottom:12px;display:block" placeholder="🔍 Buscar por nombre, correo o usuario…" oninput="buscarEnTabla('regSearch','regWrap')"><div class="tbl-wrap" id="regWrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Acceso</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
         + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td>${rowAcc(r)}</td><td>${rowBienv(r)}</td><td style="text-align:center">${rowResp(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
         + `</tbody></table></div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
@@ -1496,7 +1514,7 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th>${state.role==='superadmin'?'<th>Desc. Congreso</th>':''}<th></th></tr></thead><tbody>`
+    : (al.length?`<input id="alSearch" class="mini-in" style="width:100%;max-width:380px;margin-bottom:12px;display:block" placeholder="🔍 Buscar alumno por nombre o usuario…" oninput="buscarEnTabla('alSearch','alWrap')"><div class="tbl-wrap" id="alWrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th>${state.role==='superadmin'?'<th>Desc. Congreso</th>':''}<th></th></tr></thead><tbody>`
         + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
           +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
           +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
@@ -1710,7 +1728,7 @@ if (PRELANZAMIENTO) {
       : '<div class="cngr-acc lock">Las conferencias se habilitan al confirmar tu donativo. <a onclick="nav(\'midonativo\')">Realizar mi donativo</a></div>';
     var cards = CONF_PL.map(function(c){
       var right = activo
-        ? '<button class="cngr-pill open" onclick="toast(\'Reproduciendo la conferencia…\')">Ver ahora</button>'
+        ? '<button class="cngr-pill open" onclick="abrirVideoModal(\''+(c.yt||'')+'\',\''+String(c.cf||'Conferencia').replace(/['\\]/g,'')+'\')">Ver ahora</button>'
         : '<span class="cngr-pill lock">Se habilita con tu donativo</span>';
       return '<div class="cngr-row"><div class="cngr-ph" style="background-image:url(\''+c.ph+'\')"></div>'
         +'<div class="cngr-info"><div class="cngr-cf">'+c.cf+'</div><div class="cngr-nm">'+c.nm+'</div></div>'+right+'</div>';
@@ -1726,7 +1744,7 @@ if (PRELANZAMIENTO) {
       +banner
       +cards
       +'</div>';
-  }, after:function(){ if(NAVI&&NAVI.sb) cargarMiProgreso(true); }};
+  }, after:function(){ if(NAVI&&NAVI.sb) cargarMiProgreso(); }};
   // ================= CONTENIDO: Artículos (BD) y Videos sugeridos =================
   document.head.insertAdjacentHTML('beforeend','<style>'
     +'.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:8px}'
