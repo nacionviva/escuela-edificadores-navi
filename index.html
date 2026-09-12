@@ -462,6 +462,20 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .revista-note{font-family:var(--gov);font-size:12.5px;color:var(--soft)}
 .pdf-ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,16,.86);display:none;align-items:center;justify-content:center;padding:24px}
 .pdf-ov.on{display:flex}
+.rowcard{background:rgba(255,255,255,.028);border:1px solid var(--glassline);border-radius:14px;padding:13px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;transition:border-color .15s}
+.rowcard:hover{border-color:var(--accent-line)}
+.rc-main{flex:1 1 240px;min-width:0}
+.rc-name{font-size:15.5px;font-weight:700;color:var(--cream);letter-spacing:.2px;word-break:break-word}
+.rc-meta{font-size:12.5px;color:var(--soft);margin-top:5px;display:flex;flex-wrap:wrap;gap:3px 16px}
+.rc-meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rc-form{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.rc-form .mini-in{max-width:190px}
+.rc-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.rc-agu{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border-radius:999px;padding:2px 8px}
+.rc-agu b{color:var(--cream);min-width:22px;text-align:center}
+.rc-chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
+.rc-del{border-color:rgba(232,120,120,.45)!important;color:#E9A3A2!important}
+.list-search{width:100%;max-width:420px;margin-bottom:14px;display:block}
 .pdf-box{width:min(940px,100%);height:min(90vh,1150px);background:#0A1426;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.55)}
 .pdf-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-family:var(--gov);font-size:13px;color:var(--cream)}
 .pdf-x{background:none;border:0;color:var(--soft);font-size:20px;cursor:pointer;line-height:1}
@@ -990,7 +1004,7 @@ function pill(txt,cls){return `<span class="pill ${cls}">${txt}</span>`;}
 function buscarEnTabla(inputId, wrapId){
   var q=(((document.getElementById(inputId)||{}).value)||'').trim().toLowerCase();
   var wrap=document.getElementById(wrapId); if(!wrap) return;
-  var rows=wrap.querySelectorAll('tbody tr');
+  var rows=wrap.querySelectorAll('tbody tr, .rowcard');
   for(var i=0;i<rows.length;i++){ var t=(rows[i].textContent||'').toLowerCase(); rows[i].style.display=(!q||t.indexOf(q)>=0)?'':'none'; }
 }
 function ytEmbed(url){
@@ -1494,11 +1508,15 @@ iregistros:{title:'Registros',html(){
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
   const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
   const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); const ue=(r.usuario_generado||'').toLowerCase().replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Enviar bienvenida</button>`; };
-  const rowResp=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return ''; return `<input type="checkbox" ${a.respondio?'checked':''} onchange="toggleRespondio('${a.auth_uid}',${a.respondio?1:0})" title="Marcar si ya respondió">`; };
+  const rowResp=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return ''; return `<label class="rc-chk" title="Marcar si ya respondió"><input type="checkbox" ${a.respondio?'checked':''} onchange="toggleRespondio('${a.auth_uid}',${a.respondio?1:0})"> Respondió</label>`; };
   const body = !on ? '' : (store._loadingReg?`<div class="empty">Cargando registros…</div>`
-    : (rs.length?`<input id="regSearch" class="mini-in" style="width:100%;max-width:380px;margin-bottom:12px;display:block" placeholder="🔍 Buscar por nombre, correo o usuario…" oninput="buscarEnTabla('regSearch','regWrap')"><div class="tbl-wrap" id="regWrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>WhatsApp</th><th>Usuario generado</th><th>Acceso</th><th>Bienvenida</th><th>Respondió</th><th></th></tr></thead><tbody>`
-        + rs.map(r=>`<tr><td>${fmtFecha(r.created_at)}</td><td class="nm">${up(r.nombre)}</td><td style="font-size:12.5px">${r.correo||''}</td><td>${r.whatsapp||''}</td><td style="font-family:monospace;font-size:12px">${r.usuario_generado||'—'}</td><td>${rowAcc(r)}</td><td>${rowBienv(r)}</td><td style="text-align:center">${rowResp(r)}</td><td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
-        + `</tbody></table></div>`
+    : (rs.length?`<input id="regSearch" class="mini-in list-search" placeholder="🔍 Buscar por nombre, correo o usuario…" oninput="buscarEnTabla('regSearch','regWrap')"><div id="regWrap">`
+        + rs.map(r=>`<div class="rowcard">
+            <div class="rc-main"><div class="rc-name">${up(r.nombre)}</div>
+              <div class="rc-meta"><span>✉️ ${r.correo||'—'}</span><span>📱 ${r.whatsapp||'—'}</span><span style="font-family:monospace">${r.usuario_generado||'—'}</span><span>${fmtFecha(r.created_at)}</span></div></div>
+            <div class="rc-actions">${rowAcc(r)}${rowBienv(r)}${rowResp(r)}<button class="btn btn-sm rc-del" title="Borrar" onclick="borrarRegistro('${r.id}','${(r.nombre||'').replace(/'/g,'')}')">Borrar</button></div>
+          </div>`).join('')
+        + `</div>`
       : `<div class="empty">Aún no hay registros. Cuando alguien llene el formulario, aparecerá aquí.</div>`));
   const nAl=(store.alumnos||[]).filter(a=>a.activado).length;
   const nEnv=(store.alumnos||[]).filter(a=>a.bienvenida_enviada).length;
@@ -1514,15 +1532,20 @@ ialumnos:{title:'Alumnos',html(){
   const opt=(cur)=>`<option value="">—</option>`+grupos.map(g=>`<option ${cur===g.nombre?'selected':''}>${g.nombre}</option>`).join('');
   const noGrp = on && !grupos.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint)"><div style="font-size:13px;color:var(--dim)">Aún no has creado grupos. Ve a <b style="color:var(--cream)">Grupos</b> y crea uno para poder asignar aquí a los alumnos.</div></div>`:'';
   const body = !on ? '' : (store._loadingAl?`<div class="empty">Cargando alumnos…</div>`
-    : (al.length?`<input id="alSearch" class="mini-in" style="width:100%;max-width:380px;margin-bottom:12px;display:block" placeholder="🔍 Buscar alumno por nombre o usuario…" oninput="buscarEnTabla('alSearch','alWrap')"><div class="tbl-wrap" id="alWrap"><table class="tbl"><thead><tr><th>Nombre</th><th>Usuario</th><th>Folio</th><th>Grupo</th><th>Mentor</th><th>Conferencias</th><th>Águilas</th>${state.role==='superadmin'?'<th>Desc. Congreso</th>':''}<th></th></tr></thead><tbody>`
-        + al.map(p=>`<tr><td class="nm">${up(p.nombre)}</td><td style="font-family:monospace;font-size:12.5px">${p.usuario||''}</td><td style="font-family:monospace">${p.folio||'—'}</td>`
-          +`<td><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select></td>`
-          +`<td><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></td>`
-          +`<td><button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar':'Activar'}</button></td>`
-          +`<td style="white-space:nowrap"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button> <b style="color:var(--cream)">${p.aguilas||0}</b> <span style="font-size:11px;color:var(--soft)">${nivelAguilas(p.aguilas)!=='—'?'· '+nivelAguilas(p.aguilas):''}</span> <button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></td>`
-          +(state.role==='superadmin'?`<td style="text-align:center"><b style="color:var(--cream)">${descuentoCongreso(p.auth_uid)}%</b> <span style="font-size:11px;color:var(--soft)">(${mesesDonados(p.auth_uid)} mes)</span></td>`:'')
-          +`<td><button class="btn btn-sm" style="border-color:rgba(232,120,120,.45);color:#E9A3A2" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button></td></tr>`).join('')
-        + `</tbody></table></div>`
+    : (al.length?`<input id="alSearch" class="mini-in list-search" placeholder="🔍 Buscar alumno por nombre o usuario…" oninput="buscarEnTabla('alSearch','alWrap')"><div id="alWrap">`
+        + al.map(p=>`<div class="rowcard">
+            <div class="rc-main">
+              <div class="rc-name">${up(p.nombre)}</div>
+              <div class="rc-meta"><span style="font-family:monospace">${p.usuario||''}</span><span>Folio ${p.folio||'—'}</span>${nivelAguilas(p.aguilas)!=='—'?`<span>Nivel ${nivelAguilas(p.aguilas)}</span>`:''}${state.role==='superadmin'?`<span>Desc. Congreso ${descuentoCongreso(p.auth_uid)}% · ${mesesDonados(p.auth_uid)} mes</span>`:''}</div>
+              <div class="rc-form"><select class="mini-in" onchange="asignarGrupo('${p.auth_uid}',this.value)">${opt(p.grupo)}</select><input class="mini-in" value="${(p.mentor||'').replace(/"/g,'&quot;')}" placeholder="Mentor" onchange="asignarMentor('${p.auth_uid}',this.value)"></div>
+            </div>
+            <div class="rc-actions">
+              <button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar Congreso':'Activar Congreso'}</button>
+              <span class="rc-agu" title="Águilas"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button><b>${p.aguilas||0}</b><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></span>
+              <button class="btn btn-sm rc-del" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button>
+            </div>
+          </div>`).join('')
+        + `</div>`
       : `<div class="empty">Aún no hay alumnos activados. Ve a <b>Registros</b> y activa el acceso de las personas.</div>`));
   return head('Coordinación de Inscripciones','Alumnos','Alumnos con acceso. Asígnalos a un grupo (máx. 12) y a su mentor. El botón de Conferencias los desbloquea al confirmar su donativo.')+banner+noGrp+(on&&al.length?`<div class="page-sub" style="margin:-4px 0 14px"><b style="color:var(--cream)">${al.length}</b> alumnos</div>`:'')+body;
 }, after(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); cargarGrupos(); cargarDonativos(); } }},
