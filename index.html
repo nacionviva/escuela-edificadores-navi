@@ -233,6 +233,14 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .row.click{cursor:pointer}
 .row.click:hover{border-color:var(--accent-line)}
 .row.locked{opacity:.5}
+.eje-acc{margin-bottom:10px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(127,168,214,.045)}
+.eje-acc>summary{list-style:none;cursor:pointer;display:flex;gap:14px;align-items:center;padding:14px 16px}
+.eje-acc>summary::-webkit-details-marker{display:none}
+.eje-acc .eje-chev{color:var(--accent);font-size:18px;transition:transform .2s;flex:none}
+.eje-acc[open] .eje-chev{transform:rotate(180deg)}
+.eje-acc .eje-body{padding:2px 16px 14px 16px}
+.eje-acc summary .t{color:var(--cream);font-weight:700}
+.eje-acc summary .d{color:var(--soft);font-size:12.5px;margin-top:2px}
 .rnum{width:37px;height:37px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
 .row.locked .rnum{border-color:var(--soft);color:var(--soft)}
 .rinfo{flex:1;min-width:0}
@@ -495,12 +503,12 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
     <div class="login-title">Escuela de Edificadores NAVI</div>
     <div class="login-sub">Criterio y carácter para la vida pública de México</div>
     <form onsubmit="doLogin(event)">
-      <div class="field"><label for="inUser">Usuario</label><input id="inUser" type="text" value="jose.sanchez" autocomplete="username"></div>
-      <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" value="Edificadores2026" autocomplete="current-password"></div>
+      <div class="field"><label for="inUser">Usuario</label><input id="inUser" type="text" placeholder="tunombre@edificadoresnavi.mx" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" placeholder="Tu clave del correo de bienvenida" autocomplete="current-password"></div>
       <button class="btn btn-solid btn-lg" type="submit">Ingresar a la Escuela</button>
     </form>
     <div style="margin-top:16px;font-size:12.5px;color:var(--dim);line-height:1.55">La Escuela no cobra inscripción. Se sostiene con un <b>donativo mensual voluntario</b> (desde $200), no obligatorio, para mantener la plataforma y seguir formando líderes para México.</div>
-    <div class="login-demo">Demo: entra con cualquier usuario. Dentro podrás cambiar de <b>rol</b> (participante, mentor, director, inscripciones) desde la barra superior.</div>
+    <div class="login-demo">Usa el <b>usuario</b> y la <b>clave</b> que te llegaron en tu correo de bienvenida. ¿Problemas para entrar? Escríbenos por WhatsApp al 812 332 6119.</div>
   </div>
 </div>
 
@@ -555,7 +563,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   <div class="main-wrap">
     <div class="topbar">
       <div class="crumb" id="crumb">Inicio</div>
-      <div class="role-switch">
+      <div class="role-switch" id="roleSwitch" style="display:none">
         <span class="lbl">Ver como</span>
         <select id="roleSel" onchange="switchRole(this.value)">
           <option value="participante">Participante</option>
@@ -595,24 +603,24 @@ const store = {
     {id:3,numero:3,nombre:'Economía',pregunta:'¿Cómo deben entender los cristianos su relación con el trabajo, la propiedad, la pobreza, la riqueza y la política económica?',rango:'Abr – Jul 2027'}
   ],
   modulos:[
-    {id:1,tri:1,num:1,titulo:'Antropología cristiana y vida pública',pf:'¿Qué visión del ser humano debe sostener una comprensión cristiana del gobierno civil?',fecha:iso(2026,9,17),prof:'Roberto Hernández'},
-    {id:2,tri:1,num:2,titulo:'Propósito y límites del gobierno civil',pf:'¿Para qué existe el gobierno civil ante Dios y qué cosas no debe pretender hacer?',fecha:iso(2026,10,1),prof:'Roberto Hernández'},
-    {id:3,tri:1,num:3,titulo:'Corrupción y Estado de Derecho',pf:'¿Por qué la corrupción es más que una falla administrativa o de eficiencia?',fecha:iso(2026,10,15),prof:'Roberto Hernández'},
-    {id:4,tri:1,num:4,titulo:'Secularismo, Estado secular y libertad religiosa',pf:'¿Cómo debe servir un cristiano en un Estado secular sin privatizar su fe?',fecha:iso(2026,10,29),prof:'Roberto Hernández'},
-    {id:5,tri:1,num:5,titulo:'Función pública como vocación',pf:'¿Qué carácter, criterio y hábitos necesita el cristiano que sirve dentro del Estado?',fecha:iso(2026,11,12),prof:'Roberto Hernández'},
-    {id:6,tri:2,num:1,titulo:'El propósito general de la educación',pf:'¿Qué significa educar a una persona y no solo transmitirle información?',fecha:iso(2027,1,7),prof:'Ana Ruiz'},
-    {id:7,tri:2,num:2,titulo:'Educación y formación moral del ciudadano',pf:'¿Qué tipo de ciudadano forma una educación que nunca es moralmente neutral?',fecha:iso(2027,1,21),prof:'Ana Ruiz'},
-    {id:8,tri:2,num:3,titulo:'Autoridades formativas: familia, Iglesia, escuela, Estado y cultura digital',pf:'¿Qué funciones formativas corresponden a cada autoridad y cuáles son sus límites?',fecha:iso(2027,2,4),prof:'Ana Ruiz'},
-    {id:9,tri:2,num:4,titulo:'Verdad, contenido académico y neutralidad moral',pf:'¿Puede la educación pública ser neutral respecto de la verdad y la moral?',fecha:iso(2027,2,18),prof:'Ana Ruiz'},
-    {id:10,tri:2,num:5,titulo:'Educación cívica, identidad nacional y bien común',pf:'¿Cómo formar ciudadanos que amen rectamente a México sin manipulación ideológica?',fecha:iso(2027,3,4),prof:'Ana Ruiz'},
-    {id:11,tri:2,num:6,titulo:'Desigualdad educativa, justicia y responsabilidad pública',pf:'¿Qué exige la justicia cristiana frente a la desigualdad educativa en México?',fecha:iso(2027,3,18),prof:'Ana Ruiz'},
-    {id:12,tri:3,num:1,titulo:'Trabajo, vocación y mandato cultural',pf:'¿Cuál es el propósito de Dios para el trabajo humano?',fecha:iso(2027,4,22),prof:'Carlos Mendoza'},
-    {id:13,tri:3,num:2,titulo:'Propiedad, mayordomía y recursos naturales',pf:'¿Cómo deben entender los cristianos la propiedad y los recursos naturales ante Dios?',fecha:iso(2027,5,6),prof:'Carlos Mendoza'},
-    {id:14,tri:3,num:3,titulo:'Pecado, incentivos y estructuras económicas injustas',pf:'¿Cómo afecta el pecado personal e institucional la vida económica?',fecha:iso(2027,5,20),prof:'Carlos Mendoza'},
-    {id:15,tri:3,num:4,titulo:'Mercados y orden moral de la economía',pf:'¿Qué lugar deben ocupar los mercados en una visión cristiana de la economía?',fecha:iso(2027,6,10),prof:'Carlos Mendoza'},
-    {id:16,tri:3,num:5,titulo:'Pobreza, riqueza, desigualdad y responsabilidad social',pf:'¿Cómo debe responder el cristiano ante la pobreza, la riqueza y la desigualdad?',fecha:iso(2027,6,24),prof:'Carlos Mendoza'},
-    {id:17,tri:3,num:6,titulo:'Estado, mercado, sociedad civil y subsidiariedad',pf:'¿Qué responsabilidades corresponden al Estado, al mercado, a la familia y a la Iglesia?',fecha:iso(2027,7,8),prof:'Carlos Mendoza'},
-    {id:18,tri:3,num:7,titulo:'Política económica y prudencia pública',pf:'¿Con qué criterios de prudencia deben evaluarse las propuestas de política económica?',fecha:iso(2027,7,22),prof:'Carlos Mendoza'}
+    {id:1,tri:1,num:1,titulo:'Antropología cristiana y vida pública',pf:'¿Qué visión del ser humano debe sostener una comprensión cristiana del gobierno civil?',fecha:iso(2026,9,17),prof:'Mtro. José Pablo Sánchez'},
+    {id:2,tri:1,num:2,titulo:'Propósito y límites del gobierno civil',pf:'¿Para qué existe el gobierno civil ante Dios y qué cosas no debe pretender hacer?',fecha:iso(2026,10,1),prof:'Mtro. José Pablo Sánchez'},
+    {id:3,tri:1,num:3,titulo:'Corrupción y Estado de Derecho',pf:'¿Por qué la corrupción es más que una falla administrativa o de eficiencia?',fecha:iso(2026,10,15),prof:''},
+    {id:4,tri:1,num:4,titulo:'Secularismo, Estado secular y libertad religiosa',pf:'¿Cómo debe servir un cristiano en un Estado secular sin privatizar su fe?',fecha:iso(2026,10,29),prof:''},
+    {id:5,tri:1,num:5,titulo:'Función pública como vocación',pf:'¿Qué carácter, criterio y hábitos necesita el cristiano que sirve dentro del Estado?',fecha:iso(2026,11,12),prof:''},
+    {id:6,tri:2,num:1,titulo:'El propósito general de la educación',pf:'¿Qué significa educar a una persona y no solo transmitirle información?',fecha:iso(2027,1,7),prof:''},
+    {id:7,tri:2,num:2,titulo:'Educación y formación moral del ciudadano',pf:'¿Qué tipo de ciudadano forma una educación que nunca es moralmente neutral?',fecha:iso(2027,1,21),prof:''},
+    {id:8,tri:2,num:3,titulo:'Autoridades formativas: familia, Iglesia, escuela, Estado y cultura digital',pf:'¿Qué funciones formativas corresponden a cada autoridad y cuáles son sus límites?',fecha:iso(2027,2,4),prof:''},
+    {id:9,tri:2,num:4,titulo:'Verdad, contenido académico y neutralidad moral',pf:'¿Puede la educación pública ser neutral respecto de la verdad y la moral?',fecha:iso(2027,2,18),prof:''},
+    {id:10,tri:2,num:5,titulo:'Educación cívica, identidad nacional y bien común',pf:'¿Cómo formar ciudadanos que amen rectamente a México sin manipulación ideológica?',fecha:iso(2027,3,4),prof:''},
+    {id:11,tri:2,num:6,titulo:'Desigualdad educativa, justicia y responsabilidad pública',pf:'¿Qué exige la justicia cristiana frente a la desigualdad educativa en México?',fecha:iso(2027,3,18),prof:''},
+    {id:12,tri:3,num:1,titulo:'Trabajo, vocación y mandato cultural',pf:'¿Cuál es el propósito de Dios para el trabajo humano?',fecha:iso(2027,4,22),prof:''},
+    {id:13,tri:3,num:2,titulo:'Propiedad, mayordomía y recursos naturales',pf:'¿Cómo deben entender los cristianos la propiedad y los recursos naturales ante Dios?',fecha:iso(2027,5,6),prof:''},
+    {id:14,tri:3,num:3,titulo:'Pecado, incentivos y estructuras económicas injustas',pf:'¿Cómo afecta el pecado personal e institucional la vida económica?',fecha:iso(2027,5,20),prof:''},
+    {id:15,tri:3,num:4,titulo:'Mercados y orden moral de la economía',pf:'¿Qué lugar deben ocupar los mercados en una visión cristiana de la economía?',fecha:iso(2027,6,10),prof:''},
+    {id:16,tri:3,num:5,titulo:'Pobreza, riqueza, desigualdad y responsabilidad social',pf:'¿Cómo debe responder el cristiano ante la pobreza, la riqueza y la desigualdad?',fecha:iso(2027,6,24),prof:''},
+    {id:17,tri:3,num:6,titulo:'Estado, mercado, sociedad civil y subsidiariedad',pf:'¿Qué responsabilidades corresponden al Estado, al mercado, a la familia y a la Iglesia?',fecha:iso(2027,7,8),prof:''},
+    {id:18,tri:3,num:7,titulo:'Política económica y prudencia pública',pf:'¿Con qué criterios de prudencia deben evaluarse las propuestas de política económica?',fecha:iso(2027,7,22),prof:''}
   ],
   // materiales detallados para módulo 2 (ejemplo del documento); el resto se genera abajo
   materiales:[
@@ -629,7 +637,7 @@ const store = {
     {id:'u4',nombre:'Patricia Lira',usuario:'patricia.lira',rol:'participante',perfil:'empresario',estatus:'activo',insc:'confirmado'},
     {id:'u5',nombre:'Jorge Ramos',usuario:'jorge.ramos',rol:'participante',perfil:'servidor_publico',estatus:'activo',insc:'preinscrito'},
     {id:'u6',nombre:'Sofía Herrera',usuario:'sofia.herrera',rol:'participante',perfil:'maestro',estatus:'activo',insc:'preinscrito'},
-    {id:'p1',nombre:'Roberto Hernández',usuario:'roberto.hernandez',rol:'profesor',perfil:'otro',estatus:'activo',insc:'—'},
+    {id:'p1',nombre:'Maestro NAVI',usuario:'maestro',rol:'profesor',perfil:'otro',estatus:'activo',insc:'—'},
     {id:'d1',nombre:'Dirección Académica',usuario:'direccion',rol:'director',perfil:'otro',estatus:'activo',insc:'—'},
     {id:'i1',nombre:'Registro NAVI',usuario:'registro',rol:'inscripciones',perfil:'otro',estatus:'activo',insc:'—'}
   ],
@@ -644,12 +652,12 @@ const store = {
   progreso:{},
   foro:[
     {id:1,mod:1,autor:'María González',ini:'MG',color:'var(--lime)',cuando:'hace 2 horas',texto:'Terminé la lectura de Romanos 13 y me quedé pensando en la diferencia entre someterse a la autoridad y obedecer en todo. ¿Alguien más ve la tensión con Hechos 5:29?'},
-    {id:2,mod:1,autor:'Prof. Roberto Hernández',ini:'RH',color:'var(--coral)',cuando:'hace 5 horas',texto:'Excelente pregunta, María. La traemos a la discusión del jueves: la clave está en distinguir la autoridad como institución de Dios y el mandato concreto de un gobernante.'},
+    {id:2,mod:1,autor:'Dirección Académica',ini:'RH',color:'var(--coral)',cuando:'hace 5 horas',texto:'Excelente pregunta, María. La traemos a la discusión del jueves: la clave está en distinguir la autoridad como institución de Dios y el mandato concreto de un gobernante.'},
     {id:3,mod:1,autor:'Luis Treviño',ini:'LT',color:'var(--accent)',cuando:'ayer',texto:'Para los que trabajamos en municipio: el caso de captura institucional se parece muchísimo a lo que vivimos en los comités de adquisiciones. Llevo notas para la clase.'}
   ],
   avisos:[
     {id:1,titulo:'Bienvenidos a la generación 2026–2027',cuerpo:'La sesión inaugural es el jueves 10 de septiembre a las 7 pm. Revisen que su acceso funcione.',autor:'Dirección Académica',cuando:'hace 3 días',alcance:'generación'},
-    {id:2,titulo:'Lecturas del Módulo 1 disponibles',cuerpo:'Ya pueden descargar los textos del Módulo 1. Lleguen con la aplicación prudencial resuelta.',autor:'Prof. Roberto Hernández',cuando:'hace 1 día',alcance:'módulo'}
+    {id:2,titulo:'Lecturas del Módulo 1 disponibles',cuerpo:'Ya pueden descargar los textos del Módulo 1. Lleguen con la aplicación prudencial resuelta.',autor:'Dirección Académica',cuando:'hace 1 día',alcance:'módulo'}
   ],
   donativos:[],
   // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
@@ -665,7 +673,7 @@ const store = {
   registros:[],
   alumnos:[],
   // Donativo mensual voluntario
-  donativoInfo:{min:200,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Para sostener la plataforma y seguir formando líderes íntegros para México, pedimos un donativo mensual voluntario, no obligatorio, desde $200. Puedes dar la cantidad que tú decidas. Tu donativo es privado: nadie ve cuánto donas.'},
+  donativoInfo:{min:200,recomendado:500,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Se sostiene con un donativo mensual voluntario. Recomendado: $500 al mes, que incluye el acceso a las conferencias del Congreso Nación Viva. Mínimo: $200 al mes (acceso solo a las clases). Tú decides la cantidad; tu donativo es privado.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'812 332 6119'},
   transparencia:{periodo:'Ejercicio 2026',items:[
     {cat:'Plataforma y tecnología',pct:35},
@@ -766,6 +774,13 @@ const MENUS = {
   superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos']]
 };
+// Muestra el nombre en formato Título aunque en la BD esté en MAYÚSCULAS (no toca la BD).
+function nombreBonito(s){
+  s=(s==null?'':String(s)).toLowerCase().trim().replace(/\s+/g,' ');
+  if(!s) return '';
+  var min={de:1,del:1,la:1,las:1,los:1,y:1,e:1,da:1,do:1,van:1,von:1,di:1,du:1};
+  return s.split(' ').map(function(w,i){ if(!w) return w; if(i>0 && min[w]) return w; return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
+}
 const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
 const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1',superadmin:'d1'};
 const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta',superadmin:'dpanel'};
@@ -777,7 +792,12 @@ const ICONS={
  cap:'<path d="M22 9 12 5 2 9l10 4 10-4z"/><path d="M6 11v4.5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5V11"/>',
  calendar:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 3v3.2M16 3v3.2"/>',
  chart:'<path d="M3 12h3l2.5 6 4-13 2.5 9 2-4h4"/>',
- heart:'<path d="M12 20s-7-4.4-9.3-9C1.2 8 2.6 4.6 6 4.6c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.4 0 4.8 3.4 3.3 6.4C19 15.6 12 20 12 20z"/>',
+ heart:'<path d="M12 21C6.5 16.5 3 13.2 3 9.2 3 6.6 5 4.6 7.5 4.6c1.7 0 3.3 1 4.5 2.6 1.2-1.6 2.8-2.6 4.5-2.6C19 4.6 21 6.6 21 9.2c0 4-3.5 7.3-9 11.8z"/>',
+ ejes:'<path d="M3 9l9-5 9 5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/>',
+ cupula:'<path d="M12 2.2v1.6"/><path d="M6.5 9a5.5 5.5 0 0 1 11 0"/><path d="M4.5 9h15"/><path d="M6.5 9.5v8M10 9.5v8M14 9.5v8M17.5 9.5v8"/><path d="M4 17.5h16"/><path d="M3 20.5h18"/>',
+ pergamino:'<path d="M7 4h9v13a3 3 0 0 0 3 3H8a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2z"/><path d="M16 4a2 2 0 0 1 2 2v1h-2"/><path d="M5 6a2 2 0 0 0-2 2 2 2 0 0 0 2 2"/><path d="M9 9h5M9 12h5M9 15h3"/>',
+ chartup:'<path d="M3 17l5-5 3 3 8-9"/><path d="M14.5 6h4.5v4.5"/>',
+ maestros:'<circle cx="8" cy="8" r="3"/><path d="M2 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><path d="M16 4l5 2.5-5 2.5"/>',
  chat:'<path d="M21 11.5a8 8 0 0 1-11.5 7.2L3 20l1.3-6.4A8 8 0 1 1 21 11.5z"/>',
  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
  check:'<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 12.5l2.5 2.5L16 9"/>',
@@ -790,7 +810,10 @@ const ICONS={
  list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
  image:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/>',
  layers:'<path d="M12 3 2 8l10 5 10-5z"/><path d="M2 13l10 5 10-5"/><path d="M2 18l10 5 10-5"/>',
- news:'<path d="M4 4h12v16H5a1 1 0 0 1-1-1z"/><path d="M16 8h3a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 12h6M7 16h4"/>'
+ news:'<path d="M4 4h12v16H5a1 1 0 0 1-1-1z"/><path d="M16 8h3a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6M7 12h6M7 16h4"/>',
+ play:'<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>',
+ flame:'<path d="M12 22a6 6 0 0 0 6-6c0-3.5-2.6-5.2-3.5-8-.9 1.8-1.8 2.7-3.5 2.7 1-2.7 0-5.4-2.6-7-.1 2.7-1.8 3.6-2.9 5.4A6 6 0 0 0 12 22z"/>',
+ mic:'<rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'
 };
 function svgIcon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
@@ -824,14 +847,20 @@ const NAVI = {
     const sb=this.sb;
     const { data:{ user } } = await sb.auth.getUser();
     // Perfil propio -> rol + nombre real
-    const { data:me } = await sb.schema('navi').from('usuarios')
-      .select('nombre,rol_id,roles(codigo)').eq('auth_uid', user.id).single();
-    if(me){
-      const cod = me.roles && me.roles.codigo;
-      const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
-      state.role = codeMap[cod] || this.rolMap[me.rol_id] || 'participante';
-      const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
-      if(du) du.nombre = me.nombre;
+    const { data:me, error:eMe } = await sb.schema('navi').from('usuarios')
+      .select('nombre,usuario,email,foto,rol_id,must_change_password,perfil_configurado,causa,propuesta,bio,roles(codigo)').eq('auth_uid', user.id).maybeSingle();
+    if(eMe) console.warn('[perfil] no pude leer mi fila:', eMe.message);
+    const cod = me && me.roles && me.roles.codigo;
+    const codeMap={superadmin:'superadmin',director:'director',coordinador:'director',profesor:'profesor',participante:'participante',inscripciones:'inscripciones'};
+    state.role = codeMap[cod] || (me && this.rolMap[me.rol_id]) || 'participante';
+    // Escribe el nombre/datos REALES sobre el usuario de la sesión (nunca deja el de ejemplo)
+    const du = store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
+    if(du){
+      du.nombre = (me && me.nombre) || (user.email || '').split('@')[0] || du.nombre;
+      if(me && me.usuario) du.usuario = me.usuario;
+      du.email = (me && me.email) || user.email || du.email;
+      if(me && me.foto) du.foto = me.foto;
+      if(me){ du.causa=me.causa||''; du.propuesta=me.propuesta||''; du.bio=me.bio||''; du.must_change_password=!!me.must_change_password; du.perfil_configurado=!!me.perfil_configurado; }
     }
     // Trimestres reales
     const { data:tr } = await sb.schema('navi').from('trimestres')
@@ -853,22 +882,25 @@ const NAVI = {
 function enterApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
+  state.realRole=state.role;
   document.getElementById('roleSel').value=state.role;
   applyRole(true);
   window.scrollTo(0,0);
+  if(typeof maybeOnboarding==='function') setTimeout(maybeOnboarding, 250);
 }
 
 async function doLogin(e){
   e.preventDefault();
-  const idf = document.getElementById('inUser').value.trim() || 'jose.sanchez';
-  const pass = document.getElementById('inPass').value;
+  const idf = document.getElementById('inUser').value.trim();
+  const pass = document.getElementById('inPass').value.trim();
+  if(!idf || !pass){ if(typeof toast==='function') toast('Escribe tu usuario y tu clave.'); else alert('Escribe tu usuario y tu clave.'); return; }
   // MODO DEMO (sin conexión configurada): comportamiento de siempre
   if(!NAVI.activo){
     const found=DB.usuarioPorUser(idf);
     state.role = found?found.rol:'participante';
     enterApp(); return;
   }
-  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || idf);
+  const email = idf.includes('@') ? idf : (NAVI.userMap[idf] || (idf + '@edificadoresnavi.mx'));
   const btn = e.target.querySelector('button[type=submit]');
   const label = btn ? btn.textContent : '';
   if(btn){ btn.disabled=true; btn.textContent='Entrando…'; }
@@ -896,12 +928,21 @@ async function doLogout(){
   try{ if(NAVI.activo) await NAVI.sb.auth.signOut(); }catch(_){}
   location.reload();
 }
-function switchRole(r){state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);}
+function switchRole(r){
+  if(state.realRole!=='superadmin'){ return; }  // solo el superadmin puede cambiar de vista
+  state.role=r;applyRole(true);toast('Ahora ves la plataforma como '+ROLE_LABEL[r]);
+}
 function applyRole(reset){
+  // El selector "Ver como" es solo para el superadmin (herramienta de revisión)
+  const rs=document.getElementById('roleSwitch');
+  if(rs) rs.style.display = (state.realRole==='superadmin') ? '' : 'none';
   state.user=store.usuarios.find(u=>u.id===ROLE_USER[state.role]);
   if(reset) state.view=DEFVIEW[state.role];
-  document.getElementById('sideAvatar').textContent=initials(state.user.nombre);
-  document.getElementById('sideName').textContent=state.user.nombre;
+  var _sa=document.getElementById('sideAvatar');
+  var _f=(state.user&&state.user.foto)||(store.miProgreso&&store.miProgreso.foto)||'';
+  if(_f){ _sa.textContent=''; _sa.style.backgroundImage='url('+_f+')'; _sa.style.backgroundSize='cover'; _sa.style.backgroundPosition='center'; }
+  else { _sa.style.backgroundImage=''; _sa.textContent=initials(state.user.nombre); }
+  document.getElementById('sideName').textContent=nombreBonito(state.user.nombre);
   document.getElementById('sideRole').textContent=ROLE_LABEL[state.role];
   const sl=document.getElementById('sideLogoImg'); if(sl) sl.src=store.config.logo;
   buildMenu();
@@ -923,12 +964,20 @@ function dossierPhoto(m,big){
   return `<div class="${big?'dz-photo-lg':'dz-photo'}">${inner}<div class="scan"></div>${_cors}${big?'<div class="dz-stamp">EN SERVICIO</div>':''}</div>`;
 }
 
+// Coalesce: varias llamadas a render() en el mismo tick se pintan una sola vez (por frame).
+var _renderQueued=false;
 function render(){
+  if(_renderQueued) return;
+  _renderQueued=true;
+  var run=function(){ _renderQueued=false; renderNow(); };
+  (window.requestAnimationFrame||function(f){setTimeout(f,16);})(run);
+}
+function renderNow(){
   const m=document.getElementById('main');
   const crumb=document.getElementById('crumb');
   const V=VIEWS[state.view];
-  crumb.innerHTML='<b>'+ROLE_LABEL[state.role]+'</b> · '+(V?V.title:state.view);
-  m.innerHTML=V?V.html():'<div class="empty">Vista no encontrada</div>';
+  if(crumb) crumb.innerHTML='<b>'+ROLE_LABEL[state.role]+'</b> · '+(V?V.title:state.view);
+  if(m) m.innerHTML=V?V.html():'<div class="empty">Vista no encontrada</div>';
   if(V&&V.after)V.after();
 }
 </script>
@@ -946,7 +995,7 @@ inicio:{title:'Inicio',html(){
   const u=state.user; const mods=DB.modulosDeTrimestre(1);
   const done=avanceModulos(u.id);
   return `<div class="inicio-top"><div class="inicio-greet">
-       <div class="eyebrow">Bienvenido</div><h1 class="page">Hola, ${u.nombre.split(' ')[0]}</h1>
+       <div class="eyebrow">Bienvenido</div><h1 class="page">Hola, ${nombreBonito(u.nombre).split(' ')[0]}</h1>
        <div class="page-sub">Trimestre 1 · Gobierno Civil</div></div>
        <div class="don-top"><div class="don-txt">Donativo mensual voluntario, sin costo de inscripción · desde $200</div><button class="btn-green" onclick="nav('midonativo')">Hacer mi donativo</button></div>
      </div>`
@@ -1105,16 +1154,17 @@ midonativo:{title:'Donativo',html(){
   return head('Sostén de la Escuela','Tu donativo mensual', info.texto)
    + `<div class="grid g2">`
    + `<div class="card glass"><div class="sec-title" style="margin-top:0">Haz tu donativo</div>
-       <label style="font-size:12.5px;color:var(--dim);font-weight:600">Monto mensual (mínimo $${info.min})</label>
-       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px">${[200,300,500,1000].map(v=>`<button class="btn btn-sm" onclick="setMonto(${v})">$${v}</button>`).join('')}</div>
-       <input id="donMonto" type="number" min="${info.min}" value="200" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:15px;font-family:inherit;outline:none">
+       <label style="font-size:13px;color:var(--cream);font-weight:700">Donativo mensual · recomendado $${info.recomendado||500}</label>
+       <div style="font-size:12px;color:var(--soft);margin:3px 0 8px">Con <b style="color:var(--dim)">$${info.recomendado||500}</b> incluyes las <b style="color:var(--dim)">conferencias del Congreso</b>. Mínimo <b style="color:var(--dim)">$${info.min}</b> (solo clases).</div>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px">${[500,700,1000,200].map(v=>`<button class="btn btn-sm ${v===(info.recomendado||500)?'btn-accent':''}" onclick="setMonto(${v})">$${v}${v===(info.recomendado||500)?' ★':''}</button>`).join('')}</div>
+       <input id="donMonto" type="number" min="${info.min}" value="${info.recomendado||500}" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:15px;font-family:inherit;outline:none">
        <div class="sec-title">Datos para transferencia</div>
        <div class="cred">${c.banco} · ${c.titular}<button class="btn btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${c.clabe}');toast('CLABE copiada')">Copiar</button></div>
        <label style="font-size:12px;color:var(--soft);margin:10px 0 4px;display:block">CLABE / Cuenta (Mercado Pago)</label>
        <div class="cred">${c.clabe}<button class="btn btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${c.clabe}');toast('CLABE copiada')">Copiar</button></div>
        <label style="font-size:12px;color:var(--soft);margin:10px 0 4px;display:block">Concepto (escríbelo tal cual: es tu folio)</label>
        <div class="cred">${concepto}<button class="btn btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${concepto}');toast('Concepto copiado')">Copiar</button></div>
-       <p style="font-size:12px;color:var(--soft);margin:10px 0 0">Al transferir, envía tu <b style="color:var(--dim)">comprobante</b> por WhatsApp al <b style="color:var(--dim)">${c.whatsapp}</b>. Con el donativo de lanzamiento ($300) también se habilitan las conferencias del Congreso.</p>
+       <p style="font-size:12px;color:var(--soft);margin:10px 0 0">Al transferir, envía tu <b style="color:var(--dim)">comprobante</b> por WhatsApp al <b style="color:var(--dim)">${c.whatsapp}</b>. Con un donativo de <b style="color:var(--dim)">$500 o más</b> se habilitan también las conferencias del Congreso.</p>
        <button class="btn btn-solid btn-lg" style="margin-top:16px" onclick="registrarDonativoPropio()">Ya transferí · registrar mi donativo</button>
        <p style="font-size:12px;color:var(--soft);margin-top:10px">Tu donativo es privado: nadie ve cuánto donas. Con gusto reportamos en qué se usan los fondos.</p>
      </div>`
@@ -1286,7 +1336,7 @@ dcontenido:{title:'Programa de estudio',html(){
    + DB.trimestres().map(t=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
        <div><b style="font-size:16px">Trimestre ${t.numero} · ${t.nombre}</b><div style="font-size:12.5px;color:var(--soft)">${t.rango}</div></div>${pill(DB.modulosDeTrimestre(t.id).length+' módulos','pill-info')}</div>`
        + DB.modulosDeTrimestre(t.id).map(m=>{
-           if(state.editMod!==m.id) return `<div class="row" style="margin-bottom:7px;padding:11px 14px"><div class="rnum" style="width:30px;height:30px;font-size:12px">${m.num}</div><div class="rinfo"><div class="t" style="font-size:13.5px">${m.titulo}</div><div class="d">Mentor: ${m.prof} · ${fmtFecha(m.fecha)}</div></div><button class="btn btn-sm" onclick="state.editMod=${m.id};render()">Editar</button></div>`;
+           if(state.editMod!==m.id) return `<div class="row" style="margin-bottom:7px;padding:11px 14px"><div class="rnum" style="width:30px;height:30px;font-size:12px">${m.num}</div><div class="rinfo"><div class="t" style="font-size:13.5px">${m.titulo}</div><div class="d">Maestro: ${m.prof||'Por confirmar'} · ${fmtFecha(m.fecha)}</div></div><button class="btn btn-sm" onclick="state.editMod=${m.id};render()">Editar</button></div>`;
            return `<div class="card" style="margin-bottom:8px;border-color:var(--accent-line)"><div class="form">
              <label>Título del módulo ${m.num}</label><input id="cmTit" value="${(m.titulo||'').replace(/"/g,'&quot;')}">
              <label>Pregunta formativa</label><textarea id="cmPf" style="min-height:58px">${(m.pf||'').replace(/</g,'&lt;')}</textarea>
@@ -1327,7 +1377,7 @@ drevista:{title:'Revista',html(){
    + (()=>{const ed=state.editArt?DB.articulos().find(a=>a.id===state.editArt):null;const q=s=>(s||'').replace(/"/g,'&quot;');return `
        <div class="form" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
          <div><label>Título del artículo</label><input id="artTit" value="${ed?q(ed.titulo):''}" placeholder="Ej. Economía, trabajo y dignidad"></div>
-         <div><label>Autor</label><input id="artAut" value="${ed?q(ed.autor):''}" placeholder="Ej. Carlos Mendoza"></div>
+         <div><label>Autor</label><input id="artAut" value="${ed?q(ed.autor):''}" placeholder="Ej. nombre del autor"></div>
          <div style="grid-column:1 / -1"><label>Edición</label><input id="artEd" value="${ed?q(ed.edicion||'1ª edición'):'1ª edición'}" placeholder="Ej. 1ª edición"></div>
          <div style="grid-column:1 / -1"><label>Imagen del artículo</label>
            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="btn" style="cursor:pointer;margin:0">Elegir imagen<input id="artImg" type="file" accept="image/png,image/jpeg" style="display:none" onchange="previewArtImg(event)"></label><span id="artImgName" style="font-size:12px;color:var(--soft)">${ed&&ed.img?'Imagen actual — elige otra para cambiarla':'Ninguna seleccionada'}</span></div>
@@ -1387,9 +1437,12 @@ ialta:{title:'Alta de participante',html(){
 iregistros:{title:'Registros',html(){
   const rs=store.registros||[];
   const on=!!(NAVI&&NAVI.sb);
-  const amap={}; (store.alumnos||[]).forEach(a=>{ if(a.email) amap[a.email.toLowerCase()]=a; });
+  const amap={}; (store.alumnos||[]).forEach(a=>{ if(a.email) amap[a.email.toLowerCase()]=a; if(a.usuario) amap[a.usuario.toLowerCase()]=a; });
+  const sentMap={}; (store.alumnos||[]).forEach(a=>{ if(a.bienvenida_enviada){ if(a.email) sentMap[a.email.toLowerCase()]=1; if(a.usuario) sentMap[a.usuario.toLowerCase()]=1; } });
+  const nPend = rs.filter(r=>{ const k=(r.usuario_generado||'').toLowerCase(); return k && (r.correo||'').includes('@') && !sentMap[k]; }).length;
+  const nSinAcc = rs.filter(r=>(r.correo||'').includes('@') && !(r.usuario_generado||'').trim()).length;
   const banner = on
-    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div>`
+    ? `<div class="card" style="margin-bottom:16px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:13px;color:var(--dim)">Registros en vivo de tu <b style="color:var(--cream)">formulario</b>. Activa el acceso de cada persona; al hacerlo pasa a <b style="color:var(--cream)">Alumnos</b>.</div><div style="display:flex;gap:8px;flex-wrap:wrap">${nSinAcc?`<button class="btn btn-sm btn-accent" onclick="procesarPendientes()">⚙ Crear accesos faltantes (${nSinAcc})</button>`:''}${nPend?`<button class="btn btn-sm btn-solid" onclick="enviarBienvenidaPendientes()">✉ Enviar bienvenida a los ${nPend} pendientes</button>`:`<span class="pill pill-ok">Sin bienvenidas pendientes</span>`}<button class="btn btn-sm" onclick="cargarRegistros(true);cargarAlumnos(true)">Actualizar</button></div></div>`
     : `<div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--dim)">Para ver los registros reales, <b style="color:var(--cream)">inicia sesión como administrador</b> (tu correo y clave de Supabase).</div></div>`;
   const rowAcc=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(a&&a.activado) return pill('Activado','pill-ok'); if(r.usuario_generado) return `<button class="btn btn-sm btn-accent" onclick="activarAcceso('${r.usuario_generado}')">Activar acceso</button>`; return pill('Pendiente','pill-wait'); };
   const rowBienv=(r)=>{ const a=amap[(r.usuario_generado||'').toLowerCase()]; if(!a) return '<span style="color:var(--soft);font-size:12px">—</span>'; const to=(r.correo||'').replace(/'/g,''); const ue=(r.usuario_generado||'').toLowerCase().replace(/'/g,''); return a.bienvenida_enviada?`<span class="pill pill-ok" style="margin-right:6px">Enviado</span><button class="btn btn-sm" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Reenviar</button>`:`<button class="btn btn-sm btn-accent" onclick="enviarBienvenida('${a.auth_uid}','${to}',this,'${ue}')">Enviar bienvenida</button>`; };
@@ -1485,21 +1538,30 @@ if (PRELANZAMIENTO) {
     {cf:'El despertar de una iglesia con gobierno', nm:'Dr. Richard Hays', ph:'data:image/jpeg;base64,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'},
     {cf:'Los mecanismos que conforman una Nación Viva', nm:'Dr. Natividad Ramos', ph:'data:image/jpeg;base64,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'}
   ];
+  // Temas ya cubiertos (con maestro confirmado). Los demás se muestran como "Próximamente".
+  var REVELADOS={1:{1:'Mtro. José Pablo Sánchez',2:'Mtro. José Pablo Sánchez'}};
   function ejesPL(extra){
-    return store.trimestres.map(function(t){
+    var MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    function fd(d){ try{ var x=(d instanceof Date)?d:new Date(d); if(isNaN(x)) return ''; return x.getDate()+' '+MES[x.getMonth()]+' '+x.getFullYear(); }catch(e){ return ''; } }
+    return store.trimestres.map(function(t,ti){
       var mods=store.modulos.filter(function(m){return m.tri===t.id;}).sort(function(a,b){return a.num-b.num;});
-      var reveal=(t.numero===1)?mods.slice(0,2):[];
-      var temasHtml='';
-      if(reveal.length){
-        temasHtml='<div style="margin-top:10px">'
-          +reveal.map(function(m){return '<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px solid var(--line)"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);min-width:54px">Tema '+t.numero+'.'+m.num+'</span><span style="font-size:13.5px;color:var(--cream)">'+m.titulo+'</span></div>';}).join('')
-          +'<div style="font-size:12px;color:var(--soft);margin-top:8px">Los demás temas de este eje se revelarán próximamente.</div></div>';
-      }
-      return '<div class="row locked" style="margin-bottom:10px;align-items:flex-start"><div class="rnum">'+t.numero+'</div>'
-        +'<div class="rinfo"><div class="t">'+t.nombre+'</div><div class="d">'+t.rango+'</div>'
-        +(extra?('<div class="d" style="margin-top:4px;color:var(--soft)">'+t.pregunta+'</div>'):'')
-        +temasHtml
-        +'</div>'+pill('Próximamente','pill-soon')+'</div>';
+      var rows=mods.map(function(m){
+        var maestro=REVELADOS[t.numero]&&REVELADOS[t.numero][m.num];
+        var cell = maestro
+          ? '<span style="font-size:14px;color:var(--cream)">'+m.titulo+'</span><span style="display:block;font-size:11.5px;color:var(--accent);margin-top:2px">'+maestro+'</span>'
+          : '<span style="font-size:14px;color:var(--soft);font-style:italic">Próximamente</span>';
+        return '<div style="display:flex;gap:12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)">'
+          +'<span style="font-family:var(--mono);font-size:12px;color:var(--accent);min-width:60px">Tema '+t.numero+'.'+m.num+'</span>'
+          +'<span style="font-family:var(--mono);font-size:11.5px;color:var(--soft);min-width:92px">'+fd(m.fecha)+'</span>'
+          +'<span style="flex:1">'+cell+'</span></div>';
+      }).join('');
+      return '<details class="eje-acc"'+(ti===0?' open':'')+'>'
+        +'<summary><div class="rnum">'+t.numero+'</div>'
+        +'<div style="flex:1"><div class="t" style="font-size:16.5px">'+t.nombre+'</div>'
+        +'<div class="d">'+t.rango+' · '+mods.length+' temas</div>'
+        +(extra?('<div class="d" style="margin-top:4px;color:var(--soft)">'+t.pregunta+'</div>'):'')+'</div>'
+        +'<span class="eje-chev">▾</span></summary>'
+        +'<div class="eje-body">'+rows+'</div></details>';
     }).join('');
   }
   store.miProgreso = store.miProgreso || {aguilas:0, meses:0};
@@ -1543,6 +1605,8 @@ if (PRELANZAMIENTO) {
       var r=await NAVI.sb.schema('navi').rpc('set_mi_foto',{p_foto:dataUrl});
       if(r.error) throw r.error;
       store.miProgreso=Object.assign(store.miProgreso||{}, {foto:dataUrl});
+      if(state.user) state.user.foto=dataUrl;
+      var _sa=document.getElementById('sideAvatar'); if(_sa){ _sa.textContent=''; _sa.style.backgroundImage='url('+dataUrl+')'; _sa.style.backgroundSize='cover'; _sa.style.backgroundPosition='center'; }
       toast('¡Foto actualizada!'); render();
     }catch(e){ toast('No se pudo guardar la foto (¿corriste el paso 20?).'); }
   }
@@ -1557,7 +1621,9 @@ if (PRELANZAMIENTO) {
     var u=state.user||{nombre:'edificador'};
     return '<div class="card" style="margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
       +miAvatarHtml(72)
-      +'<div style="flex:1;min-width:180px"><div style="font-family:var(--gov);font-size:19px;color:var(--cream)">'+u.nombre+'</div><div style="font-size:12.5px;color:var(--soft)">Edificador NAVI · Generación 2026–2027</div></div>'
+      +'<div style="flex:1;min-width:180px"><div style="font-family:var(--gov);font-size:19px;color:var(--cream)">'+nombreBonito(u.nombre)+'</div><div style="font-size:12.5px;color:var(--soft)">Edificador NAVI · Generación 2026–2027</div>'
+      +((u.causa||u.propuesta)?('<div style="font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.5">'+(u.causa?('Causa: <b style="color:var(--accent)">'+u.causa+'</b>'):'')+(u.causa&&u.propuesta?' · ':'')+(u.propuesta?('Propone: <b style="color:var(--cream)">'+u.propuesta+'</b>'):'')+'</div>'):'')
+      +'</div>'
       +'<label class="btn btn-sm" style="cursor:pointer;margin:0">Cambiar foto<input type="file" accept="image/*" style="display:none" onchange="subirMiFoto(event)"></label>'
       +'</div>';
   }
@@ -1578,14 +1644,16 @@ if (PRELANZAMIENTO) {
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
-    return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
-      +'<h1 class="page">Hola, '+u.nombre.split(' ')[0]+'</h1>'
+    var antorcha = hayRev ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
+    var artsDB = (window.artDBListHtml?window.artDBListHtml('Artículos de Nación Viva',true):'');
+    return antorcha + artsDB
+      +'<div class="page-head"'+((hayRev||artsDB)?' style="margin-top:24px"':'')+'><div class="eyebrow">Generación 2026–2027</div>'
+      +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
       +miPerfilHtml()
       +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
       +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
       +miProgresoHtml()
-      +(DB.articulos().filter(function(a){return a.publicado;}).length?('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()):'')
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
@@ -1594,7 +1662,7 @@ if (PRELANZAMIENTO) {
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Acompaña tu formación con la música de <b>Nación Viva</b>. Escúchala aquí mismo o ábrela en Spotify.</div>'
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
       +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>';
-  }, after:function(){ startCarousel(); cargarMiProgreso(); }};
+  }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarContenido==='function') cargarContenido(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
       + ejesPL(true);
@@ -1627,6 +1695,369 @@ if (PRELANZAMIENTO) {
       +cards
       +'</div>';
   }};
+  // ================= CONTENIDO: Artículos (BD) y Videos sugeridos =================
+  document.head.insertAdjacentHTML('beforeend','<style>'
+    +'.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:8px}'
+    +'.vid-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(127,168,214,.04)}'
+    +'.vid-embed{position:relative;padding-top:56.25%}.vid-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}'
+    +'.vid-meta{padding:12px 14px}.vid-t{color:var(--cream);font-weight:700;font-size:14.5px}.vid-a{color:var(--accent);font-size:12.5px;margin-top:2px}.vid-n{color:var(--soft);font-size:12.5px;margin-top:6px;line-height:1.45}'
+    +'.art-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}'
+    +'.art-item{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:rgba(127,168,214,.04);cursor:pointer;transition:border-color .15s,background .15s}'
+    +'.art-item:hover{border-color:var(--accent-line);background:var(--accent-tint)}'
+    +'.art-item-k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}'
+    +'.art-item-t{font-family:Georgia,serif;color:var(--cream);font-size:19px;line-height:1.2;margin:6px 0 4px}'
+    +'.art-item-a{color:var(--soft);font-size:12.5px}.art-item-d{color:var(--dim);font-size:13px;margin-top:8px;line-height:1.5}.art-item-go{color:var(--accent);font-size:13px;font-weight:700;margin-top:10px}'
+    +'.art-reader{width:min(760px,100%);max-height:90vh;overflow:auto;background:#FBFAF6;color:#1B2A44;border-radius:14px;padding:44px 52px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.55)}'
+    +'.art-x{position:absolute;top:16px;right:16px;color:#1B2A44;background:#EEF1F6;border-radius:8px}'
+    +'.art-kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#1C4E86;font-weight:700}'
+    +'.art-title{font-family:Georgia,serif;color:#122239;font-size:30px;line-height:1.15;margin:10px 0 6px}'
+    +'.art-author{color:#5A6A82;font-size:14px;margin-bottom:14px}'
+    +'.art-lead{font-family:Georgia,serif;font-size:18px;color:#2A3648;line-height:1.5;margin:0 0 16px}'
+    +'.art-body p{font-size:16px;line-height:1.7;color:#25303F;margin:0 0 14px;text-align:justify}'
+    +'</style>');
+  MENUS.participante.push(['videos','play','Videos']);
+  MENUS.superadmin && MENUS.superadmin.push(['dpublicar','edit','Publicar']);
+  store.artDB = store.artDB || []; store.vidDB = store.vidDB || [];
+  window.cargarContenido = async function(force){
+    if(!(NAVI&&NAVI.sb)) return;
+    if(store._contLoaded && !force) return; store._contLoaded=true;
+    try{
+      var a=await NAVI.sb.schema('navi').from('articulos').select('*').order('created_at',{ascending:false});
+      var v=await NAVI.sb.schema('navi').from('videos').select('*').order('created_at',{ascending:false});
+      store.artDB=a.data||[]; store.vidDB=v.data||[]; render();
+    }catch(e){ store._contLoaded=false; }
+  };
+  function ytId(u){ u=(u||'').trim(); var m=u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{6,})/); return m?m[1]:u; }
+  window.artDBListHtml=function(titulo,hideIfEmpty){
+    var arts=(store.artDB||[]).filter(function(a){return a.publicado!==false;});
+    if(!arts.length && hideIfEmpty) return '';
+    var h='<div class="sec-title">'+(titulo||'Artículos')+'</div>';
+    if(!arts.length) return h+'<div class="empty">Pronto publicaremos artículos aquí.</div>';
+    return h+'<div class="art-list">'+arts.map(function(a){
+      return '<div class="art-item" onclick="abrirArticulo(\''+a.id+'\')"><div class="art-item-k">'+(a.tipo==='pdf'?'PDF':'Artículo')+(a.edicion?(' · '+a.edicion):'')+'</div>'
+        +'<div class="art-item-t">'+(a.titulo||'')+'</div>'+(a.autor?'<div class="art-item-a">Por '+a.autor+'</div>':'')
+        +(a.resumen?'<div class="art-item-d">'+a.resumen+'</div>':'')+'<div class="art-item-go">Leer →</div></div>';
+    }).join('')+'</div>';
+  };
+  window.abrirArticulo=function(id){
+    var a=(store.artDB||[]).find(function(x){return String(x.id)===String(id);}); if(!a) return;
+    if(a.tipo==='pdf' && a.pdf_url){ window.abrirPDFGen(a.pdf_url,a.titulo); return; }
+    var prev=document.getElementById('artModal'); if(prev) prev.remove();
+    var ov=document.createElement('div'); ov.id='artModal'; ov.className='pdf-ov on';
+    var cuerpo=(a.cuerpo||'').split(/\n\s*\n/).map(function(p){return '<p>'+p.replace(/\n/g,'<br>')+'</p>';}).join('');
+    ov.innerHTML='<div class="art-reader"><button class="pdf-x art-x" onclick="cerrarArticulo()">✕</button>'
+      +'<div class="art-kicker">La Antorcha'+(a.edicion?(' · '+a.edicion):'')+'</div>'
+      +'<h1 class="art-title">'+(a.titulo||'')+'</h1>'
+      +(a.autor?'<div class="art-author">Por '+a.autor+'</div>':'')
+      +(a.resumen?'<p class="art-lead">'+a.resumen+'</p>':'')
+      +'<div class="art-body">'+cuerpo+'</div></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) window.cerrarArticulo(); });
+    document.body.appendChild(ov); document.body.style.overflow='hidden';
+  };
+  window.cerrarArticulo=function(){ var ov=document.getElementById('artModal'); if(ov) ov.remove(); document.body.style.overflow=''; };
+  window.abrirPDFGen=function(url,titulo){
+    var prev=document.getElementById('pdfModal2'); if(prev) prev.remove();
+    var ov=document.createElement('div'); ov.id='pdfModal2'; ov.className='pdf-ov on';
+    ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>'+(titulo||'Artículo')+'</span><span style="display:flex;gap:8px;align-items:center"><a class="btn btn-sm" href="'+url+'" target="_blank" rel="noopener">Abrir</a><button class="pdf-x" onclick="var o=document.getElementById(\'pdfModal2\');if(o)o.remove();document.body.style.overflow=\'\'">✕</button></span></div><iframe class="pdf-frame" src="'+url+'#view=FitH" title="Artículo"></iframe></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov){ ov.remove(); document.body.style.overflow=''; } });
+    document.body.appendChild(ov); document.body.style.overflow='hidden';
+  };
+
+  VIEWS.videos = { title:'Videos', html:function(){
+    var vids=(store.vidDB||[]).filter(function(v){return v.publicado!==false;});
+    var h0=head('Nación Viva','Videos sugeridos','Una selección de videos, organizados por tema.');
+    if(!vids.length) return h0+'<div class="empty">Muy pronto encontrarás aquí videos seleccionados por tema. Vuelve pronto.</div>';
+    var temas={}; vids.forEach(function(v){ var k=v.tema||'General'; (temas[k]=temas[k]||[]).push(v); });
+    var out='';
+    Object.keys(temas).forEach(function(tm){
+      out+='<div class="sec-title">'+tm+'</div><div class="vid-grid">'+temas[tm].map(function(v){
+        return '<div class="vid-card"><div class="vid-embed"><iframe src="https://www.youtube.com/embed/'+ytId(v.youtube_id)+'" title="'+(v.titulo||'')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'
+          +'<div class="vid-meta"><div class="vid-t">'+(v.titulo||'')+'</div>'+(v.autor?'<div class="vid-a">'+v.autor+'</div>':'')+(v.nota?'<div class="vid-n">'+v.nota+'</div>':'')+'</div></div>';
+      }).join('')+'</div>';
+    });
+    return h0+out;
+  }, after:function(){ cargarContenido(); }};
+
+  var _revHtml = VIEWS.revista.html;
+  VIEWS.revista = { title:'Revista', html:function(){
+    var base=_revHtml.call(VIEWS.revista);
+    var arts=(store.artDB||[]).filter(function(a){return a.publicado!==false;});
+    var lib='<div class="sec-title">Artículos de Nación Viva</div>';
+    if(!arts.length){ lib+='<div class="empty">Pronto publicaremos artículos aquí.</div>'; }
+    else { lib+='<div class="art-list">'+arts.map(function(a){
+      return '<div class="art-item" onclick="abrirArticulo(\''+a.id+'\')"><div class="art-item-k">'+(a.tipo==='pdf'?'PDF':'Artículo')+(a.edicion?(' · '+a.edicion):'')+'</div>'
+        +'<div class="art-item-t">'+(a.titulo||'')+'</div>'+(a.autor?'<div class="art-item-a">Por '+a.autor+'</div>':'')
+        +(a.resumen?'<div class="art-item-d">'+a.resumen+'</div>':'')+'<div class="art-item-go">Leer →</div></div>';
+    }).join('')+'</div>'; }
+    return base+lib;
+  }, after:function(){ cargarContenido(); }};
+
+  // ---- Panel de administración: Publicar contenido ----
+  function _val(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
+  window.pubArtTexto=async function(){
+    if(!(NAVI&&NAVI.sb)) return toast('Inicia sesión como administrador.');
+    var titulo=_val('naTit'); if(!titulo) return toast('Escribe un título');
+    var row={tipo:'texto',titulo:titulo,autor:_val('naAut'),edicion:_val('naEd'),resumen:_val('naRes'),cuerpo:_val('naCuerpo'),publicado:true};
+    try{ var r=await NAVI.sb.schema('navi').from('articulos').insert(row).select(); if(r.error) throw r.error;
+      toast('Artículo publicado'); store._contLoaded=false; cargarContenido(true);
+    }catch(e){ toast('No se pudo publicar (¿corriste el paso 23?).'); }
+  };
+  window.pubArtPDF=async function(){
+    if(!(NAVI&&NAVI.sb)) return toast('Inicia sesión como administrador.');
+    var titulo=_val('npTit'); if(!titulo) return toast('Escribe un título');
+    var fileEl=document.getElementById('npFile'); var url=_val('npUrl');
+    try{
+      if(fileEl && fileEl.files && fileEl.files[0]){
+        var f=fileEl.files[0]; var path='art-'+Date.now()+'-'+f.name.replace(/[^\w.]/g,'_');
+        var up=await NAVI.sb.storage.from('articulos').upload(path,f,{contentType:f.type||'application/pdf',upsert:false});
+        if(up.error) throw up.error;
+        url=NAVI.sb.storage.from('articulos').getPublicUrl(path).data.publicUrl;
+      }
+      if(!url) return toast('Sube un PDF o pega su enlace');
+      var r=await NAVI.sb.schema('navi').from('articulos').insert({tipo:'pdf',titulo:titulo,autor:_val('npAut'),edicion:_val('npEd'),resumen:_val('npRes'),pdf_url:url,publicado:true}).select();
+      if(r.error) throw r.error;
+      toast('PDF publicado'); store._contLoaded=false; cargarContenido(true);
+    }catch(e){ toast('No se pudo subir (revisa el paso 23 / storage).'); }
+  };
+  window.pubVideo=async function(){
+    if(!(NAVI&&NAVI.sb)) return toast('Inicia sesión como administrador.');
+    var titulo=_val('nvTit'); var yt=_val('nvUrl'); if(!titulo||!yt) return toast('Título y enlace de YouTube');
+    try{ var r=await NAVI.sb.schema('navi').from('videos').insert({titulo:titulo,youtube_id:ytId(yt),tema:_val('nvTema')||'General',autor:_val('nvAut'),nota:_val('nvNota'),publicado:true}).select(); if(r.error) throw r.error;
+      toast('Video agregado'); store._contLoaded=false; cargarContenido(true);
+    }catch(e){ toast('No se pudo agregar (¿corriste el paso 23?).'); }
+  };
+  window.delArt=async function(id){ if(!confirm('¿Eliminar este artículo?'))return; try{ await NAVI.sb.schema('navi').from('articulos').delete().eq('id',id); store._contLoaded=false; cargarContenido(true); toast('Eliminado'); }catch(e){ toast('No se pudo eliminar'); } };
+  window.delVid=async function(id){ if(!confirm('¿Eliminar este video?'))return; try{ await NAVI.sb.schema('navi').from('videos').delete().eq('id',id); store._contLoaded=false; cargarContenido(true); toast('Eliminado'); }catch(e){ toast('No se pudo eliminar'); } };
+
+  VIEWS.dpublicar = { title:'Publicar contenido', html:function(){
+    var arts=store.artDB||[], vids=store.vidDB||[];
+    var inp='width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:14px;font-family:inherit;outline:none;margin-bottom:8px';
+    return head('Administración','Publicar contenido','Escribe un artículo, sube un PDF o agrega un video de YouTube. Se publican al instante para los alumnos.')
+    +'<div class="grid g2">'
+    // Artículo de texto
+    +'<div class="card"><div class="sec-title" style="margin-top:0">Escribir artículo</div>'
+      +'<input id="naTit" placeholder="Título" style="'+inp+'">'
+      +'<input id="naAut" placeholder="Autor" style="'+inp+'">'
+      +'<input id="naEd" placeholder="Edición (opcional, ej. 2ª edición)" style="'+inp+'">'
+      +'<input id="naRes" placeholder="Bajada / resumen (opcional)" style="'+inp+'">'
+      +'<textarea id="naCuerpo" placeholder="Escribe aquí el artículo. Separa párrafos con una línea en blanco." style="'+inp+';min-height:150px;resize:vertical"></textarea>'
+      +'<button class="btn btn-solid" onclick="pubArtTexto()">Publicar artículo</button></div>'
+    // Artículo PDF
+    +'<div class="card"><div class="sec-title" style="margin-top:0">Subir artículo en PDF</div>'
+      +'<input id="npTit" placeholder="Título" style="'+inp+'">'
+      +'<input id="npAut" placeholder="Autor" style="'+inp+'">'
+      +'<input id="npEd" placeholder="Edición (opcional)" style="'+inp+'">'
+      +'<input id="npRes" placeholder="Bajada / resumen (opcional)" style="'+inp+'">'
+      +'<label style="font-size:12.5px;color:var(--soft);display:block;margin-bottom:4px">Sube el PDF…</label><input id="npFile" type="file" accept="application/pdf" style="'+inp+'">'
+      +'<label style="font-size:12.5px;color:var(--soft);display:block;margin-bottom:4px">…o pega un enlace a un PDF</label><input id="npUrl" placeholder="https://…" style="'+inp+'">'
+      +'<button class="btn btn-solid" onclick="pubArtPDF()">Publicar PDF</button></div>'
+    +'</div>'
+    // Video
+    +'<div class="card" style="margin-top:16px"><div class="sec-title" style="margin-top:0">Agregar video de YouTube</div>'
+      +'<div class="grid g2"><div><input id="nvTit" placeholder="Título del video" style="'+inp+'">'
+      +'<input id="nvUrl" placeholder="Enlace de YouTube (URL o ID)" style="'+inp+'">'
+      +'<input id="nvTema" placeholder="Tema (para agrupar, ej. Gobierno civil)" style="'+inp+'"></div>'
+      +'<div><input id="nvAut" placeholder="Fuente / pensador (ej. PragerU)" style="'+inp+'">'
+      +'<textarea id="nvNota" placeholder="Por qué lo sugerimos (opcional)" style="'+inp+';min-height:92px;resize:vertical"></textarea></div></div>'
+      +'<button class="btn btn-solid" onclick="pubVideo()">Agregar video</button></div>'
+    // Listas
+    +'<div class="sec-title">Artículos publicados ('+arts.length+')</div>'
+    +(arts.length?arts.map(function(a){return '<div class="row" style="padding:9px 12px"><div class="rinfo"><div class="t" style="font-size:13.5px">'+(a.titulo||'')+'</div><div class="d">'+(a.tipo==='pdf'?'PDF':'Texto')+(a.autor?(' · '+a.autor):'')+'</div></div><button class="btn btn-sm" onclick="delArt(\''+a.id+'\')">Eliminar</button></div>';}).join(''):'<div class="empty">Aún no hay artículos.</div>')
+    +'<div class="sec-title">Videos ('+vids.length+')</div>'
+    +(vids.length?vids.map(function(v){return '<div class="row" style="padding:9px 12px"><div class="rinfo"><div class="t" style="font-size:13.5px">'+(v.titulo||'')+'</div><div class="d">'+(v.tema||'General')+(v.autor?(' · '+v.autor):'')+'</div></div><button class="btn btn-sm" onclick="delVid(\''+v.id+'\')">Eliminar</button></div>';}).join(''):'<div class="empty">Aún no hay videos.</div>');
+  }, after:function(){ cargarContenido(); }};
+
+  // ================= ONBOARDING de primer ingreso (estilo setup) =================
+  document.head.insertAdjacentHTML('beforeend','<style>'
+    +'.onb-ov{position:fixed;inset:0;z-index:9000;display:flex;justify-content:center;overflow-y:auto;background:radial-gradient(120% 70% at 50% -5%,#1B2E4C 0%,rgba(10,20,38,0) 55%),linear-gradient(168deg,#0E1B33,#0A1426)}'
+    +'.onb-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(127,168,214,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(127,168,214,.055) 1px,transparent 1px);background-size:42px 42px;-webkit-mask-image:radial-gradient(120% 85% at 50% 0%,#000 42%,transparent 100%);mask-image:radial-gradient(120% 85% at 50% 0%,#000 42%,transparent 100%)}'
+    +'.onb-stage{position:relative;width:100%;max-width:560px;min-height:100%;display:flex;flex-direction:column;padding:38px 30px 34px}'
+    +'.onb-top{text-align:center;padding:16px 0 6px}'
+    +'.onb-logo{height:62px;margin:0 auto 16px;display:block}'
+    +'.onb-li.ico{display:flex;align-items:center;gap:13px}.onb-li .lii{width:38px;height:38px;flex:none;object-fit:contain}'
+    +'.onb-li .lisvg{width:42px;height:42px;flex:none;border-radius:12px;background:var(--accent-tint);border:1px solid var(--accent-line);color:var(--accent);display:flex;align-items:center;justify-content:center}.onb-li .lisvg svg{width:23px;height:23px}'
+    +'.onb-avs{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-top:10px}'
+    +'.onb-av{width:48px;height:48px;border-radius:50%;background-size:cover;background-position:center;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .12s}.onb-av:hover{transform:scale(1.06)}.onb-av.sel{border-color:var(--accent)}'
+    +'.onb-eyebrow{font-family:\'Courier New\',ui-monospace,monospace;font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent)}'
+    +'.onb-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:16px 0}'
+    +'.onb-h{text-align:center;font-family:var(--gov,Georgia),serif;font-size:34px;line-height:1.14;color:var(--cream);margin:4px 0 14px}'
+    +'.onb-sub{text-align:center;font-size:15.5px;color:var(--dim);line-height:1.62;max-width:34ch;margin:0 auto}'
+    +'.onb-fields{margin-top:24px}'
+    +'.onb-in{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:16px;font-family:inherit;outline:none;margin-bottom:12px}'
+    +'.onb-in:focus{border-color:var(--accent)}'
+    +'.onb-foot{padding-top:20px}'
+    +'.onb-btn{width:100%;min-height:54px;font-size:16px;border-radius:16px}'
+    +'.onb-paso{display:inline-flex;align-items:center;gap:8px;margin:14px auto 0;justify-content:center}'
+    +'.onb-paso .pn{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--cream)}'
+    +'.onb-paso .pe{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid}'
+    +'.onb-paso.done .pe{color:#7FD1B8;border-color:rgba(78,158,134,.55);background:rgba(78,158,134,.14)}'
+    +'.onb-paso.ahora .pe{color:'+GOLD+';border-color:rgba(242,184,75,.55);background:rgba(242,184,75,.14)}'
+    +'.onb-paso.proximo .pe{color:var(--soft);border-color:var(--line);background:rgba(255,255,255,.04)}'
+    +'.onb-ic.done{color:#7FD1B8;border-color:rgba(78,158,134,.5);background:rgba(78,158,134,.12)}'
+    +'.onb-invnota{text-align:center;font-size:14px;color:var(--soft);line-height:1.6;max-width:40ch;margin:0 auto 16px}'
+    +'.onb-invnota b{color:var(--cream)}'
+    +'.onb-skip{background:none;border:0;color:var(--soft);font-size:13.5px;cursor:pointer;margin-top:14px;display:block;width:100%;text-align:center}'
+    +'.onb-dots{display:flex;gap:8px;justify-content:center;margin:0}'
+    +'.onb-dot{width:8px;height:8px;border-radius:50%;background:rgba(127,168,214,.28)}.onb-dot.on{background:var(--accent);width:24px;border-radius:5px}'
+    +'.onb-foto{width:140px;height:140px;border-radius:50%;margin:0 auto 14px;background:#0A1426 center/cover no-repeat;border:2px solid var(--accent-line);display:flex;align-items:center;justify-content:center;color:var(--soft);font-size:13px;overflow:hidden}'
+    +'.onb-pilar{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:15px 17px;border:1px solid var(--glassline);border-radius:15px;background:rgba(255,255,255,.03);cursor:pointer;margin-bottom:10px;transition:border-color .15s,background .15s}'
+    +'.onb-pilar:hover{border-color:var(--accent-line)}.onb-pilar.sel{border-color:var(--accent);background:var(--accent-tint)}'
+    +'.onb-pilar .pk{font-family:var(--gov,Georgia),serif;color:var(--cream);font-size:17px}.onb-pilar .pd{color:var(--soft);font-size:13px;margin-top:3px}'
+    +'.onb-pilar .pic{width:42px;height:42px;flex:none;object-fit:contain}'
+    +'.onb-shot{width:100%;max-width:420px;margin:0 auto 4px;border-radius:16px;overflow:hidden;border:1px solid var(--glassline);box-shadow:0 18px 50px rgba(0,0,0,.5);display:block}'
+    +'.onb-shot img{width:100%;display:block}'
+    +'.onb-ic{width:96px;height:96px;border-radius:50%;margin:0 auto 6px;background:var(--accent-tint);border:1px solid var(--accent-line);display:flex;align-items:center;justify-content:center;color:var(--accent)}'
+    +'.onb-ic svg{width:44px;height:44px}'
+    +'.onb-prev{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.03);border:1px solid var(--glassline);border-radius:16px;padding:18px;text-align:left}'
+    +'.onb-prev .av{width:64px;height:64px;border-radius:50%;flex:none;background:#0A1426 center/cover no-repeat;border:2px solid var(--accent-line)}'
+    +'.onb-prev .nm{font-family:var(--gov,Georgia),serif;font-size:19px;color:var(--cream)}.onb-prev .rl{font-size:12.5px;color:var(--soft)}.onb-prev .cp{font-size:13px;color:var(--dim);margin-top:6px;line-height:1.5}'
+    +'.onb-back{position:absolute;top:20px;left:20px;background:none;border:0;color:var(--soft);font-size:22px;cursor:pointer;line-height:1}'
+    +'.onb-list{max-width:380px;margin:16px auto 0;text-align:left}'
+    +'.onb-li{padding:9px 2px;border-top:1px solid var(--glassline)}'
+    +'.onb-li .lin{color:var(--cream);font-weight:700;font-family:var(--gov,Georgia),serif;font-size:16px}'
+    +'.onb-li .lid{color:var(--soft);font-size:13.5px;display:block;margin-top:2px;line-height:1.45}'
+    +'.onb-ic svg{width:48px;height:48px}'
+    +'</style>');
+  var PILARES=[
+    {k:'Educación',ic:'educacion',d:'Formar mentes y corazones para el bien común.'},
+    {k:'Justicia',ic:'justicia',d:'Verdad y equidad en la vida pública de México.'},
+    {k:'Libertad',ic:'libertad',d:'La dignidad y la responsabilidad de la persona.'},
+    {k:'Familia',ic:'familia',d:'El primer lugar donde se edifica la nación.'},
+    {k:'Vida',ic:'vida',d:'Defender y honrar la vida en todas sus etapas.'}
+  ];
+  var GOLD='#F2B84B';
+  var CAMINO=[
+    {paso:1,estado:'done',ic:'check',t:'Te inscribiste',d:'Llenaste el formulario de la Escuela y quedaste en el padrón de tu generación. Este fue tu primer paso.'},
+    {paso:2,estado:'done',ic:'check',t:'Activaste tu acceso',intro:'Creaste tu contraseña y tu perfil de edificador — justo lo que acabas de hacer. Esta es tu plataforma; aquí vive:',
+      list:[['La Escuela','tus clases e información sobre tu programa.'],['La Antorcha','la revista digital de Nación Viva y artículos de economía, educación y más.'],['Tus avisos','los comunicados de tu generación.'],['Tu progreso','tu grupo, tus águilas y tu avance.']]},
+    {paso:3,estado:'ahora',ic:'pergamino',t:'Firma tu carta de compromiso',d:'La enviamos a tu correo. Léela con calma y fírmala: es tu «sí» a esta formación y a servir a México con criterio y carácter.'},
+    {paso:4,estado:'ahora',ic:'heart',t:'Haz tu donativo mensual',d:'No cobramos inscripción. Donativo mensual voluntario: <b style="color:'+GOLD+'">$500</b> recomendado (incluye el Congreso) o $200 mínimo (solo las clases). Tú decides la cantidad.'},
+    {paso:5,estado:'proximo',ic:'cupula',t:'Vive tus clases',intro:'Tres ejes de estudio, a lo largo del ciclo:',
+      list:[['Gobierno civil','17 sep – 12 nov 2026','svg:pergamino'],['Educación','7 ene – 18 mar 2027','svg:cap'],['Economía','22 abr – 22 jul 2027','svg:chartup']],
+      note:'Clases en vivo, clases pregrabadas y reuniones en vivo (sep 2026 – jul 2027), con maestros invitados del servicio público y privado.'},
+    {paso:6,estado:'proximo',img:'assets/tour/congreso.png',t:'Asiste al Congreso Nación Viva 2026',d:'Con tu donativo de <b style="color:'+GOLD+'">$500</b> desbloqueas también las conferencias del Congreso.'},
+    {paso:7,ic:'flame',t:'Levanta antorchas',d:'Prepárate para servir con criterio y carácter en los lugares de influencia que Dios te ha entregado. Enciende a otros.',invite:true,invnota:'¿Conoces a un amigo <b>docente, empresario o servidor público</b> que ame a Dios con todo su corazón? Invítalo. Comparte con él esta misma invitación.'}
+  ];
+  window.invitarWhatsApp=function(){
+    var msg='Quiero compartirte algo importante.\n\nEstoy en la *Escuela de Edificadores NAVI*, una iniciativa de Nación Viva: una formación para prepararnos y servir a México con criterio y carácter, en los lugares de influencia que Dios nos ha entregado.\n\nSi conoces a un *maestro, empresario, servidor público o estudiante* con un propósito y un llamado de Dios para su vida, esta invitación es para él o ella.\n\nConoce más aquí: https://escuela-edificadores-navi.vercel.app';
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  };
+  var onb={step:0,foto:'',causa:'',propuesta:'',bio:''};
+  var AV_COLORS=['#7FA8D6','#E8963E','#3C577F','#C8641A','#4E9E86','#8C6FB0'];
+  function avatarUrl(color){ return 'data:image/svg+xml;base64,'+btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="'+color+'"/><g transform="translate(50,52) scale(2.4) translate(-12,-12)"><path fill="#FBFAF6" d="M12 22a6 6 0 0 0 6-6c0-3.5-2.6-5.2-3.5-8-.9 1.8-1.8 2.7-3.5 2.7 1-2.7 0-5.4-2.6-7-.1 2.7-1.8 3.6-2.9 5.4A6 6 0 0 0 12 22z"/></g></svg>'); }
+  window.onbPickAvatar=function(c){ onb.foto=avatarUrl(c); onbRender(); };
+  window.maybeOnboarding=function(){
+    if(!(NAVI&&NAVI.activo)) return;
+    if(state.role!=='participante') return;
+    var u=state.user||{};
+    if(u.must_change_password || u.perfil_configurado===false){ onb={step:0,foto:'',causa:u.causa||'',propuesta:u.propuesta||'',bio:u.bio||''}; onbOpen(); }
+  };
+  function onbOpen(){ var o=document.getElementById('onbOv'); if(o) o.remove(); o=document.createElement('div'); o.id='onbOv'; o.className='onb-ov'; document.body.appendChild(o); document.body.style.overflow='hidden'; onbRender(); }
+  window.onbOpen=onbOpen;
+  window.onbClose=function(){ var o=document.getElementById('onbOv'); if(o) o.remove(); document.body.style.overflow=''; };
+  window.onbGo=function(n){ onb.step=n; onbRender(); };
+  function dots(active){ return '<div class="onb-dots">'+[1,2,3,4].map(function(i){return '<span class="onb-dot'+(i<=active?' on':'')+'"></span>';}).join('')+'</div>'; }
+  var logo = (typeof store!=='undefined' && store.config && store.config.logo) ? store.config.logo : 'assets/logo_edificadores_navi_transp.png';
+  function onbRender(){
+    var o=document.getElementById('onbOv'); if(!o) return;
+    var nombre=(typeof nombreBonito==='function'?nombreBonito((state.user||{}).nombre):((state.user||{}).nombre||'edificador')).split(' ')[0];
+    function stage(eyebrow,dn,body,foot){
+      return '<div class="onb-grid"></div><div class="onb-stage"><div class="onb-top"><img class="onb-logo" src="'+logo+'">'
+        +(dn?dots(dn):'')+'<div class="onb-eyebrow"'+(dn?' style="margin-top:12px"':'')+'>'+eyebrow+'</div></div>'
+        +'<div class="onb-body">'+body+'</div><div class="onb-foot">'+foot+'</div></div>';
+    }
+    var body,foot,c;
+    if(onb.step===0){
+      var needPass=!!(state.user&&state.user.must_change_password);
+      body='<div class="onb-h">Hola, '+nombre+'</div><div class="onb-sub">En menos de un minuto configuramos '+(needPass?'tu acceso y tu perfil de edificador. Empecemos por tu contraseña.':'tu perfil de edificador.')+'</div>';
+      foot='<button class="btn btn-solid btn-lg onb-btn" onclick="onbGo('+(needPass?1:2)+')">Comenzar →</button>';
+      c=stage('Bienvenido a la Escuela',0,body,foot);
+    } else if(onb.step===1){
+      body='<div class="onb-h">Crea tu contraseña</div><div class="onb-sub">Reemplaza la clave temporal por una tuya, fácil de recordar (mínimo 6 caracteres).</div>'
+        +'<div class="onb-fields"><input id="onbP1" class="onb-in" type="password" placeholder="Nueva contraseña" autocomplete="new-password"><input id="onbP2" class="onb-in" type="password" placeholder="Repite tu contraseña" autocomplete="new-password"></div>';
+      foot='<button id="onbPassBtn" class="btn btn-solid btn-lg onb-btn" onclick="onbSetPass()">Continuar →</button>';
+      c=stage('Paso 1 · Seguridad',1,body,foot);
+    } else if(onb.step===2){
+      var fs=onb.foto?('background-image:url('+onb.foto+')'):'';
+      body='<div class="onb-h">Ponle rostro a tu perfil</div><div class="onb-sub">Sube una foto tuya. Se optimiza sola. Puedes omitirla y ponerla después.</div>'
+        +'<div class="onb-fields" style="text-align:center"><div class="onb-foto" style="'+fs+'">'+(onb.foto?'':'Sin foto')+'</div>'
+        +'<label class="btn btn-accent" style="cursor:pointer;display:inline-flex">'+(onb.foto?'Cambiar foto':'Subir foto')+'<input type="file" accept="image/*" style="display:none" onchange="onbFotoPick(event)"></label>'
+        +'<div style="margin-top:18px"><div class="onb-eyebrow" style="margin-bottom:2px">o elige un avatar NAVI</div><div class="onb-avs">'+AV_COLORS.map(function(cc){return '<div class="onb-av'+(onb.foto===avatarUrl(cc)?' sel':'')+'" style="background-image:url('+avatarUrl(cc)+')" onclick="onbPickAvatar(\''+cc+'\')"></div>';}).join('')+'</div></div></div>';
+      foot='<button class="btn btn-solid btn-lg onb-btn" onclick="onbGo(3)">Continuar →</button><button class="onb-skip" onclick="onbFinish()">Saltar y entrar a la plataforma</button>';
+      c=stage('Paso 2 · Tu foto',2,body,foot);
+    } else if(onb.step===3){
+      var preC=(onb.causa && state.user && onb.causa===state.user.causa)?'<div class="onb-sub" style="color:var(--accent);margin-top:8px">Elegiste esta causa en el Congreso. Puedes cambiarla si quieres.</div>':'';
+      body='<div class="onb-h">¿Qué causa defiendes?</div><div class="onb-sub">Elige el pilar de Nación Viva que más resuena contigo. Aparecerá en tu perfil.</div>'+preC
+        +'<div class="onb-fields">'+PILARES.map(function(p){return '<div class="onb-pilar'+(onb.causa===p.k?' sel':'')+'" onclick="onbPickCausa(\''+p.k+'\')"><img class="pic" src="assets/icons/'+p.ic+'.png" alt=""><div style="flex:1"><div class="pk">'+p.k+'</div><div class="pd">'+p.d+'</div></div></div>';}).join('')+'</div>';
+      foot='<button class="btn btn-solid btn-lg onb-btn" onclick="onbGo(4)">Continuar →</button><button class="onb-skip" onclick="onbFinish()">Saltar y entrar</button>';
+      c=stage('Paso 3 · Tu causa',3,body,foot);
+    } else if(onb.step===4){
+      body='<div class="onb-h">¿Cuál es tu propuesta?</div><div class="onb-sub">Cuéntanos el proyecto que propones para tu causa. En tu perfil se verá: “Propone: …”.</div>'
+        +'<div class="onb-fields"><textarea id="onbProp" class="onb-in" style="min-height:120px;resize:vertical" placeholder="Escribe tu propuesta o proyecto…">'+(onb.propuesta||'')+'</textarea>'
+        +'<div class="onb-eyebrow" style="text-align:left;margin:2px 0 6px">Presentación (opcional)</div>'
+        +'<textarea id="onbBio" class="onb-in" style="min-height:84px;resize:vertical" placeholder="Un par de líneas sobre ti…">'+(onb.bio||'')+'</textarea></div>';
+      foot='<button class="btn btn-solid btn-lg onb-btn" onclick="onbCaptureAndFinish()">Terminar ✓</button><button class="onb-skip" onclick="onbFinish()">Saltar y entrar</button>';
+      c=stage('Paso 4 · Tu propuesta',4,body,foot);
+    } else if(onb.step===5){
+      var av=onb.foto?('background-image:url('+onb.foto+')'):((state.user&&state.user.foto)?('background-image:url('+state.user.foto+')'):'');
+      var cp=(onb.causa||onb.propuesta)?('Causa: <b style="color:var(--accent)">'+(onb.causa||'—')+'</b>'+(onb.propuesta?(' · Propone: <b style="color:var(--cream)">'+onb.propuesta+'</b>'):'')):'';
+      body='<div class="onb-h">¡Bienvenido, edificador!</div><div class="onb-sub">Tu perfil quedó listo. Ahora conoce el camino que vivirás en la Escuela.</div>'
+        +'<div class="onb-fields"><div class="onb-prev"><div class="av" style="'+av+'"></div><div><div class="nm">'+(typeof nombreBonito==='function'?nombreBonito((state.user||{}).nombre):(state.user||{}).nombre)+'</div><div class="rl">Edificador NAVI · Generación 2026–2027</div>'+(cp?('<div class="cp">'+cp+'</div>'):'')+'</div></div></div>';
+      foot='<button class="btn btn-solid btn-lg onb-btn" onclick="onbTour(0)">Ver el camino del edificador →</button><button class="onb-skip" onclick="onbClose();applyRole(false)">Entrar directo a la plataforma</button>';
+      c=stage('Todo listo',0,body,foot);
+    } else {
+      var idx=onb.tourI||0, n=CAMINO.length, it=CAMINO[idx];
+      var EST={done:['Completado','done'],ahora:['Te toca ahora','ahora'],proximo:['Próximamente','proximo']};
+      var es=EST[it.estado]||null;
+      var badge=it.paso?('<div class="onb-paso '+(es?es[1]:'')+'"><span class="pn">Paso '+it.paso+'</span>'+(es?'<span class="pe">'+(it.estado==='done'?'✓ ':'')+es[0]+'</span>':'')+'</div>'):'';
+      var vis=it.img?('<div class="onb-shot"><img src="'+it.img+'" alt=""></div>'):('<div class="onb-ic '+(it.estado==='done'?'done':'')+'">'+svgIcon(it.ic)+'</div>');
+      body=vis+badge+'<div class="onb-h" style="font-size:30px;margin-top:8px">'+it.t+'</div>';
+      if(it.intro) body+='<div class="onb-sub" style="margin-bottom:2px">'+it.intro+'</div>';
+      if(it.list) body+='<div class="onb-list">'+it.list.map(function(li){ if(li[2]){ var vico=(li[2].indexOf('svg:')===0)?('<span class="lisvg">'+svgIcon(li[2].slice(4))+'</span>'):('<img class="lii" src="'+li[2]+'" alt="">'); return '<div class="onb-li ico">'+vico+'<div><span class="lin">'+li[0]+'</span><span class="lid">'+li[1]+'</span></div></div>'; } return '<div class="onb-li"><span class="lin">'+li[0]+'</span><span class="lid">'+li[1]+'</span></div>';}).join('')+'</div>';
+      if(it.note) body+='<div class="onb-sub" style="margin-top:12px">'+it.note+'</div>';
+      if(it.d) body+='<div class="onb-sub">'+it.d+'</div>';
+      var last=idx>=n-1;
+      foot=(last&&it.invnota?'<div class="onb-invnota">'+it.invnota+'</div>':'')
+        +(last&&it.invite?'<button class="btn btn-accent btn-lg onb-btn" style="margin-bottom:10px" onclick="invitarWhatsApp()">Invitar a más · compartir por WhatsApp</button>':'')
+        +'<button class="btn btn-solid btn-lg onb-btn" onclick="'+(last?'onbClose();applyRole(false)':'onbTour('+(idx+1)+')')+'">'+(last?'Entrar a la plataforma':'Siguiente →')+'</button>'
+        +(idx>0?'<button class="onb-skip" onclick="onbTour('+(idx-1)+')">← Atrás</button>':'<button class="onb-skip" onclick="onbClose();applyRole(false)">Saltar el recorrido</button>');
+      c=stage('El camino del edificador',0,body,foot);
+    }
+    o.innerHTML=c;
+  }
+  window.onbTour=function(i){ onb.tourI=i; onb.step=6; onbRender(); };
+  window.verCamino=function(){ var o=document.getElementById('onbOv'); if(o)o.remove(); o=document.createElement('div');o.id='onbOv';o.className='onb-ov';document.body.appendChild(o);document.body.style.overflow='hidden'; onb.tourI=0; onb.step=6; onbRender(); };
+  window.onbSetPass=async function(){
+    var p=(document.getElementById('onbP1')||{}).value||'', p2=(document.getElementById('onbP2')||{}).value||'';
+    if(p.length<6){ toast('La contraseña debe tener al menos 6 caracteres.'); return; }
+    if(p!==p2){ toast('Las contraseñas no coinciden.'); return; }
+    var btn=document.getElementById('onbPassBtn'); if(btn){ btn.disabled=true; btn.textContent='Guardando…'; }
+    try{
+      var up=await NAVI.sb.auth.updateUser({password:p}); if(up.error) throw up.error;
+      var r=await NAVI.sb.auth.getUser(); var uid=r&&r.data&&r.data.user&&r.data.user.id;
+      if(uid){ try{ await NAVI.sb.schema('navi').from('usuarios').update({must_change_password:false}).eq('auth_uid',uid); }catch(_){ } }
+      if(state.user) state.user.must_change_password=false;
+      onbGo(2);
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent='Continuar →'; } toast('No se pudo cambiar la clave: '+((e&&e.message)||'').slice(0,120)); }
+  };
+  window.onbFotoPick=async function(ev){
+    var f=ev.target&&ev.target.files&&ev.target.files[0]; if(!f) return;
+    toast('Optimizando tu foto…');
+    try{ var d=await _resizeFoto(f,400,0.85); if(d.length>250000) d=await _resizeFoto(f,320,0.75); onb.foto=d; onbRender(); }
+    catch(e){ toast('No se pudo procesar la foto.'); }
+  };
+  window.onbPickCausa=function(k){ onb.causa=k; onbRender(); };
+  window.onbCaptureAndFinish=function(){ var pr=document.getElementById('onbProp'); var bi=document.getElementById('onbBio'); if(pr) onb.propuesta=pr.value; if(bi) onb.bio=bi.value; onbFinish(); };
+  window.onbFinish=async function(){
+    var pr=document.getElementById('onbProp'); var bi=document.getElementById('onbBio'); if(pr) onb.propuesta=pr.value; if(bi) onb.bio=bi.value;
+    try{
+      if(onb.foto){ await NAVI.sb.schema('navi').rpc('set_mi_foto',{p_foto:onb.foto}); if(state.user) state.user.foto=onb.foto; store.miProgreso=Object.assign(store.miProgreso||{},{foto:onb.foto}); }
+      await NAVI.sb.schema('navi').rpc('set_mi_perfil',{p_causa:onb.causa||'',p_propuesta:onb.propuesta||'',p_bio:onb.bio||''});
+      if(state.user){ state.user.causa=onb.causa; state.user.propuesta=onb.propuesta; state.user.bio=onb.bio; state.user.perfil_configurado=true; }
+    }catch(e){ toast('Guardado parcial (¿corriste el paso 24?).'); }
+    applyRole(false); onbGo(5);
+  };
+
   var _goModule_orig = goModule;
   goModule = function(id){ if(state.role==='participante'){ toast('Tus clases se abrirán muy pronto.'); return; } _goModule_orig(id); };
 }
@@ -1843,12 +2274,25 @@ function darAlta(){
   if(grupo){const g=store.grupos.find(x=>x.nombre===grupo); if(g&&g.inscritos<g.cupo)g.inscritos++;}
   document.getElementById('altaResult').innerHTML=`<div class="sec-title" style="margin-top:0">Acceso generado</div>
     <p style="font-size:13.5px;color:var(--dim);margin-bottom:10px">Entrega estos datos a <b style="color:var(--cream)">${n}</b>${grupo?', asignado al <b style="color:var(--cream)">'+grupo+'</b>':''}. La inscripción queda como <b>preinscrita</b> hasta confirmarla.</p>
-    <label style="font-size:12px;color:var(--soft)">Usuario</label><div class="cred">${user}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
-    <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="toast('Copiado')">Copiar</button></div>
+    <label style="font-size:12px;color:var(--soft)">Usuario</label><div class="cred">${user}<button class="btn btn-sm" onclick="copiar('${user}','Usuario copiado')">Copiar</button></div>
+    <label style="font-size:12px;color:var(--soft);margin-top:10px;display:block">Clave temporal</label><div class="cred">${clave}<button class="btn btn-sm" onclick="copiar('${clave}','Clave copiada')">Copiar</button></div>
     <div style="margin-top:14px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:12px;font-size:12.5px;color:var(--dim)">Recuérdale que la Escuela <b style="color:var(--cream)">no cobra inscripción</b>: se sostiene con un <b style="color:var(--cream)">donativo mensual voluntario</b> (desde $200), no obligatorio. Dentro de la plataforma, en la sección Donativo, encontrará la cuenta y podrá registrar su aportación.</div>`;
   toast('Participante dado de alta');
 }
 const GRUPOS=['Grupo 1','Grupo 2','Grupo 3','Grupo 4','Grupo 5','Grupo 6','Grupo 7','Grupo 8'];
+function copiar(txt,msg){
+  txt=String(txt);
+  function ok(){ if(typeof toast==='function') toast(msg||'Copiado'); }
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,fallback); return; }
+  }catch(e){}
+  fallback();
+  function fallback(){
+    try{ var t=document.createElement('textarea'); t.value=txt; t.setAttribute('readonly',''); t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0,txt.length); document.execCommand('copy'); document.body.removeChild(t); ok(); }
+    catch(e){ if(typeof toast==='function') toast('Copia manual: '+txt); }
+  }
+}
+window.copiar=copiar;
 function up(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase(); }
 function fmtFecha(iso){ if(!iso) return '—'; try{ var d=new Date(iso); return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear(); }catch(e){ return iso; } }
 async function cargarRegistros(force){
@@ -1979,6 +2423,39 @@ async function enviarBienvenida(authUid, toEmail, btn, usuarioEmail){
     console.error('enviarBienvenida:', msg, e);
     toast('No se pudo enviar: '+String(msg).slice(0,200));
   }
+}
+async function enviarBienvenidaPendientes(){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  // Marca de ya-enviado por correo de acceso (usuario_generado == email de acceso)
+  const sent={}; (store.alumnos||[]).forEach(a=>{ if(a.bienvenida_enviada){ if(a.email) sent[a.email.toLowerCase()]=1; if(a.usuario) sent[a.usuario.toLowerCase()]=1; } });
+  const rs=store.registros||[];
+  const conCorreo=rs.filter(r=>(r.correo||'').includes('@'));
+  const sinAcceso=conCorreo.filter(r=>!(r.usuario_generado||'').trim());       // falta activar acceso
+  const pend=conCorreo.filter(r=>{ const k=(r.usuario_generado||'').toLowerCase(); return k && !sent[k]; });
+  if(!pend.length){
+    let m='No hay bienvenidas pendientes por enviar.';
+    if(sinAcceso.length) m+=' Hay '+sinAcceso.length+' registro(s) con correo pero SIN acceso creado: primero pulsa "Activar acceso" en cada uno.';
+    toast(m); return;
+  }
+  let aviso='Se enviará la bienvenida a '+pend.length+' persona(s), una por una.';
+  if(sinAcceso.length) aviso+='\n\nNota: '+sinAcceso.length+' registro(s) NO se enviarán porque todavía no tienen acceso creado (actívalos primero).';
+  if(!confirm(aviso+'\n\n¿Continuar?')) return;
+  let ok=0, fail=0;
+  for(let i=0;i<pend.length;i++){
+    const r=pend[i];
+    toast('Enviando '+(i+1)+' de '+pend.length+'…');
+    try{
+      const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ usuario_email:r.usuario_generado, to_email:r.correo } });
+      if(error) throw error;
+      if(data && data.ok===false) throw new Error(data.error||'error');
+      const a=(store.alumnos||[]).find(x=>(x.email||'').toLowerCase()===(r.usuario_generado||'').toLowerCase());
+      if(a){ a.bienvenida_enviada=true; a.bienvenida_at=new Date().toISOString(); }
+      ok++;
+    }catch(e){ fail++; console.error('bulk bienvenida', r.correo, e); }
+    await new Promise(res=>setTimeout(res, 800)); // pausa anti rate-limit
+  }
+  cargarAlumnos(true); // refresca el estado real desde el servidor
+  toast('Bienvenidas enviadas: '+ok+(fail?(' · fallaron '+fail):' ✓')+(sinAcceso.length?(' · '+sinAcceso.length+' sin acceso (actívalos)'):''));
 }
 async function toggleRespondio(authUid, current){
   if(!(NAVI&&NAVI.sb)) return;

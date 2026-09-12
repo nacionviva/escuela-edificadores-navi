@@ -1,5 +1,9 @@
 {
   "trailingSlash": false,
+  "headers": [
+    { "source": "/(.*)\\.html", "headers": [ { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" } ] },
+    { "source": "/plataforma", "headers": [ { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" } ] }
+  ],
   "redirects": [
     { "source": "/", "destination": "/home.html", "permanent": false }
   ],
