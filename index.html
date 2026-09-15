@@ -1542,6 +1542,7 @@ ialumnos:{title:'Alumnos',html(){
             <div class="rc-actions">
               <button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar Congreso':'Activar Congreso'}</button>
               <span class="rc-agu" title="Águilas"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button><b>${p.aguilas||0}</b><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></span>
+              <button class="btn btn-sm" title="Enviar correo: Ya eres Edificador NAVI (recuerda su usuario)" onclick="enviarFelicitacion('${p.auth_uid}',this)">✉ Felicitar</button>
               <button class="btn btn-sm rc-del" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button>
             </div>
           </div>`).join('')
@@ -2648,6 +2649,24 @@ async function borrarAlumno(authUid,nombre){
     store.alumnos=(store.alumnos||[]).filter(a=>a.auth_uid!==authUid);
     toast('Alumno borrado'); render();
   }catch(e){ toast('No se pudo borrar (revisa el paso 14 / permisos RLS).'); }
+}
+async function enviarFelicitacion(authUid, btn){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  const a=(store.alumnos||[]).find(x=>x.auth_uid===authUid);
+  if(!confirm('¿Enviar la felicitación "Ya eres Edificador NAVI" a '+((a&&nombreBonito(a.nombre))||'este alumno')+'? (Incluye su usuario de acceso.)')) return;
+  const orig=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  try{
+    const { data, error } = await NAVI.sb.functions.invoke('enviar-bienvenida', { body:{ auth_uid:authUid, usuario_email:(a&&a.email)||undefined, tipo:'felicitacion' } });
+    if(error) throw error;
+    if(data && data.ok===false) throw new Error(data.error||'error');
+    toast('Felicitación enviada ✓'); if(btn){ btn.disabled=false; btn.textContent='✓ Felicitado'; }
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent=orig; }
+    let msg=(e&&e.message)||'error';
+    try{ if(e&&e.context&&typeof e.context.json==='function'){ const j=await e.context.json(); if(j&&j.error) msg=j.error; } }catch(_){}
+    console.error('enviarFelicitacion:', msg, e);
+    toast('No se pudo enviar: '+String(msg).slice(0,160));
+  }
 }
 async function borrarRegistro(id,nombre){
   if(!(NAVI&&NAVI.sb)) return;
