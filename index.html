@@ -1549,6 +1549,7 @@ ialumnos:{title:'Alumnos',html(){
               <button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar Congreso':'Activar Congreso'}</button>
               <span class="rc-agu" title="Águilas"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button><b>${p.aguilas||0}</b><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></span>
               <button class="btn btn-sm" title="Enviar correo: Ya eres Edificador NAVI (recuerda su usuario)" onclick="enviarFelicitacion('${p.auth_uid}',this)">✉ Felicitar</button>
+              <button class="btn btn-sm" title="Restablecer contraseña y mostrar usuario + clave nueva" onclick="resetearClave('${p.auth_uid}',this)">🔑 Clave</button>
               <button class="btn btn-sm rc-del" title="Borrar" onclick="borrarAlumno('${p.auth_uid}','${(p.nombre||'').replace(/'/g,'')}')">Borrar</button>
             </div>
           </div>`).join('')
@@ -2595,10 +2596,15 @@ async function cargarGrupos(force){
   if(store._grpLoaded && !force) return;
   store._grpLoaded=true;
   try{
-    const { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor,dia,hora,link_clase,en_vivo').order('nombre');
-    if(error) throw error;
+    let { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor,dia,hora,link_clase,en_vivo').order('nombre');
+    if(error){
+      // Reintento sin las columnas del paso 28 (por si aún no se corrió)
+      const r2 = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor').order('nombre');
+      if(r2.error) throw r2.error;
+      data = r2.data;
+    }
     store.naviGrupos = data||[];
-  }catch(e){ store._grpLoaded=false; }
+  }catch(e){ store._grpLoaded=false; store._grpErr=(e&&e.message)||'error'; }
   render();
 }
 function claseGrupoBlock(gr){
@@ -2667,8 +2673,16 @@ async function crearGrupo(){
     const { data, error } = await NAVI.sb.schema('navi').from('grupos').insert({nombre,mentor:mentor||null}).select('id,nombre,mentor');
     if(error) throw error;
     store.naviGrupos = (store.naviGrupos||[]).concat(data||[]).sort((a,b)=>a.nombre.localeCompare(b.nombre));
-    if(ni)ni.value=''; if(mi)mi.value=''; toast('Grupo creado'); render();
-  }catch(e){ toast('No se pudo crear el grupo (¿corriste el paso 14? ¿nombre repetido?).'); }
+    store._grpLoaded=false; await cargarGrupos(true);
+    if(ni)ni.value=''; if(mi)mi.value=''; toast('Grupo creado ✓'); render();
+  }catch(e){
+    var m=(e&&e.message)||'error';
+    var hint = /does not exist|relation|schema|42P01/i.test(m) ? ' — falta crear la tabla: corre el paso 34 en Supabase.'
+             : /row-level|violates|permission|denied|42501/i.test(m) ? ' — tu sesión no tiene permiso de admin (entra con nacionviva1 y revisa el paso 11).'
+             : /duplicate|unique|23505/i.test(m) ? ' — ya existe un grupo con ese nombre.'
+             : '';
+    toast('No se pudo crear el grupo: '+String(m).slice(0,110)+hint);
+  }
 }
 async function borrarGrupo(id,nombre){
   if(!(NAVI&&NAVI.sb)) return;
@@ -2681,6 +2695,48 @@ async function borrarGrupo(id,nombre){
     (store.alumnos||[]).forEach(a=>{ if(a.grupo===nombre) a.grupo=null; });
     toast('Grupo borrado'); render();
   }catch(e){ toast('No se pudo borrar el grupo.'); }
+}
+/* ===== Restablecer contraseña (admin) con clave simple + pop-up ===== */
+function genClaveSimple(){ var d='23456789'; var s='navi'; for(var i=0;i<4;i++) s+=d[Math.floor(Math.random()*d.length)]; return s; }
+function copiarTexto(t,btn){ try{ navigator.clipboard.writeText(t); if(btn){ var o=btn.textContent; btn.textContent='✓ Copiado'; setTimeout(function(){ btn.textContent=o; },1300); } }catch(e){ if(typeof toast==='function') toast('Copia manual: '+t); } }
+function cerrarClaveModal(){ var o=document.getElementById('claveModal'); if(o) o.remove(); }
+function mostrarClaveModal(usuario, clave, nombre){
+  var ov=document.getElementById('claveModal'); if(ov) ov.remove();
+  var u=(String(usuario||'').indexOf('@')>=0)?usuario:(usuario+'@edificadoresnavi.mx');
+  var nom=(typeof nombreBonito==='function'?nombreBonito(nombre):nombre)||'alumno';
+  ov=document.createElement('div'); ov.id='claveModal'; ov.className='pdf-ov on';
+  ov.innerHTML='<div class="pdf-box" style="max-width:460px">'
+    +'<div class="pdf-bar"><span>Acceso de '+nom+'</span><button class="pdf-x" onclick="cerrarClaveModal()" aria-label="Cerrar">✕</button></div>'
+    +'<div style="padding:22px;background:var(--card)">'
+    +'<div style="font-size:13px;color:var(--dim);margin-bottom:16px;line-height:1.5">Comparte estos datos con la persona tal cual. Al entrar, la plataforma le pedirá cambiar la clave por una suya.</div>'
+    +'<div style="margin-bottom:14px"><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin-bottom:5px">Usuario</div>'
+    +'<div style="display:flex;gap:8px;align-items:center"><code style="flex:1;font-size:15px;background:rgba(127,168,214,.10);padding:10px 12px;border-radius:9px;color:var(--cream);word-break:break-all">'+u+'</code><button class="btn btn-sm" onclick="copiarTexto(\''+u+'\',this)">Copiar</button></div></div>'
+    +'<div><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin-bottom:5px">Contraseña nueva</div>'
+    +'<div style="display:flex;gap:8px;align-items:center"><code style="flex:1;font-size:20px;font-weight:800;background:rgba(127,168,214,.10);padding:10px 12px;border-radius:9px;color:var(--accent-bright);letter-spacing:2px">'+clave+'</code><button class="btn btn-sm btn-accent" onclick="copiarTexto(\''+clave+'\',this)">Copiar</button></div></div>'
+    +'<button class="btn btn-accent" style="margin-top:18px;width:100%" onclick="copiarTexto(\'Usuario: '+u+'  |  Clave: '+clave+'\',this)">Copiar usuario y clave juntos</button>'
+    +'</div></div>';
+  ov.addEventListener('click',function(e){ if(e.target===ov) cerrarClaveModal(); });
+  document.body.appendChild(ov);
+}
+async function resetearClave(authUid, btn){
+  if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
+  var a=(store.alumnos||[]).find(function(x){return x.auth_uid===authUid;});
+  if(!a){ toast('No encontré al alumno.'); return; }
+  var nom=(typeof nombreBonito==='function'?nombreBonito(a.nombre):a.nombre)||'este alumno';
+  if(!confirm('¿Restablecer la contraseña de '+nom+'?\nSe generará una clave nueva y sencilla, y te la mostraré en pantalla para que se la compartas.')) return;
+  var clave=genClaveSimple();
+  var orig=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Generando…'; }
+  try{
+    var ref=a.usuario||a.email;
+    var r=await NAVI.sb.schema('navi').rpc('reset_password',{p_usuario_o_correo:ref,p_nueva:clave});
+    if(r.error) throw r.error;
+    if(btn){ btn.disabled=false; btn.textContent=orig; }
+    mostrarClaveModal(a.usuario||ref, clave, a.nombre);
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent=orig; }
+    var msg=(e&&e.message)||'error';
+    toast('No se pudo restablecer: '+String(msg).slice(0,150)+' (¿corriste el paso 33?)');
+  }
 }
 async function borrarAlumno(authUid,nombre){
   if(!(NAVI&&NAVI.sb)) return;
