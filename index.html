@@ -747,6 +747,12 @@ store.articulos.forEach(a=>{ if(a.publicado===undefined) a.publicado=true; });
   });
 })();
 
+// Videos reales de las clases grabadas (Mtro. José Pablo Sánchez · Trimestre 1)
+(function(){
+  var VIDS={1:'wTiCEhmH7nk',2:'wMwHBFhZz0I'};
+  store.modulos.forEach(function(m){ if(VIDS[m.id]) m.videoUrl=VIDS[m.id]; });
+})();
+
 // ---- DB: API estable (esto es lo que se conecta a Supabase al desplegar) ----
 const DB = {
   generacion:()=>store.generacion,
@@ -1595,6 +1601,33 @@ dfinanzas:{title:'Finanzas',html(){
 
 /* ===== Capa de pre-lanzamiento del portal del alumno ===== */
 const PRELANZAMIENTO = true;
+// ===== Lanzamiento programado: las clases se abren a las 12:00 a.m. del jue 17 sep 2026 =====
+var LANZAMIENTO = new Date(2026,8,17,0,0,0); // mes 8 = septiembre (0-indexado)
+function clasesAbiertas(){ return Date.now() >= LANZAMIENTO.getTime(); }
+function moduloAbierto(m){ if(!m||!m.fecha) return false; var f=new Date(m.fecha); var mid=new Date(f.getFullYear(),f.getMonth(),f.getDate(),0,0,0); return Date.now()>=mid.getTime(); }
+window.clasesAbiertas=clasesAbiertas; window.moduloAbierto=moduloAbierto;
+function lanzamientoBanner(){
+  return '<div class="hero glass" style="margin-bottom:20px"><div>'
+    +'<div class="lbl">⏳ Cuenta regresiva</div>'
+    +'<div class="tt" style="font-size:18px;margin-top:4px">Tus clases se abren muy pronto</div>'
+    +'<div class="dt">Jueves 17 de septiembre · 12:00 a.m. · arranca el Módulo 1.</div>'
+    +'<div class="countdown">'
+      +'<div class="cd-box"><div class="n" id="lzD">–</div><div class="u">días</div></div>'
+      +'<div class="cd-box"><div class="n" id="lzH">–</div><div class="u">horas</div></div>'
+      +'<div class="cd-box"><div class="n" id="lzM">–</div><div class="u">min</div></div>'
+      +'<div class="cd-box"><div class="n" id="lzS">–</div><div class="u">seg</div></div>'
+    +'</div></div></div>';
+}
+var _lzFlip=false;
+function tickLanza(){
+  var diff=LANZAMIENTO.getTime()-Date.now();
+  if(diff<=0){ if(!_lzFlip){ _lzFlip=true; if(typeof render==='function') render(); } return; }
+  if(!document.getElementById('lzD')) return;
+  var s=Math.floor(diff/1000), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), mm=Math.floor(s%3600/60), ss=s%60;
+  var set=function(id,v){var x=document.getElementById(id); if(x) x.textContent=String(v).padStart(2,'0');};
+  set('lzD',d); set('lzH',h); set('lzM',mm); set('lzS',ss);
+}
+setInterval(tickLanza,1000);
 if (PRELANZAMIENTO) {
   MENUS.participante = [
     ['inicio','home','Inicio'],
@@ -1619,10 +1652,13 @@ if (PRELANZAMIENTO) {
       var mods=store.modulos.filter(function(m){return m.tri===t.id;}).sort(function(a,b){return a.num-b.num;});
       var rows=mods.map(function(m){
         var maestro=REVELADOS[t.numero]&&REVELADOS[t.numero][m.num];
+        var abierto=!!maestro && moduloAbierto(m);
         var cell = maestro
-          ? '<span style="font-size:14px;color:var(--cream)">'+m.titulo+'</span><span style="display:block;font-size:11.5px;color:var(--accent);margin-top:2px">'+maestro+'</span>'
+          ? '<span style="font-size:14px;color:var(--cream)">'+m.titulo+'</span><span style="display:block;font-size:11.5px;color:var(--accent);margin-top:2px">'+maestro+(abierto?' · <span style="color:var(--lime)">▶ Ver clase</span>':'')+'</span>'
           : '<span style="font-size:14px;color:var(--soft);font-style:italic">Próximamente</span>';
-        return '<div style="display:flex;gap:12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)">'
+        var base='display:flex;gap:12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line)';
+        var attr = abierto ? (' style="'+base+';cursor:pointer" onclick="goModule('+m.id+')"') : (' style="'+base+'"');
+        return '<div'+attr+'>'
           +'<span style="font-family:var(--mono);font-size:12px;color:var(--accent);min-width:60px">Tema '+t.numero+'.'+m.num+'</span>'
           +'<span style="font-family:var(--mono);font-size:11.5px;color:var(--soft);min-width:92px">'+fd(m.fecha)+'</span>'
           +'<span style="flex:1">'+cell+'</span></div>';
@@ -1722,10 +1758,11 @@ if (PRELANZAMIENTO) {
     return antorcha + artsDB
       +'<div class="page-head"'+((hayRev||artsDB)?' style="margin-top:24px"':'')+'><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
-      +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. Tu formación está por comenzar.</div></div>'
+      +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. '+(clasesAbiertas()?'Tus clases ya están disponibles.':'Tu formación está por comenzar.')+'</div></div>'
       +miPerfilHtml()
-      +'<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);margin-bottom:20px">'
-      +'<div style="font-size:14px;color:var(--cream)"><b>Estamos preparando tus clases.</b> Muy pronto se abrirán los módulos de cada eje. Mientras tanto, ya puedes leer <b>La Antorcha</b> y conocer las conferencias del <b>Congreso Nación Viva 2026</b>.</div></div>'
+      +(clasesAbiertas()
+         ? heroProxima(DB.modulo(1))
+         : lanzamientoBanner())
       +miClaseCard()
       +miProgresoHtml()
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
@@ -2173,8 +2210,13 @@ function ventanaBanner(m){
    </div><span class="pill pill-info">Video</span></div>`;
 }
 function videoBlock(m){
-  return `<div class="video-box" onclick="toast('Aquí se reproduce el video de la clase (demo).')"><div class="play">▶</div><div class="vlabel">Ver la clase · Módulo ${m.num}</div></div>`
-   + `<button class="btn btn-sm" onclick="toggleTrans()">Ver transcripción</button>`
+  var vid=m.videoUrl||'';
+  var emb=/^[A-Za-z0-9_-]{6,15}$/.test(vid)?('https://www.youtube.com/embed/'+vid):ytEmbed(vid);
+  var player=emb
+    ? `<div class="video-embed" style="position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000"><iframe src="${emb}?rel=0" title="Clase · Módulo ${m.num}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`
+    : `<div class="video-box" onclick="toast('Esta clase estará disponible muy pronto.')"><div class="play">▶</div><div class="vlabel">Ver la clase · Módulo ${m.num}</div></div>`;
+  return player
+   + `<button class="btn btn-sm" style="margin-top:10px" onclick="toggleTrans()">Ver transcripción</button>`
    + `<div id="trans" class="transbox hidden">${m.transcripcion.split('\n\n').map(p=>'<p>'+p+'</p>').join('')}</div>`;
 }
 function reunionBlock(m){
