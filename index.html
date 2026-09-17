@@ -2172,7 +2172,15 @@ if (PRELANZAMIENTO) {
   };
 
   var _goModule_orig = goModule;
-  goModule = function(id){ if(state.role==='participante'){ toast('Tus clases se abrirán muy pronto.'); return; } _goModule_orig(id); };
+  goModule = function(id){
+    if(state.role==='participante'){
+      var m = (typeof DB!=='undefined' && DB.modulo) ? DB.modulo(id) : (store.modulos||[]).find(function(x){return x.id===id;});
+      if(!(m && typeof moduloAbierto==='function' && moduloAbierto(m))){
+        toast('Esta clase se abre en su fecha. Muy pronto.'); return;
+      }
+    }
+    _goModule_orig(id);
+  };
 }
 
 </script>
