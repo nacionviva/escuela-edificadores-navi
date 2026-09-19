@@ -521,6 +521,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
       <div class="field"><label for="inPass">Clave de acceso</label><input id="inPass" type="password" placeholder="Tu clave del correo de bienvenida" autocomplete="current-password"></div>
       <button class="btn btn-solid btn-lg" type="submit">Ingresar a la Escuela</button>
     </form>
+    <div style="margin-top:12px;text-align:center"><a onclick="abrirRecuperar()" style="cursor:pointer;font-size:12.5px;color:var(--accent-bright);text-decoration:underline">¿Olvidaste tu contraseña?</a></div>
     <div style="margin-top:16px;font-size:12.5px;color:var(--dim);line-height:1.55">La Escuela no cobra inscripción. Se sostiene con un <b>donativo mensual voluntario</b> (desde $200), no obligatorio, para mantener la plataforma y seguir formando líderes para México.</div>
     <div class="login-demo">Usa el <b>usuario</b> y la <b>clave</b> que te llegaron en tu correo de bienvenida. ¿Problemas para entrar? Escríbenos por WhatsApp al 811 060 6353.</div>
   </div>
@@ -909,6 +910,31 @@ function enterApp(){
   if(typeof maybeOnboarding==='function') setTimeout(maybeOnboarding, 250);
 }
 
+/* ===== Recuperación de contraseña (autoservicio) ===== */
+function cerrarRecuperar(){ var o=document.getElementById('recModal'); if(o) o.remove(); }
+function abrirRecuperar(){
+  var ov=document.getElementById('recModal'); if(ov) ov.remove();
+  ov=document.createElement('div'); ov.id='recModal'; ov.className='pdf-ov on';
+  ov.innerHTML='<div class="pdf-box" style="max-width:440px">'
+    +'<div class="pdf-bar"><span>Recuperar contraseña</span><button class="pdf-x" onclick="cerrarRecuperar()" aria-label="Cerrar">✕</button></div>'
+    +'<div style="padding:22px;background:var(--card)">'
+    +'<div style="font-size:13px;color:var(--dim);margin-bottom:14px;line-height:1.55">Escribe tu <b>usuario</b> o tu <b>correo</b>. Te enviaremos una <b>clave nueva</b> a tu correo registrado. Al entrar podrás cambiarla por una tuya.</div>'
+    +'<input id="recInput" class="mini-in" style="width:100%;margin-bottom:14px" placeholder="tunombre@edificadoresnavi.mx  ·  o tu correo" autocapitalize="off" spellcheck="false" onkeydown="if(event.key===\'Enter\')enviarRecuperacion(document.getElementById(\'recSend\'))">'
+    +'<button id="recSend" class="btn btn-accent" style="width:100%" onclick="enviarRecuperacion(this)">Enviar clave nueva</button>'
+    +'</div></div>';
+  ov.addEventListener('click',function(e){ if(e.target===ov) cerrarRecuperar(); });
+  document.body.appendChild(ov);
+  setTimeout(function(){ var i=document.getElementById('recInput'); if(i) i.focus(); },60);
+}
+async function enviarRecuperacion(btn){
+  var v=((document.getElementById('recInput')||{}).value||'').trim();
+  if(!v){ toast('Escribe tu usuario o correo.'); return; }
+  if(!(NAVI&&NAVI.sb)){ toast('No hay conexión en este momento. Intenta más tarde.'); return; }
+  var o=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  try{ await NAVI.sb.functions.invoke('recuperar-clave',{ body:{ usuario_o_correo:v } }); }catch(_){}
+  cerrarRecuperar();
+  toast('Si tu cuenta existe, te enviamos una clave nueva a tu correo. Revisa tu bandeja (y la carpeta de spam).');
+}
 async function doLogin(e){
   e.preventDefault();
   const idf = document.getElementById('inUser').value.trim();
