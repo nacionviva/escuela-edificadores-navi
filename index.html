@@ -1658,6 +1658,18 @@ function tickLanza(){
   set('lzD',d); set('lzH',h); set('lzM',mm); set('lzS',ss);
 }
 setInterval(tickLanza,1000);
+// ===== Acceso premium: básico (clases) gratis; La Antorcha, Congreso y videos con aportación =====
+function esPremium(){ return !!(state.user && state.user.acceso_congreso); }
+window.esPremium=esPremium;
+function candadoAporte(titulo, texto){
+  return '<div class="card" style="border-color:var(--accent-line);background:var(--accent-tint);text-align:center;padding:28px 22px">'
+    +'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="var(--accent-bright)" stroke-width="1.6" style="margin:0 auto 8px;display:block"><rect x="4" y="10.5" width="16" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>'
+    +'<div style="font-family:Georgia,serif;font-size:21px;color:var(--cream);margin-bottom:8px">'+(titulo||'Contenido para edificadores')+'</div>'
+    +'<div style="font-size:13.5px;color:var(--dim);max-width:470px;margin:0 auto 18px;line-height:1.6">'+(texto||'')+'</div>'
+    +'<button class="btn btn-accent" onclick="nav(\'midonativo\')">Hacer mi aportación para desbloquear</button>'
+    +'<div style="font-size:12px;color:var(--soft);margin-top:12px">Tus clases siguen siendo gratis. Con tu donativo mensual (recomendado $400) se abren La Antorcha, el Congreso y todos los videos.</div>'
+    +'</div>';
+}
 if (PRELANZAMIENTO) {
   MENUS.participante = [
     ['inicio','home','Inicio'],
@@ -1782,9 +1794,10 @@ if (PRELANZAMIENTO) {
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
+    var premium=esPremium();
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
-    var antorcha = hayRev ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
-    var artsDB = (window.artDBListHtml?window.artDBListHtml('Artículos de Nación Viva',true):'');
+    var antorcha = (premium && hayRev) ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
+    var artsDB = (premium && window.artDBListHtml)?window.artDBListHtml('Artículos de Nación Viva',true):'';
     return antorcha + artsDB
       +'<div class="page-head"'+((hayRev||artsDB)?' style="margin-top:24px"':'')+'><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
@@ -1797,8 +1810,9 @@ if (PRELANZAMIENTO) {
       +miProgresoHtml()
       +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
       +'<div class="sec-title">Congreso Nación Viva 2026</div>'
-      +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div>'
-      +'<button class="btn btn-accent" onclick="nav(\'congreso\')">Ver las conferencias</button></div>'
+      +(premium
+         ? '<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div><button class="btn btn-accent" onclick="nav(\'congreso\')">Ver las conferencias</button></div>'
+         : candadoAporte('La Antorcha, el Congreso y los videos','Tu acceso a las clases es gratuito. El contenido para edificadores —la revista La Antorcha, las conferencias del Congreso y los videos seleccionados— se desbloquea con tu aportación mensual.'))
       +'<div class="sec-title">Música · Nación Viva</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Acompaña tu formación con la música de <b>Nación Viva</b>. Escúchala aquí mismo o ábrela en Spotify.</div>'
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
@@ -1810,6 +1824,11 @@ if (PRELANZAMIENTO) {
   }};
   VIEWS.congreso = {title:'Congreso', html:function(){
     var u=state.user||{}; var activo=!!u.acceso_congreso;
+    if(!activo){
+      return '<div class="cngr"><div class="cngr-head"><img class="cngr-logo" src="assets/logo_congreso.png" onerror="this.style.display=\'none\'" alt="Congreso Nación Viva 2026"><div class="cngr-sub">28 y 29 de agosto · Monterrey</div></div>'
+        + candadoAporte('Conferencias del Congreso Nación Viva 2026','El video introductorio y las conferencias de los oradores se desbloquean con tu aportación mensual.')
+        + '</div>';
+    }
     var intro=store.congresoIntro;
     var introHtml = (intro&&intro.id)
       ? '<div class="cngr-video"><iframe src="https://www.youtube.com/embed/'+intro.id+'" title="Video introductorio del Congreso" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'
@@ -1905,6 +1924,8 @@ if (PRELANZAMIENTO) {
   };
 
   VIEWS.videos = { title:'Videos', html:function(){
+    if(!esPremium()) return head('Nación Viva','Videos sugeridos','Una selección de videos, organizados por tema.')
+      + candadoAporte('Videos seleccionados','Los videos nuevos y sugeridos de Nación Viva se desbloquean con tu aportación mensual.');
     var vids=(store.vidDB||[]).filter(function(v){return v.publicado!==false;});
     var h0=head('Nación Viva','Videos sugeridos','Una selección de videos, organizados por tema.');
     if(!vids.length) return h0+'<div class="empty">Muy pronto encontrarás aquí videos seleccionados por tema. Vuelve pronto.</div>';
@@ -1921,6 +1942,8 @@ if (PRELANZAMIENTO) {
 
   var _revHtml = VIEWS.revista.html;
   VIEWS.revista = { title:'Revista', html:function(){
+    if(!esPremium()) return head('Nación Viva','La Antorcha','Revista digital de Nación Viva.')
+      + candadoAporte('La Antorcha','La revista y los artículos de Nación Viva se desbloquean con tu aportación mensual.');
     var base=_revHtml.call(VIEWS.revista);
     var arts=(store.artDB||[]).filter(function(a){return a.publicado!==false;});
     var lib='<div class="sec-title">Artículos de Nación Viva</div>';
