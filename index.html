@@ -688,7 +688,7 @@ const store = {
   registros:[],
   alumnos:[],
   // Donativo mensual voluntario
-  donativoInfo:{min:200,recomendado:400,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Se sostiene con un donativo mensual voluntario. Recomendado: $400 al mes, que incluye el acceso a las conferencias del Congreso Nación Viva. Mínimo: $200 al mes (acceso solo a las clases). Tú decides la cantidad; tu donativo es privado.'},
+  donativoInfo:{min:200,recomendado:400,texto:'La Escuela de Edificadores NAVI no cobra inscripción. Las clases son gratuitas para todos. Con tu donativo mensual voluntario (desde $200) desbloqueas el acceso completo: La Antorcha, las conferencias del Congreso Nación Viva y los videos. Tú decides la cantidad; tu donativo es privado.'},
   cuenta:{banco:'Mercado Pago',titular:'Nación Viva A.C.',clabe:'722969020657519631',concepto:'Donativo Nacion Viva',whatsapp:'811 060 6353'},
   transparencia:{periodo:'Ejercicio 2026',items:[
     {cat:'Plataforma y tecnología',pct:35},
@@ -1244,8 +1244,8 @@ midonativo:{title:'Donativo',html(){
   return head('Sostén de la Escuela','Tu donativo mensual', info.texto)
    + `<div class="grid g2">`
    + `<div class="card glass"><div class="sec-title" style="margin-top:0">Haz tu donativo</div>
-       <label style="font-size:13px;color:var(--cream);font-weight:700">Donativo mensual · recomendado $${info.recomendado||500}</label>
-       <div style="font-size:12px;color:var(--soft);margin:3px 0 8px">Con <b style="color:var(--dim)">$${info.recomendado||500}</b> incluyes las <b style="color:var(--dim)">conferencias del Congreso</b>. Mínimo <b style="color:var(--dim)">$${info.min}</b> (solo clases).</div>
+       <label style="font-size:13px;color:var(--cream);font-weight:700">Donativo mensual · recomendado $${info.recomendado||400}</label>
+       <div style="font-size:12px;color:var(--soft);margin:3px 0 8px">Con <b style="color:var(--dim)">cualquier donativo (desde $${info.min})</b> desbloqueas <b style="color:var(--dim)">La Antorcha, el Congreso y los videos</b>. Sin donativo, tienes acceso a las clases.</div>
        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px">${[400,600,1000,200].map(v=>`<button class="btn btn-sm ${v===(info.recomendado||400)?'btn-accent':''}" onclick="setMonto(${v})">$${v}${v===(info.recomendado||400)?' ★':''}</button>`).join('')}</div>
        <input id="donMonto" type="number" min="${info.min}" value="${info.recomendado||500}" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glassline);background:rgba(255,255,255,.05);color:var(--cream);font-size:15px;font-family:inherit;outline:none">
        <div class="sec-title">Datos para transferencia</div>
@@ -1667,7 +1667,7 @@ function candadoAporte(titulo, texto){
     +'<div style="font-family:Georgia,serif;font-size:21px;color:var(--cream);margin-bottom:8px">'+(titulo||'Contenido para edificadores')+'</div>'
     +'<div style="font-size:13.5px;color:var(--dim);max-width:470px;margin:0 auto 18px;line-height:1.6">'+(texto||'')+'</div>'
     +'<button class="btn btn-accent" onclick="nav(\'midonativo\')">Hacer mi aportación para desbloquear</button>'
-    +'<div style="font-size:12px;color:var(--soft);margin-top:12px">Tus clases siguen siendo gratis. Con tu donativo mensual (recomendado $400) se abren La Antorcha, el Congreso y todos los videos.</div>'
+    +'<div style="font-size:12px;color:var(--soft);margin-top:12px">Tus clases siguen siendo gratis. Con tu donativo mensual (desde $200) se abren La Antorcha, el Congreso y todos los videos.</div>'
     +'</div>';
 }
 if (PRELANZAMIENTO) {
@@ -2096,7 +2096,7 @@ if (PRELANZAMIENTO) {
     {paso:2,estado:'done',ic:'check',t:'Activaste tu acceso',intro:'Creaste tu contraseña y tu perfil de edificador — justo lo que acabas de hacer. Esta es tu plataforma; aquí vive:',
       list:[['La Escuela','tus clases e información sobre tu programa.'],['La Antorcha','la revista digital de Nación Viva y artículos de economía, educación y más.'],['Tus avisos','los comunicados de tu generación.'],['Tu progreso','tu grupo, tus águilas y tu avance.']]},
     {paso:3,estado:'ahora',ic:'pergamino',t:'Firma tu carta de compromiso',d:'La enviamos a tu correo. Léela con calma y fírmala: es tu «sí» a esta formación y a servir a México con criterio y carácter.'},
-    {paso:4,estado:'ahora',ic:'heart',t:'Haz tu donativo mensual',d:'No cobramos inscripción. Donativo mensual voluntario: <b style="color:'+GOLD+'">$400</b> recomendado (incluye el Congreso) o $200 mínimo (solo las clases). Tú decides la cantidad.'},
+    {paso:4,estado:'ahora',ic:'heart',t:'Haz tu donativo mensual',d:'No cobramos inscripción; las clases son gratis. Con cualquier donativo (<b style="color:'+GOLD+'">desde $200</b>) desbloqueas La Antorcha, el Congreso y los videos. Recomendado $400. Tú decides la cantidad.'},
     {paso:5,estado:'proximo',ic:'cupula',t:'Vive tus clases',intro:'Tres ejes de estudio, a lo largo del ciclo:',
       list:[['Gobierno civil','17 sep – 12 nov 2026','svg:pergamino'],['Educación','7 ene – 18 mar 2027','svg:cap'],['Economía','22 abr – 22 jul 2027','svg:chartup']],
       note:'Clases en vivo, clases pregrabadas y reuniones en vivo (sep 2026 – jul 2027), con maestros invitados del servicio público y privado.'},
@@ -2564,7 +2564,11 @@ async function registrarDonativo(authUid, monto){
   if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
   const m=parseFloat(monto); if(!m||m<=0){ toast('Monto inválido'); return; }
   try{ const {data,error}=await NAVI.sb.schema('navi').from('donativos').insert({auth_uid:authUid,monto:m}).select('id,auth_uid,monto,mes,metodo,created_at'); if(error) throw error;
-    store.donativosDB=(data||[]).concat(store.donativosDB||[]); toast('Donativo registrado ($'+m.toLocaleString('es-MX')+')'); render();
+    store.donativosDB=(data||[]).concat(store.donativosDB||[]);
+    // Cualquier donativo desbloquea el premium: marcar acceso al alumno
+    try{ await NAVI.sb.schema('navi').from('usuarios').update({acceso_congreso:true}).eq('auth_uid',authUid); }catch(_){}
+    var _a=(store.alumnos||[]).find(function(x){return x.auth_uid===authUid;}); if(_a) _a.acceso_congreso=true;
+    toast('Donativo registrado ($'+m.toLocaleString('es-MX')+') · Acceso completo habilitado'); render();
   }catch(e){ toast('No se pudo registrar (¿corriste el paso 18?).'); }
 }
 async function agregarGasto(){
@@ -3094,9 +3098,10 @@ async function registrarDonativoPropio(){
     try{
       const {error}=await NAVI.sb.schema('navi').rpc('registrar_mi_donativo',{p_monto:v,p_metodo:'Transferencia'});
       if(error) throw error;
-      if(state.user && v>=400) state.user.acceso_congreso=true;
+      if(state.user) state.user.acceso_congreso=true;   // cualquier donativo desbloquea el premium
       await cargarMisDonativos(true);
-      toast('¡Gracias! Tu donativo de $'+v.toLocaleString('es-MX')+' quedó registrado'+(v>=400?' · Congreso habilitado':''));
+      toast('¡Gracias! Tu donativo de $'+v.toLocaleString('es-MX')+' quedó registrado · Acceso completo habilitado');
+      render();
     }catch(e){ toast('No se pudo registrar (¿corriste el paso 27?): '+String((e&&e.message)||'').slice(0,120)); }
     return;
   }
