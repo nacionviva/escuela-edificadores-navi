@@ -792,7 +792,7 @@ const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['comunidad','chat','Comunidad'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
   director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos']]
 };
 // Muestra el nombre en formato Título aunque en la BD esté en MAYÚSCULAS (no toca la BD).
@@ -1166,7 +1166,7 @@ modulo:{title:'Clase',html(){
    + `<div class="sec-title">Preguntas de la clase · esta es tu entrega</div>`
    + qaBlock(m,resp,enviado)
    + feedbackBlock(ent);
-}},
+}, after:function(){ if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); }},
 
 calendario:{title:'Calendario',html(){return calendarioHTML();}},
 
@@ -1195,7 +1195,7 @@ avisos:{title:'Avisos',html(){
   return head('Generación 2026–2027','Avisos','Comunicados de la dirección y los mentores de la Escuela.')
    + (av.length? av.map(a=>`<div class="row" style="align-items:flex-start;padding:14px 16px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0"></div><div class="rinfo"><div class="t">${a.titulo}</div><div class="d" style="color:var(--dim);font-size:13.5px;margin-top:4px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div></div>`).join('')
      : `<div class="empty">No hay avisos por ahora.</div>`);
-}},
+}, after:function(){ if(typeof cargarAvisos==='function') cargarAvisos(); }},
 
 revista:{title:'Revista',html(){
   const r=store.revista;
@@ -1513,7 +1513,31 @@ davisos:{title:'Avisos',html(){
        <div style="display:flex;gap:8px;margin-top:12px">${ed?`<button class="btn btn-accent btn-sm" onclick="guardarAvisoEdit()">Guardar cambios</button><button class="btn btn-sm" onclick="state.editAviso=null;render()">Cancelar</button>`:`<button class="btn btn-accent btn-sm" onclick="publicarAviso()">Publicar aviso</button>`}</div></div></div>`
    + (store.avisos.length?store.avisos.map(a=>`<div class="row" style="align-items:flex-start;padding:13px 15px"><div class="rinfo"><div class="t">${a.titulo} ${a.publicado?pill('Publicado','pill-ok'):pill('Borrador','pill-wait')}</div><div class="d" style="margin-top:5px;color:var(--dim);font-size:13px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start"><button class="btn btn-sm" onclick="toggleAvisoPub(${a.id})">${a.publicado?'Despublicar':'Publicar'}</button><button class="btn btn-sm" onclick="state.editAviso=${a.id};render()">Editar</button><button class="btn btn-sm" onclick="eliminarAviso(${a.id})">Eliminar</button></div></div>`).join('')
      :`<div class="empty">Aún no hay avisos.</div>`);
-}},
+}, after:function(){ if(typeof cargarAvisos==='function') cargarAvisos(); }},
+
+drespuestas:{title:'Respuestas', html(){
+  var rows=store.respuestasAdmin||[];
+  var h=head('Dirección Académica','Respuestas de los alumnos','Lo que cada alumno respondió en las preguntas de cada módulo. Puedes dejar tu retroalimentación.');
+  if(!(NAVI&&NAVI.sb)) return h+'<div class="card"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver las respuestas.</div></div>';
+  if(store._respAdmLoading && !rows.length) return h+'<div class="empty">Cargando respuestas…</div>';
+  if(!rows.length) return h+'<div class="empty">Aún no hay respuestas enviadas por los alumnos.</div>';
+  var byMod={}; rows.forEach(function(r){ var k=r.tri+'.'+r.num; (byMod[k]=byMod[k]||[]).push(r); });
+  var out='';
+  Object.keys(byMod).sort().forEach(function(k){
+    var mm=(store.modulos||[]).find(function(x){return (x.tri+'.'+x.num)===k;});
+    out+='<div class="sec-title">'+(mm?('Tema '+k+' · '+mm.titulo):('Tema '+k))+'</div>';
+    byMod[k].forEach(function(r){
+      var preg=(mm&&mm.preguntas)||[];
+      var qa=(r.respuestas||[]).map(function(ans,i){ return '<div style="margin:7px 0"><div style="font-size:12px;color:var(--soft)">'+((preg[i])||('Pregunta '+(i+1)))+'</div><div style="font-size:14px;color:var(--cream);margin-top:2px">'+String(ans==null?'':ans||'(sin respuesta)').replace(/</g,'&lt;')+'</div></div>'; }).join('');
+      var rid='retro_'+r.usuario_id+'_'+r.tri+'_'+r.num;
+      out+='<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px"><div style="font-weight:700;color:var(--cream)">'+up(r.nombre||'')+'</div>'+pill(r.estatus==='retroalimentado'?'Retroalimentado':'Entregado',r.estatus==='retroalimentado'?'pill-ok':'pill-info')+'</div>'
+        +qa
+        +'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><input class="mini-in" id="'+rid+'" style="flex:1;min-width:220px" placeholder="Escribe tu retroalimentación…" value="'+((r.retroalimentacion||'').replace(/"/g,'&quot;'))+'"><button class="btn btn-sm btn-accent" onclick="darRetro(\''+r.usuario_id+'\','+r.tri+','+r.num+')">Guardar retro</button></div>'
+        +'</div>';
+    });
+  });
+  return h+out;
+}, after:function(){ if(typeof cargarRespuestasAdmin==='function') cargarRespuestasAdmin(); }},
 
 /* ---------- INSCRIPCIONES ---------- */
 ialta:{title:'Alta de participante',html(){
@@ -1817,7 +1841,7 @@ if (PRELANZAMIENTO) {
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Acompaña tu formación con la música de <b>Nación Viva</b>. Escúchala aquí mismo o ábrela en Spotify.</div>'
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
       +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>';
-  }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
+  }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
       + ejesPL(true);
@@ -2361,14 +2385,44 @@ function toggleTrans(){const t=document.getElementById('trans');if(t)t.classList
 function guardarRespuestas(mod,enviar){
   const m=DB.modulo(mod);
   const arr=m.preguntas.map((q,i)=>{const el=document.getElementById('qa'+i);return el?el.value:'';});
+  if(NAVI&&NAVI.sb){
+    (async function(){
+      try{
+        const r=await NAVI.sb.schema('navi').rpc('enviar_respuestas',{p_tri:m.tri,p_num:m.num,p_respuestas:arr,p_enviar:!!enviar});
+        if(r.error) throw r.error;
+        const e=store.entregas[mod]||(store.entregas[mod]={}); const prev=e[state.user.id]||{};
+        e[state.user.id]={estatus:enviar?'entregado':'borrador',respuestas:arr,retro:prev.retro};
+        if(enviar){
+          (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente';
+          if(r.data&&typeof r.data.aguilas!=='undefined'&&store.miProgreso) store.miProgreso.aguilas=r.data.aguilas;
+          toast('Respuestas enviadas · asistencia registrada ✓');
+        } else toast('Borrador guardado');
+        store._miProgLoaded=false; cargarMiProgreso(true); render();
+      }catch(err){ toast('No se pudo guardar: '+String((err&&err.message)||err).slice(0,130)); }
+    })();
+    return;
+  }
   const prev=(store.entregas[mod]&&store.entregas[mod][state.user.id])||{};
   const e=store.entregas[mod]||(store.entregas[mod]={});
   e[state.user.id]={estatus:enviar?'entregado':'pendiente',respuestas:arr,retro:prev.retro};
-  if(enviar){ // la asistencia se registra automáticamente al enviar las respuestas
-    (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente';
-    toast('Respuestas enviadas · asistencia registrada');
-  } else toast('Borrador guardado');
+  if(enviar){ (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente'; toast('Respuestas enviadas · asistencia registrada'); } else toast('Borrador guardado');
   if(enviar)render();
+}
+async function cargarMisRespuestas(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._respLoaded && !force) return; store._respLoaded=true;
+  try{
+    const r=await NAVI.sb.schema('navi').from('respuestas_modulo').select('tri,num,respuestas,estatus,retroalimentacion');
+    if(r.error) throw r.error;
+    (r.data||[]).forEach(function(row){
+      var mm=(store.modulos||[]).find(function(x){return x.tri===row.tri && x.num===row.num;});
+      if(!mm) return;
+      var e=store.entregas[mm.id]||(store.entregas[mm.id]={});
+      e[state.user.id]={estatus:row.estatus,respuestas:row.respuestas||[],retro:row.retroalimentacion||''};
+      if(row.estatus==='entregado'||row.estatus==='retroalimentado'){ (store.asistencias[mm.id]||(store.asistencias[mm.id]={}))[state.user.id]='presente'; }
+    });
+    render();
+  }catch(e){ store._respLoaded=false; }
 }
 function editarRespuestas(mod){const e=store.entregas[mod]&&store.entregas[mod][state.user.id];if(e)e.estatus='pendiente';render();}
 /* profesor: retroalimentación cualitativa (sin números) */
@@ -2428,10 +2482,63 @@ function calificar(mod,uid){
   if(e&&e.respuestas&&e.respuestas.length){const m=DB.modulo(mod);preview='Respuestas de '+p.nombre+':\n\n'+m.preguntas.map((q,i)=>(i+1)+'. '+q+'\n→ '+((e.respuestas[i]||'').trim()||'(sin respuesta)')).join('\n\n')+'\n\n———\n';}
   const cal=prompt(preview+'Calificación (0-10) para '+p.nombre+':', e&&e.calif?String(e.calif):'9.0');
   if(cal===null)return; e.calif=parseFloat(cal)||0; e.estatus='calificado'; render(); toast('Entrega calificada');}
-function publicarAviso(){const t=(document.getElementById('avTit').value||'').trim();const c=(document.getElementById('avCuerpo').value||'').trim();if(!t)return toast('Escribe un título');store.avisos.unshift({id:Date.now(),titulo:t,cuerpo:c,autor:state.user.nombre,cuando:'ahora',alcance:'generación',publicado:true});render();toast('Aviso publicado');}
+async function publicarAviso(){
+  const t=(document.getElementById('avTit').value||'').trim();const c=(document.getElementById('avCuerpo').value||'').trim();
+  if(!t)return toast('Escribe un título');
+  if(NAVI&&NAVI.sb){
+    try{
+      const r=await NAVI.sb.schema('navi').from('avisos').insert({titulo:t,cuerpo:c}).select('id');
+      if(r.error) throw r.error;
+      store._avisosLoaded=false; await cargarAvisos(true);
+      var a=document.getElementById('avTit'); if(a)a.value=''; var b=document.getElementById('avCuerpo'); if(b)b.value='';
+      toast('Aviso publicado ✓'); render();
+    }catch(e){ toast('No se pudo publicar: '+String((e&&e.message)||e).slice(0,130)); }
+    return;
+  }
+  store.avisos.unshift({id:Date.now(),titulo:t,cuerpo:c,autor:state.user.nombre,cuando:'ahora',alcance:'generación',publicado:true});render();toast('Aviso publicado');
+}
+async function cargarAvisos(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._avisosLoaded && !force) return; store._avisosLoaded=true;
+  try{
+    const r=await NAVI.sb.schema('navi').from('avisos').select('id,titulo,cuerpo,alcance,fecha').order('fecha',{ascending:false});
+    if(r.error) throw r.error;
+    store.avisos=(r.data||[]).map(function(a){
+      var f=''; try{ f=new Date(a.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'long'}); }catch(_){}
+      return {id:a.id,titulo:a.titulo,cuerpo:a.cuerpo||'',autor:'Dirección Académica',cuando:f,alcance:a.alcance||'generacion',publicado:true};
+    });
+    render();
+  }catch(e){ store._avisosLoaded=false; }
+}
+async function cargarRespuestasAdmin(force){
+  if(!(NAVI&&NAVI.sb)) return;
+  if(store._respAdmLoaded && !force) return; store._respAdmLoaded=true; store._respAdmLoading=true;
+  try{
+    const r=await NAVI.sb.schema('navi').rpc('respuestas_admin');
+    if(r.error) throw r.error;
+    store.respuestasAdmin=r.data||[]; store._respAdmLoading=false; render();
+  }catch(e){ store._respAdmLoaded=false; store._respAdmLoading=false; toast('No pude cargar respuestas: '+String((e&&e.message)||e).slice(0,110)); }
+}
+async function darRetro(uid,tri,num){
+  if(!(NAVI&&NAVI.sb)) return;
+  var el=document.getElementById('retro_'+uid+'_'+tri+'_'+num); var txt=el?el.value.trim():'';
+  if(!txt){ toast('Escribe la retroalimentación.'); return; }
+  try{ const r=await NAVI.sb.schema('navi').rpc('retro_respuesta',{p_usuario_id:uid,p_tri:tri,p_num:num,p_texto:txt}); if(r.error) throw r.error;
+    store._respAdmLoaded=false; await cargarRespuestasAdmin(true); toast('Retroalimentación guardada ✓');
+  }catch(e){ toast('No se pudo guardar: '+String((e&&e.message)||e).slice(0,120)); }
+}
 function guardarAvisoEdit(){const a=store.avisos.find(x=>x.id===state.editAviso);if(!a)return;const t=(document.getElementById('avTit').value||'').trim();const c=(document.getElementById('avCuerpo').value||'').trim();if(t)a.titulo=t;a.cuerpo=c;state.editAviso=null;render();toast('Aviso actualizado');}
 function toggleAvisoPub(id){const a=store.avisos.find(x=>x.id===id);if(a){a.publicado=!a.publicado;render();toast(a.publicado?'Aviso publicado':'Aviso despublicado');}}
-function eliminarAviso(id){store.avisos=store.avisos.filter(x=>x.id!==id);render();toast('Aviso eliminado');}
+async function eliminarAviso(id){
+  if(NAVI&&NAVI.sb){
+    if(!confirm('¿Eliminar este aviso?')) return;
+    try{ const r=await NAVI.sb.schema('navi').from('avisos').delete().eq('id',id); if(r.error) throw r.error;
+      store.avisos=store.avisos.filter(x=>x.id!==id); toast('Aviso eliminado'); render();
+    }catch(e){ toast('No se pudo eliminar: '+String((e&&e.message)||e).slice(0,120)); }
+    return;
+  }
+  store.avisos=store.avisos.filter(x=>x.id!==id);render();toast('Aviso eliminado');
+}
 function avisosInicio(){
   const av=store.avisos.filter(a=>a.publicado).slice(0,2);
   if(!av.length) return '';
