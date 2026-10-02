@@ -3235,6 +3235,19 @@ function tick(){const H=document.getElementById('cdH');if(!H)return;let d=NEXT-D
   if(M)M.textContent=String(Math.floor(d%3600000/60000)).padStart(2,'0');
   if(S)S.textContent=String(Math.floor(d%60000/1000)).padStart(2,'0');}
 setInterval(tick,1000);
+
+/* ===== Mantener sesión iniciada: si ya hay una sesión válida, entra directo ===== */
+(async function restaurarSesion(){
+  try{
+    if(!(NAVI && NAVI.sb)) return;                 // modo demo / sin conexión: flujo normal
+    const { data } = await NAVI.sb.auth.getSession();
+    if(!data || !data.session) return;             // sin sesión: bienvenida → login como siempre
+    const w=document.getElementById('welcome'); if(w) w.classList.add('hidden');
+    const l=document.getElementById('login');   if(l) l.classList.add('hidden');
+    try{ await NAVI.cargarPerfilYDatos(); }catch(_){ }
+    enterApp();                                     // entra directo al panel
+  }catch(e){ /* si algo falla, se mantiene el flujo normal de bienvenida/login */ }
+})();
 </script>
 </body>
 </html>
