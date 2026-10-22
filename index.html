@@ -480,7 +480,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .pdf-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-family:var(--gov);font-size:13px;color:var(--cream)}
 .pdf-x{background:none;border:0;color:var(--soft);font-size:20px;cursor:pointer;line-height:1}
 .pdf-x:hover{color:var(--cream)}
-.pdf-frame{flex:1;width:100%;border:0;background:#0A1426}
+.pdf-frame{flex:1;width:100%;border:0;background:#0A1426}.libro-host{flex:1;width:100%;display:flex;flex-direction:column;min-height:0;background:#0A1426}.libro-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 8px 2px}.libro-wrap{width:100%;max-width:560px;margin:0 auto}.libro-book{touch-action:pan-y}.libro-book .lbpage{background:#fff;overflow:hidden}.libro-book .lbpage img{width:100%;height:100%;display:block;object-fit:cover}.libro-ctrl{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 0 12px}.libro-nav{width:44px;height:44px;border-radius:50%;border:1px solid rgba(201,162,75,.45);background:rgba(255,255,255,.06);color:#c9a24b;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}.libro-nav:hover{background:rgba(201,162,75,.18)}.libro-nav:disabled{opacity:.3;cursor:default}.libro-no{min-width:78px;text-align:center;font-family:var(--mono);font-size:13px;color:var(--soft)}
 .cngr{--mag:#E6127D;--lime:#C3D64A;--orange:#F6A01E}
 .cngr-head{text-align:center;padding:4px 0 14px}
 .cngr-logo{height:118px;width:auto;max-width:88%;filter:drop-shadow(0 14px 34px rgba(0,0,0,.5))}
@@ -683,7 +683,7 @@ const store = {
     {id:2,titulo:'Requisitos para ser un buen gobernante',autor:'Dr. Alfredo Serés',edicion:'1ª edición',img:'assets/revista/art2.png',bg:'linear-gradient(135deg,#15243C,#4A3358)'},
     {id:3,titulo:'La mujer en su papel trascendental dentro de la política mexicana',autor:'Lic. Gamaliela Tan',edicion:'1ª edición',img:'assets/revista/art3.png',bg:'linear-gradient(135deg,#13233D,#8E4D3E)'}
   ],
-  revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/antorcha-portada.png',nombre:'La Antorcha'},
+  revista:{edicion:'1ª edición',pdf:'assets/revista/La-Antorcha-1a-edicion.pdf',portada:'assets/revista/antorcha-portada.png',nombre:'La Antorcha',libro:{dir:'assets/revista/antorcha-1/',prefijo:'pg-',ext:'.webp',paginas:21,lib:'assets/js/page-flip.min.js'}},
   congresoIntro:{id:'C_tyhek0xt0'},
   registros:[],
   alumnos:[],
@@ -2269,13 +2269,62 @@ function abrirRevista(){
   var ov=document.getElementById('pdfModal');
   if(!ov){
     ov=document.createElement('div'); ov.id='pdfModal'; ov.className='pdf-ov';
-    ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>La Antorcha · '+r.edicion+'</span><span style="display:flex;gap:8px;align-items:center"><a class="btn btn-sm" href="'+r.pdf+'" download="La-Antorcha-1a-edicion.pdf">Descargar</a><button class="pdf-x" onclick="cerrarRevista()" aria-label="Cerrar">\u2715</button></span></div><iframe class="pdf-frame" src="'+r.pdf+'#view=FitH" title="La Antorcha"></iframe></div>';
+    ov.innerHTML='<div class="pdf-box"><div class="pdf-bar"><span>La Antorcha · '+r.edicion+'</span><span style="display:flex;gap:8px;align-items:center"><a class="btn btn-sm" href="'+r.pdf+'" download="La-Antorcha-1a-edicion.pdf">Descargar</a><button class="pdf-x" onclick="cerrarRevista()" aria-label="Cerrar">\u2715</button></span></div><div id="libroHost" class="libro-host"></div></div>';
     ov.addEventListener('click',function(e){ if(e.target===ov) cerrarRevista(); });
     document.body.appendChild(ov);
   }
   ov.classList.add('on'); document.body.style.overflow='hidden';
+  montarLibro(r);
 }
-function cerrarRevista(){ var ov=document.getElementById('pdfModal'); if(ov) ov.classList.remove('on'); document.body.style.overflow=''; }
+function montarLibro(r){
+  var host=document.getElementById('libroHost'); if(!host) return;
+  if(host.getAttribute('data-ready')==='1') return;
+  function build(){
+    if(typeof St==='undefined' || !St.PageFlip){ libroFallback(host,r); return; }
+    host.setAttribute('data-ready','1'); construirLibro(host,r);
+  }
+  if(typeof St!=='undefined' && St.PageFlip){ build(); return; }
+  if(!(r.libro&&r.libro.lib)){ libroFallback(host,r); return; }
+  var s=document.createElement('script'); s.src=r.libro.lib;
+  s.onload=build; s.onerror=function(){ libroFallback(host,r); };
+  document.head.appendChild(s);
+}
+function construirLibro(host,r){
+  var L=r.libro, N=L.paginas;
+  host.innerHTML='<div class="libro-stage"><div class="libro-wrap"><div class="libro-book"></div></div></div>'
+    +'<div class="libro-ctrl"><button class="libro-nav" id="lbPrev" aria-label="Anterior">\u2039</button>'
+    +'<span class="libro-no" id="lbNo">1 / '+N+'</span>'
+    +'<button class="libro-nav" id="lbNext" aria-label="Siguiente">\u203a</button></div>';
+  var book=host.querySelector('.libro-book');
+  function pad(i){ return (i<10?'0':'')+i; }
+  function src(i){ return L.dir+L.prefijo+pad(i)+L.ext; }
+  var pages=[];
+  for(var i=1;i<=N;i++){
+    var d=document.createElement('div'); d.className='lbpage';
+    if(i===1||i===N) d.setAttribute('data-density','hard');
+    var im=document.createElement('img'); im.src=src(i); im.alt='Página '+i; im.draggable=false;
+    if(i>2) im.loading='lazy';
+    d.appendChild(im); pages.push(d);
+  }
+  var probe=new Image();
+  probe.onload=function(){
+    var ratio=probe.width/probe.height, baseH=860, baseW=Math.round(baseH*ratio);
+    var flip=new St.PageFlip(book,{width:baseW,height:baseH,size:'stretch',minWidth:380,maxWidth:600,minHeight:500,maxHeight:940,showCover:true,maxShadowOpacity:0.5,drawShadow:true,flippingTime:760,usePortrait:true,autoSize:true,mobileScrollSupport:false});
+    flip.loadFromHTML(pages);
+    var no=host.querySelector('#lbNo'),p=host.querySelector('#lbPrev'),nx=host.querySelector('#lbNext');
+    function upd(){ var k=flip.getCurrentPageIndex(); no.textContent=(k+1)+' / '+N; p.disabled=k<=0; nx.disabled=k>=N-1; }
+    flip.on('flip',upd); flip.on('changeOrientation',upd); upd();
+    p.onclick=function(){ flip.flipPrev(); }; nx.onclick=function(){ flip.flipNext(); };
+    host._keys=function(e){ if(e.key==='ArrowLeft') flip.flipPrev(); else if(e.key==='ArrowRight') flip.flipNext(); };
+    document.addEventListener('keydown',host._keys);
+  };
+  probe.onerror=function(){ libroFallback(host,r); };
+  probe.src=src(1);
+}
+function libroFallback(host,r){
+  host.innerHTML='<iframe class="pdf-frame" src="'+r.pdf+'#view=FitH" title="La Antorcha"></iframe>';
+}
+function cerrarRevista(){ var ov=document.getElementById('pdfModal'); if(ov) ov.classList.remove('on'); var h=document.getElementById('libroHost'); if(h&&h._keys){ document.removeEventListener('keydown',h._keys); } document.body.style.overflow=''; }
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarRevista(); });
 function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
 function heroProxima(mod){
