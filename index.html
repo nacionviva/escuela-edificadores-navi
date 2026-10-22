@@ -1985,7 +1985,8 @@ if (PRELANZAMIENTO) {
     var arts=(store.artDB||[]).filter(function(a){return a.publicado!==false;});
     var lib='<div class="sec-title">Artículos de Nación Viva</div>';
     if(!arts.length){ lib+='<div class="empty">Pronto publicaremos artículos aquí.</div>'; }
-    else { lib+='<div class="art-list">'+arts.map(function(a){
+    else { lib+='<div class="art-cards">'+arts.map(function(a){
+      if(a.portada){ return '<div class="art-cardimg" onclick="abrirArticulo(\''+a.id+'\')"><img src="'+a.portada+'" alt="'+(a.titulo||'')+'" loading="lazy"><div class="art-cardimg-go">Leer el artículo →</div></div>'; }
       return '<div class="art-item" onclick="abrirArticulo(\''+a.id+'\')"><div class="art-item-k">'+(a.tipo==='pdf'?'PDF':'Artículo')+(a.edicion?(' · '+a.edicion):'')+'</div>'
         +'<div class="art-item-t">'+(a.titulo||'')+'</div>'+(a.autor?'<div class="art-item-a">Por '+a.autor+'</div>':'')
         +(a.resumen?'<div class="art-item-d">'+a.resumen+'</div>':'')+'<div class="art-item-go">Leer →</div></div>';
