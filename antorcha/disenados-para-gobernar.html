@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diseñados para gobernar · La Antorcha — Nación Viva</title>
+<meta name="description" content="El llamado del cristiano a ocupar su lugar en la vida pública. Un artículo de Gamaliela Tan para La Antorcha, revista de Nación Viva.">
+
+<!-- Open Graph (tarjeta de preview para WhatsApp / correo) -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="La Antorcha · Nación Viva">
+<meta property="og:title" content="Diseñados para gobernar">
+<meta property="og:description" content="El llamado del cristiano a ocupar su lugar en la vida pública. Por Gamaliela Tan.">
+<meta property="og:image" content="https://escuela-edificadores-navi.vercel.app/assets/revista/og-disenados.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://escuela-edificadores-navi.vercel.app/antorcha/disenados-para-gobernar.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diseñados para gobernar · La Antorcha">
+<meta name="twitter:description" content="El llamado del cristiano a ocupar su lugar en la vida pública. Por Gamaliela Tan.">
+<meta name="twitter:image" content="https://escuela-edificadores-navi.vercel.app/assets/revista/og-disenados.jpg">
+
+<style>
+  :root{ --red:#6d2d28; --gold:#cbad7a; --acc:#d9bd8a; --cream:#f2e8d6; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:Georgia,'Times New Roman',serif;background:var(--red);color:var(--cream);
+    min-height:100%;display:flex;flex-direction:column}
+  .sans{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px 22px;position:relative}
+  .frame{position:absolute;inset:16px;border:1.4px solid var(--gold);pointer-events:none}
+  .frame2{position:absolute;inset:19px;border:.5px solid rgba(203,173,122,.5);pointer-events:none}
+  .logo{width:min(260px,70vw);margin-bottom:18px}
+  .ed{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-bottom:22px}
+  .title{font-size:clamp(40px,9vw,72px);line-height:1.0;font-weight:700;letter-spacing:-.01em}
+  .rl{width:120px;height:2px;background:var(--gold);border:0;margin:22px auto}
+  .deck{font-style:italic;font-size:clamp(16px,2.6vw,20px);line-height:1.4;max-width:560px;color:rgba(242,232,214,.95)}
+  .by{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-top:16px}
+  .cta{display:inline-block;margin-top:30px;background:var(--gold);color:var(--red);font-weight:700;
+    font-size:15px;letter-spacing:.04em;padding:13px 26px;border-radius:999px;border:0;cursor:pointer;text-decoration:none}
+  .cta:hover{background:var(--acc)}
+  .foot{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(242,232,214,.5);padding:16px;text-align:center}
+  /* lector */
+  #reader{position:fixed;inset:0;z-index:50;background:#0b1430;display:none}
+  #reader.on{display:block}
+  #reader .close{position:absolute;top:12px;right:14px;z-index:60;background:rgba(255,255,255,.1);
+    color:#fff;border:0;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer}
+  #epdf{height:100%}
+  .loadmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#cdd6ef;font-family:sans-serif}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="frame"></div><div class="frame2"></div>
+    <img class="logo" src="../assets/revista/antorcha-logo-white.png" alt="La Antorcha"
+         onerror="this.style.display='none'">
+    <div class="ed sans">Segunda Edición · Artículo 001</div>
+    <h1 class="title">Diseñados<br>para gobernar</h1>
+    <hr class="rl">
+    <p class="deck">El llamado del cristiano a ocupar su lugar en la vida pública.</p>
+    <div class="by sans">Por Gamaliela Tan · Coach de lo Familiar</div>
+    <button class="cta sans" id="btnLeer">Leer el artículo</button>
+  </div>
+  <div class="foot sans">Nación Viva · La Antorcha</div>
+
+  <div id="reader">
+    <button class="close" id="btnClose" aria-label="Cerrar">&#10005;</button>
+    <div class="loadmsg" id="loadmsg">Cargando el artículo…</div>
+    <div id="epdf"></div>
+  </div>
+
+<script>
+var PDF = "/assets/revista/La-Antorcha-Disenados-para-gobernar.pdf";
+var started = false;
+function abrir(){
+  var r=document.getElementById('reader'); r.classList.add('on'); document.body.style.overflow='hidden';
+  if(started) return; started=true;
+  import('https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js').then(function(m){
+    var EmbedPDF=m.default||m;
+    document.getElementById('loadmsg').style.display='none';
+    EmbedPDF.init({ type:'container', target:document.getElementById('epdf'), src:PDF,
+      theme:{preference:'dark'}, i18n:{ defaultLocale:'es', fallbackLocale:'en' } });
+  }).catch(function(){
+    document.getElementById('epdf').innerHTML='<iframe src="'+PDF+'" style="width:100%;height:100%;border:0"></iframe>';
+    document.getElementById('loadmsg').style.display='none';
+  });
+}
+document.getElementById('btnLeer').onclick=abrir;
+document.getElementById('btnClose').onclick=function(){ document.getElementById('reader').classList.remove('on'); document.body.style.overflow=''; };
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ document.getElementById('reader').classList.remove('on'); document.body.style.overflow=''; } });
+</script>
+</body>
+</html>

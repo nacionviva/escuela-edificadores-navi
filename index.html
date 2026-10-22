@@ -676,7 +676,7 @@ const store = {
   ],
   donativos:[],
   // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
-  mentores:[],
+  mentores:[{id:'m1',foto:'assets/mentores/gamaliela-tan.jpg',publicado:true,nombre:'Gamaliela Tan',materia:'Coach de lo Familiar',expediente:'NV-003',ingreso:'2026',frase:'Acompaño a las familias a sanar, a comunicarse sin violencia y a descubrir su razón de ser (IKIGAI) para vivir el propósito con el que Dios las diseñó.',formacion:'Lic. en Ciencias Jurídicas · Mexicana de ascendencia china',experiencia:'Comenzó en Malasia impartiendo talleres y conferencias. Actualmente radica en Monterrey, N.L., donde imparte cursos en línea de Sanidad Emocional, Mente Renovada y Encontrando tu Propósito de Vida. Apasionada por las Familias Transculturales (CTC), la Comunicación No Violenta (CNV) y el IKIGAI.',bio:'Autora de tres libros: «Linaje Escogido», «Cimientos Eternos» y «Mujeres Anónimas». Madre de dos hijos y esposa de Jeffrey Tan, autor de «El Reformador». Su trabajo se centra en la restauración familiar, la sanidad emocional y el acompañamiento de personas para que descubran y vivan su propósito.'}],
   // ARTÍCULOS de la revista/blog Nación Viva (se conectará al blog real). img: placeholder con degradado.
   articulos:[
     {id:1,titulo:'¿Cuál es el mejor modelo para desarrollar liderazgo?',autor:'Dr. Jorge Salcedo Mireles',edicion:'1ª edición',img:'assets/revista/art1.png',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)'},
@@ -1007,7 +1007,7 @@ function mphoto(m){return m.foto?`<img class="mphoto" src="${m.foto}" alt="${m.n
 const _cors='<span class="cor tl"></span><span class="cor tr"></span><span class="cor bl"></span><span class="cor br"></span>';
 function dossierPhoto(m,big){
   const inner=m.foto?`<img src="${m.foto}" alt="${m.nombre}">`:`<div class="ini">${initials(m.nombre)}</div>`;
-  return `<div class="${big?'dz-photo-lg':'dz-photo'}">${inner}<div class="scan"></div>${_cors}${big?'<div class="dz-stamp">EN SERVICIO</div>':''}</div>`;
+  return `<div class="${big?'dz-photo-lg':'dz-photo'}">${inner}<div class="scan"></div>${_cors}${big?'<div class="dz-stamp">EDIFICANDO</div>':''}</div>`;
 }
 
 // Coalesce: varias llamadas a render() en el mismo tick se pintan una sola vez (por frame).
@@ -1105,7 +1105,7 @@ mentores:{title:'Mis Mentores',html(){
   return head('Archivo de la Escuela','Mis Mentores','Consulta el expediente de cada mentor que acompaña los trimestres. Toca una ficha para abrir el expediente completo.')
    + (ms.length?`<div class="dossier-grid">`
    + ms.map(x=>`<div class="dossier-card" onclick="goMentor('${x.id}')">
-        <div class="dz-topbar"><span>EXP. ${x.expediente}</span><span class="cls">CONFIDENCIAL</span></div>
+        <div class="dz-topbar"><span>EXP. ${x.expediente}</span><span class="cls">EDIFICANDO</span></div>
         <div class="dzc-body">${dossierPhoto(x,false)}
           <div class="dzc-meta"><div class="dzc-exp">MENTOR · INGRESO ${x.ingreso}</div><div class="dzc-name">${x.nombre}</div><div class="dzc-area">${x.materia}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
         </div></div>`).join('')
@@ -1117,7 +1117,7 @@ mentorDetalle:{title:'Expediente',html(){
   const x=DB.mentor(state.mentorId)||DB.mentores()[0];
   return `<button class="back-link" onclick="nav('mentores')">← Volver al archivo</button>`
    + `<div class="dossier">
-       <div class="dz-head"><span>ARCHIVO DE MENTORES · NACIÓN VIVA</span><span class="cls">CONFIDENCIAL</span></div>
+       <div class="dz-head"><span>ARCHIVO DE MENTORES · NACIÓN VIVA</span><span class="cls">EDIFICANDO</span></div>
        <div class="dz-body">${dossierPhoto(x,true)}
          <div class="dz-fields">
            <div class="dz-row"><div class="dz-label">Expediente</div><div class="dz-val">${x.expediente}</div></div>
@@ -1126,7 +1126,7 @@ mentorDetalle:{title:'Expediente',html(){
            <div class="dz-row"><div class="dz-label">Formación</div><div class="dz-val">${x.formacion}</div></div>
            <div class="dz-row"><div class="dz-label">Experiencia</div><div class="dz-val">${x.experiencia}</div></div>
            <div class="dz-row"><div class="dz-label">Ingreso</div><div class="dz-val">${x.ingreso}</div></div>
-           <div class="dz-row"><div class="dz-label">Estatus</div><div class="dz-val" style="color:#7FE090">EN SERVICIO</div></div>
+           <div class="dz-row"><div class="dz-label">Estatus</div><div class="dz-val" style="color:#7FE090">EDIFICANDO</div></div>
          </div>
        </div>
        <div class="dz-section">Declaración en archivo</div>
