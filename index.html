@@ -1824,7 +1824,7 @@ if (PRELANZAMIENTO) {
     var premium=esPremium();
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
     var antorcha = (premium && hayRev) ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
-    var artsDB = (premium && window.artDBListHtml)?window.artDBListHtml('',true):'';
+    var artsDB='';
     return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. '+(clasesAbiertas()?'Tus clases ya están disponibles.':'Tu formación está por comenzar.')+'</div></div>'
@@ -2477,11 +2477,13 @@ function guardarPreguntas(mod){captureClase(mod);const m=DB.modulo(mod);
 /* carrusel de artículos (revista Nación Viva) */
 let carIdx=0, carInt=null;
 function articulosCarousel(){
-  const arts=DB.articulos().filter(a=>a.publicado);
+  var a1=DB.articulos().filter(function(a){return a.publicado;}).map(function(a){return {img:a.img,bg:a.bg,titulo:a.titulo,autor:a.autor,edicion:a.edicion,go:"nav('revista')",lbl:'Leer la revista'};});
+  var a2=(store.artDB||[]).filter(function(a){return a.publicado!==false;}).map(function(a){return {img:a.portada,bg:'',titulo:a.titulo,autor:a.autor,edicion:a.edicion,go:"abrirArticulo('"+a.id+"')",lbl:'Leer el art\u00edculo'};});
+  var arts=a1.concat(a2);
   if(!arts.length) return '';
-  return `<div class="carousel" id="carousel">`
-   + arts.map((a,i)=>`<div class="slide${i===0?' on':''}${a.img?' has-img':''}" onclick="nav('revista')"><div class="slide-bg" style="background:${a.img?`url('${a.img}') center/cover`:a.bg}"></div>${a.img?`<div class="slide-read-only">Leer la revista →</div>`:`<div class="slide-txt"><span class="slide-tag">La Antorcha${a.edicion?' · '+a.edicion:''}</span><div class="slide-tit">${a.titulo}</div><div class="slide-aut">Por ${a.autor}</div><div class="slide-read">Leer la revista →</div></div>`}</div>`).join('')
-   + `<div class="dots">`+arts.map((a,i)=>`<button class="dot${i===0?' on':''}" onclick="goSlide(${i})" aria-label="Artículo ${i+1}"></button>`).join('')+`</div></div>`;
+  return '<div class="carousel" id="carousel">'
+   + arts.map(function(a,i){ return '<div class="slide'+(i===0?' on':'')+(a.img?' has-img':'')+'" onclick="'+a.go+'"><div class="slide-bg" style="background:'+(a.img?("url('"+a.img+"') center/cover"):a.bg)+'"></div>'+(a.img?('<div class="slide-read-only">'+a.lbl+' \u2192</div>'):('<div class="slide-txt"><span class="slide-tag">La Antorcha'+(a.edicion?' \u00b7 '+a.edicion:'')+'</span><div class="slide-tit">'+a.titulo+'</div><div class="slide-aut">Por '+a.autor+'</div><div class="slide-read">'+a.lbl+' \u2192</div></div>'))+'</div>'; }).join('')
+   + '<div class="dots">'+arts.map(function(a,i){ return '<button class="dot'+(i===0?' on':'')+'" onclick="goSlide('+i+')" aria-label="Art\u00edculo '+(i+1)+'"></button>'; }).join('')+'</div></div>';
 }
 function goSlide(i){const c=document.getElementById('carousel');if(!c)return;const s=c.querySelectorAll('.slide'),d=c.querySelectorAll('.dot');if(!s.length)return;carIdx=(i+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('on',j===carIdx));d.forEach((x,j)=>x.classList.toggle('on',j===carIdx));}
 function startCarousel(){carIdx=0;if(carInt)clearInterval(carInt);carInt=setInterval(()=>{const c=document.getElementById('carousel');if(!c){clearInterval(carInt);carInt=null;return;}goSlide(carIdx+1);},5000);}
