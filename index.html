@@ -1810,21 +1810,21 @@ if (PRELANZAMIENTO) {
     var desc=Math.min(50,mp.meses*5);
     var niv=mp.aguilas>=300?'C':mp.aguilas>=150?'B':mp.aguilas>=60?'A':'—';
     var grupoTxt = mp.grupo ? ('<b style="color:var(--cream)">'+mp.grupo+'</b>'+(mp.mentor?(' · Mentor: <b style="color:var(--cream)">'+mp.mentor+'</b>'):'')) : 'Te asignaremos a tu grupo muy pronto.';
-    return '<div class="sec-title" style="margin-top:0">Mi progreso</div>'
+    return '<details class="eje-acc" style="margin-top:0"><summary><div style="flex:1"><div class="t" style="font-size:16.5px">Mi progreso</div><div class="d">Tu grupo, tus \u00e1guilas y tus recompensas</div></div><span class="eje-chev">\u25be</span></summary><div class="eje-body" style="padding-top:14px">'
       +'<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;align-items:center;gap:12px">'
       +'<span style="flex:none;width:38px;height:38px;border-radius:10px;background:rgba(127,168,214,.18);display:flex;align-items:center;justify-content:center;color:var(--accent)">'+svgIcon('layers')+'</span>'
       +'<div><div style="font-size:11.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em">Tu grupo</div><div style="font-size:14.5px;color:var(--dim)">'+grupoTxt+'</div></div></div>'
       +'<div class="grid g2" style="margin-bottom:20px">'
       +'<div class="card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" style="height:48px" onerror="this.style.display=\'none\'"><div><div class="stat-n" style="font-size:32px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver tus clases y participar. ¡Sigue sumando!</div></div>'
       +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
-      +'</div>';
+      +'</div></div></details>';
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var premium=esPremium();
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
     var antorcha = (premium && hayRev) ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
-    var artsDB = (premium && window.artDBListHtml)?window.artDBListHtml('Artículos de Nación Viva',true):'';
+    var artsDB = (premium && window.artDBListHtml)?window.artDBListHtml('',true):'';
     return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. '+(clasesAbiertas()?'Tus clases ya están disponibles.':'Tu formación está por comenzar.')+'</div></div>'
@@ -1917,7 +1917,7 @@ if (PRELANZAMIENTO) {
   window.artDBListHtml=function(titulo,hideIfEmpty){
     var arts=(store.artDB||[]).filter(function(a){return a.publicado!==false;});
     if(!arts.length && hideIfEmpty) return '';
-    var h='<div class="sec-title">'+(titulo||'Artículos')+'</div>';
+    var h=titulo?('<div class="sec-title">'+titulo+'</div>'):'';
     if(!arts.length) return h+'<div class="empty">Pronto publicaremos artículos aquí.</div>';
     return h+'<div class="art-cards">'+arts.map(function(a){
       if(a.portada){
