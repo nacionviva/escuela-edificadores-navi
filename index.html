@@ -1167,7 +1167,7 @@ modulo:{title:'Clase',html(){
    + `<div class="sec-title">Lecturas de apoyo</div>`
    + mats.map(x=>`<div class="reading"><div class="ri">${x.icon}</div><div><div class="rt">${x.titulo}</div><div class="rd">${x.ref}</div></div><input type="checkbox" ${prog.has(x.id)?'checked':''} onchange="toggleLectura(${x.id})" aria-label="Marcar como leído"></div>`).join('')
    + `<div class="sec-title">Preguntas de la clase · esta es tu entrega</div>`
-   + qaBlock(m,resp,enviado)
+   + qaBlock(m,resp,enviado,ent)
    + feedbackBlock(ent);
 }, after:function(){ if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); }},
 
@@ -2341,13 +2341,26 @@ function reunionBlock(m){
      <p>En vivo comentamos los dos temas del mes (este módulo y el anterior). Jueves ${fmtFecha(m.reunionFecha)} · 7:00 pm (CDMX).</p>
      <button class="btn btn-accent btn-sm" onclick="toast('Aquí se abre la liga de Google Meet de la reunión mensual.')">Ir a la reunión (Google Meet)</button></div>`;
 }
-function qaBlock(m,resp,enviado){
+function fmtSello(iso){ if(!iso) return ''; try{ var d=new Date(iso); var mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; var h=d.getHours(), ap=h<12?'am':'pm', h12=((h%12)||12); var mm=('0'+d.getMinutes()).slice(-2); return d.getDate()+' '+mes[d.getMonth()]+' '+d.getFullYear()+', '+h12+':'+mm+' '+ap; }catch(e){ return ''; } }
+function qaBlock(m,resp,enviado,ent){
   const qs=m.preguntas.map((q,i)=>`<div class="qa"><label>${i+1}. ${q}</label><textarea id="qa${i}" ${enviado?'disabled':''} placeholder="Escribe tu respuesta…">${(resp[i]||'').replace(/</g,'&lt;')}</textarea></div>`).join('');
-  const acc=enviado
-    ? `<span class="pill pill-ok">Entregado</span><button class="btn btn-sm" onclick="editarRespuestas(${m.id})">Editar</button>`
-    : `<button class="btn" onclick="guardarRespuestas(${m.id},false)">Guardar borrador</button><button class="btn btn-accent" onclick="guardarRespuestas(${m.id},true)">Enviar respuestas</button>`;
-  return `<div class="card">${qs}<div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">${acc}</div>
-     <p style="font-size:12px;color:var(--soft);margin-top:10px">Al enviar, tus respuestas cuentan como la entrega del módulo y el equipo las revisa.</p></div>`;
+  if(enviado){
+    const sello=fmtSello((ent&&ent.guardadoEn)||'');
+    return `<div class="card">${qs}
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-top:14px;padding:14px 16px;border-radius:14px;background:rgba(84,180,110,.12);border:1px solid rgba(84,180,110,.4)">
+        <div style="font-size:20px;line-height:1;color:#5bbd77;flex-shrink:0">✓</div>
+        <div><div style="font-weight:700;color:#bfe9cc;font-size:14.5px">Entregado y guardado</div>
+        <div style="font-size:13px;color:var(--dim);margin-top:3px">${sello?('Guardado el '+sello+' · '):''}Tu equipo ya puede ver tus respuestas.</div></div>
+      </div>
+      <div style="margin-top:12px"><button class="btn btn-sm" onclick="editarRespuestas(${m.id})">Editar mis respuestas</button></div></div>`;
+  }
+  const borr=(ent&&ent.estatus==='borrador');
+  return `<div class="card">${qs}
+     ${borr?`<div style="margin-top:12px;padding:11px 14px;border-radius:12px;background:rgba(214,170,90,.12);border:1px solid rgba(214,170,90,.38);font-size:13px;color:#e9d4a8">📝 Tienes un <b>borrador guardado</b>, pero <b>aún no lo has entregado</b>. Dale a "Enviar respuestas" para que cuente como tu entrega.</div>`:''}
+     <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+       <button class="btn btn-accent btn-lg" onclick="guardarRespuestas(${m.id},true)">Enviar respuestas</button>
+       <button class="btn btn-sm" onclick="guardarRespuestas(${m.id},false)">Solo guardar borrador</button></div>
+     <p style="font-size:12px;color:var(--soft);margin-top:10px">Al <b>enviar</b>, tus respuestas cuentan como la entrega del módulo, se registra tu asistencia y sumas tus águilas. El <b>borrador</b> solo guarda tu avance, sin entregar.</p></div>`;
 }
 function moduloRow(m){
   return `<div class="row click" onclick="goModule(${m.id})"><div class="rnum">${m.num}</div>
@@ -2417,13 +2430,14 @@ function toggleTrans(){const t=document.getElementById('trans');if(t)t.classList
 function guardarRespuestas(mod,enviar){
   const m=DB.modulo(mod);
   const arr=m.preguntas.map((q,i)=>{const el=document.getElementById('qa'+i);return el?el.value:'';});
+  if(enviar && !confirm('¿Enviar tus respuestas del Módulo '+m.num+'? Quedarán guardadas y las podrás editar después.')) return;
   if(NAVI&&NAVI.sb){
     (async function(){
       try{
         const r=await NAVI.sb.schema('navi').rpc('enviar_respuestas',{p_tri:m.tri,p_num:m.num,p_respuestas:arr,p_enviar:!!enviar});
         if(r.error) throw r.error;
         const e=store.entregas[mod]||(store.entregas[mod]={}); const prev=e[state.user.id]||{};
-        e[state.user.id]={estatus:enviar?'entregado':'borrador',respuestas:arr,retro:prev.retro};
+        e[state.user.id]={estatus:enviar?'entregado':'borrador',respuestas:arr,retro:prev.retro,guardadoEn:new Date().toISOString()};
         if(enviar){
           (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente';
           if(r.data&&typeof r.data.aguilas!=='undefined'&&store.miProgreso) store.miProgreso.aguilas=r.data.aguilas;
@@ -2436,7 +2450,7 @@ function guardarRespuestas(mod,enviar){
   }
   const prev=(store.entregas[mod]&&store.entregas[mod][state.user.id])||{};
   const e=store.entregas[mod]||(store.entregas[mod]={});
-  e[state.user.id]={estatus:enviar?'entregado':'pendiente',respuestas:arr,retro:prev.retro};
+  e[state.user.id]={estatus:enviar?'entregado':'pendiente',respuestas:arr,retro:prev.retro,guardadoEn:new Date().toISOString()};
   if(enviar){ (store.asistencias[mod]||(store.asistencias[mod]={}))[state.user.id]='presente'; toast('Respuestas enviadas · asistencia registrada'); } else toast('Borrador guardado');
   if(enviar)render();
 }
@@ -2444,13 +2458,13 @@ async function cargarMisRespuestas(force){
   if(!(NAVI&&NAVI.sb)) return;
   if(store._respLoaded && !force) return; store._respLoaded=true;
   try{
-    const r=await NAVI.sb.schema('navi').from('respuestas_modulo').select('tri,num,respuestas,estatus,retroalimentacion');
+    const r=await NAVI.sb.schema('navi').from('respuestas_modulo').select('tri,num,respuestas,estatus,retroalimentacion,updated_at');
     if(r.error) throw r.error;
     (r.data||[]).forEach(function(row){
       var mm=(store.modulos||[]).find(function(x){return x.tri===row.tri && x.num===row.num;});
       if(!mm) return;
       var e=store.entregas[mm.id]||(store.entregas[mm.id]={});
-      e[state.user.id]={estatus:row.estatus,respuestas:row.respuestas||[],retro:row.retroalimentacion||''};
+      e[state.user.id]={estatus:row.estatus,respuestas:row.respuestas||[],retro:row.retroalimentacion||'',guardadoEn:row.updated_at||''};
       if(row.estatus==='entregado'||row.estatus==='retroalimentado'){ (store.asistencias[mm.id]||(store.asistencias[mm.id]={}))[state.user.id]='presente'; }
     });
     render();
