@@ -2371,11 +2371,26 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarRevi
 function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
 function heroProxima(mod){
   const m=mod||DB.proximaSesion();
+  var _now=Date.now();
+  function _fr(d){var dd=['dom','lun','mar','mié','jue','vie','sáb'];var mm=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return dd[d.getDay()]+' '+d.getDate()+' '+mm[d.getMonth()]+' '+d.getFullYear();}
+  var _meets=(store.modulos||[]).filter(function(x){return x.reunion && x.reunionFecha;})
+    .map(function(x){var d=new Date(x.reunionFecha);d.setHours(19,0,0,0);return d;})
+    .filter(function(d){return d.getTime()>_now;}).sort(function(a,b){return a-b;});
+  var _nm=_meets[0]||null;
+  window.__cdTarget=_nm?_nm.getTime():0;
+  var _cerca=_nm?(_nm.getTime()-_now<=7*86400000):false;
+  var reunionHtml='';
+  if(_nm && _cerca){
+    reunionHtml='<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div>'
+      +'<div style="font-size:11.5px;color:var(--soft);margin-top:8px">Reunión en vivo: '+_fr(_nm)+' · 7:00 pm (CDMX).</div>';
+  } else if(_nm){
+    reunionHtml='<div style="margin-top:12px;font-size:13px;color:var(--dim)">🗓️ Próxima reunión en vivo: <b style="color:var(--cream)">'+_fr(_nm)+' · 7:00 pm (CDMX)</b></div>';
+  }
   return `<div class="hero glass"><div>
      <div class="lbl">📹 Tu clase de esta quincena</div>
      <div class="tt">Módulo ${m.num} · ${m.titulo}</div>
      <div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}${m.reunion?' · incluye la reunión mensual (Meet)':''}</div>
-     ${m.reunion?`<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Cuenta regresiva a la reunión en vivo (hora simulada).</div>`:''}
+     ${reunionHtml}
    </div><button class="btn btn-accent" onclick="goModule(${m.id})">Ver la clase</button></div>`;
 }
 function ventanaBanner(m){
@@ -3334,9 +3349,8 @@ async function cargarMisDonativos(force){
   render();
 }
 
-/* contador regresivo (demo: sesión dentro de ~3 h) */
-const NEXT=new Date(Date.now()+(3*60+12)*60000);
-function tick(){const H=document.getElementById('cdH');if(!H)return;let d=NEXT-Date.now();if(d<0)d=0;
+/* contador regresivo a la próxima reunión real (window.__cdTarget) */
+function tick(){const H=document.getElementById('cdH');if(!H)return;let d=(window.__cdTarget||0)-Date.now();if(d<0)d=0;
   H.textContent=String(Math.floor(d/3600000)).padStart(2,'0');
   const M=document.getElementById('cdM'),S=document.getElementById('cdS');
   if(M)M.textContent=String(Math.floor(d%3600000/60000)).padStart(2,'0');
