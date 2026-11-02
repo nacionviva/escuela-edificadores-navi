@@ -797,7 +797,7 @@ const MENUS = {
   participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
   director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  superadmin:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['davance','chart','Avance'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos']]
 };
 // Muestra el nombre en formato Título aunque en la BD esté en MAYÚSCULAS (no toca la BD).
@@ -1409,6 +1409,7 @@ dpanel:{title:'Panel',html(){
        <div class="card"><div class="stat-n">${nReg}</div><div class="stat-l">Registrados (formulario)</div></div>
        <div class="card"><div class="stat-n">${nIns}</div><div class="stat-l">Inscritos (con acceso)</div></div>
        <div class="card"><div class="stat-n">${nAcc}</div><div class="stat-l">Con acceso a conferencias</div></div></div>`
+   + videoBienvenidaCard()
    + `<div class="card"><div class="sec-title" style="margin-top:0">¿Cómo se cuentan?</div>
        <p style="font-size:13px;color:var(--dim);line-height:1.6"><b style="color:var(--cream)">Registrados</b>: personas que llenaron el formulario de inscripción. <b style="color:var(--cream)">Inscritos</b>: registros a los que ya les activaste el acceso (aparecen en Alumnos). <b style="color:var(--cream)">Con acceso a conferencias</b>: alumnos con las conferencias del Congreso desbloqueadas tras confirmar su donativo.</p></div>`;
 }, after(){ if(NAVI&&NAVI.sb){ cargarRegistros(); cargarAlumnos(); } }},
@@ -1534,6 +1535,47 @@ davisos:{title:'Avisos',html(){
    + (store.avisos.length?store.avisos.map(a=>`<div class="row" style="align-items:flex-start;padding:13px 15px"><div class="rinfo"><div class="t">${a.titulo} ${a.publicado?pill('Publicado','pill-ok'):pill('Borrador','pill-wait')}</div><div class="d" style="margin-top:5px;color:var(--dim);font-size:13px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start"><button class="btn btn-sm" onclick="toggleAvisoPub(${a.id})">${a.publicado?'Despublicar':'Publicar'}</button><button class="btn btn-sm" onclick="state.editAviso=${a.id};render()">Editar</button><button class="btn btn-sm" onclick="eliminarAviso(${a.id})">Eliminar</button></div></div>`).join('')
      :`<div class="empty">Aún no hay avisos.</div>`);
 }, after:function(){ if(typeof cargarAvisos==='function') cargarAvisos(); }},
+
+davance:{title:'Avance',html(){
+  var h=head('Dirección Académica','Avance de los alumnos','Quién ha entregado qué. Cada columna es un módulo. ✓ entregado · ★ con tu retro · ~ borrador sin enviar · · sin entregar.');
+  if(!(NAVI&&NAVI.sb)) return h+'<div class="card"><div style="font-size:13px;color:var(--dim)">Inicia sesión como administrador para ver el avance.</div></div>';
+  var al=(store.alumnos||[]).filter(function(a){return a.activado;});
+  var mods=(store.modulos||[]).filter(function(m){return m.tri===1;}).sort(function(a,b){return a.num-b.num;});
+  if(store._loadingAl && !al.length) return h+'<div class="empty">Cargando alumnos…</div>';
+  if(!al.length) return h+'<div class="empty">Aún no hay alumnos activos.</div>';
+  var mp={}; (store.respuestasAdmin||[]).forEach(function(r){ mp[r.usuario_id+'|'+r.tri+'.'+r.num]=r.estatus; });
+  var N=mods.length;
+  var filas=al.map(function(a){
+    var ent=0; var cells=mods.map(function(m){ var st=mp[a.id+'|'+m.tri+'.'+m.num]; if(st==='entregado'||st==='retroalimentado') ent++; return st; });
+    return {a:a,cells:cells,ent:ent};
+  });
+  filas.sort(function(x,y){ return x.ent-y.ent || String(x.a.nombre||'').localeCompare(String(y.a.nombre||'')); });
+  var conEntrega=filas.filter(function(f){return f.ent>0;}).length;
+  var totalEnt=filas.reduce(function(s,f){return s+f.ent;},0);
+  var pct=al.length?Math.round(conEntrega/al.length*100):0;
+  var cards='<div class="grid g4" style="margin-bottom:18px">'
+    +'<div class="card"><div class="stat-n">'+al.length+'</div><div class="stat-l">Alumnos activos</div></div>'
+    +'<div class="card"><div class="stat-n">'+conEntrega+'</div><div class="stat-l">Han entregado algo</div></div>'
+    +'<div class="card"><div class="stat-n">'+pct+'%</div><div class="stat-l">Participación</div></div>'
+    +'<div class="card"><div class="stat-n">'+totalEnt+'</div><div class="stat-l">Entregas totales</div></div></div>';
+  function dot(st){
+    if(st==='retroalimentado') return '<span title="Con retroalimentación" style="color:#5bbd77">★</span>';
+    if(st==='entregado') return '<span title="Entregado" style="color:#5bbd77">✓</span>';
+    if(st==='borrador') return '<span title="Borrador sin enviar" style="color:#d6aa5a">~</span>';
+    return '<span title="Sin entregar" style="color:var(--soft)">·</span>';
+  }
+  var th='<th style="text-align:left">Alumno</th>'+mods.map(function(m){return '<th title="'+String(m.titulo||'').replace(/"/g,'')+'">M'+m.num+'</th>';}).join('')+'<th>Entregas</th><th>Águilas</th><th>Grupo</th>';
+  var body=filas.map(function(f){
+    var tds=f.cells.map(function(st){return '<td style="text-align:center;font-size:16px">'+dot(st)+'</td>';}).join('');
+    var col=f.ent===0?'#E9A3A2':(f.ent>=N?'#5bbd77':'var(--cream)');
+    return '<tr><td class="nm">'+up(f.a.nombre)+'</td>'+tds
+      +'<td style="text-align:center;font-weight:700;color:'+col+'">'+f.ent+'/'+N+'</td>'
+      +'<td style="text-align:center">'+(f.a.aguilas||0)+'</td>'
+      +'<td style="font-size:12px;color:var(--dim)">'+(f.a.grupo?up(f.a.grupo):'—')+'</td></tr>';
+  }).join('');
+  return h+cards+'<div class="tbl-wrap"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+body+'</tbody></table></div>'
+    +'<p style="font-size:12px;color:var(--soft);margin-top:10px">Ordenado de menos a más entregas, para ver primero a quién animar.</p>';
+}, after:function(){ if(NAVI&&NAVI.sb){ cargarAlumnos(); if(typeof cargarRespuestasAdmin==='function') cargarRespuestasAdmin(); } }},
 
 drespuestas:{title:'Respuestas', html(){
   var rows=store.respuestasAdmin||[];
@@ -2663,12 +2705,12 @@ async function cargarAlumnos(force){
   if(store._alLoaded && !force) return;
   store._alLoaded=true; store._loadingAl=true; render();
   try{
-    const cols='auth_uid,email,nombre,usuario,folio,telefono,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,felicitacion_enviada,respondio,aguilas,roles(codigo)';
+    const cols='id,auth_uid,email,nombre,usuario,folio,telefono,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,felicitacion_enviada,respondio,aguilas,roles(codigo)';
     let { data, error } = await NAVI.sb.schema('navi').from('usuarios').select(cols).order('folio');
     if(error){
       // Reintento sin la columna felicitacion_enviada (por si aún no se corrió el paso 35)
       const r2 = await NAVI.sb.schema('navi').from('usuarios')
-        .select('auth_uid,email,nombre,usuario,folio,telefono,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,respondio,aguilas,roles(codigo)').order('folio');
+        .select('id,auth_uid,email,nombre,usuario,folio,telefono,estatus,acceso_congreso,activado,grupo,mentor,bienvenida_enviada,respondio,aguilas,roles(codigo)').order('folio');
       if(r2.error) throw r2.error;
       data = r2.data;
     }
