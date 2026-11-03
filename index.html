@@ -163,8 +163,16 @@ a{color:var(--accent)}
   #app.nav-collapsed .sidebar{width:64px;padding:18px 8px}
   #app.nav-collapsed .side-logo{flex-direction:column;gap:12px;justify-content:center;padding:0 0 12px}
   #app.nav-collapsed .side-logo .t{display:none}
-  #app.nav-collapsed #navMenu{display:none}
-  #app.nav-collapsed .side-foot{display:none}
+  #app.nav-collapsed #navMenu{display:flex;flex-direction:column;align-items:center;gap:8px}
+  #app.nav-collapsed .nav-btn{position:relative;width:46px;height:46px;min-height:46px;padding:0;justify-content:center;border-radius:13px;background:var(--card);border-color:var(--line);margin:0}
+  #app.nav-collapsed .nav-btn.active{background:var(--accent-tint);border-color:var(--accent-line)}
+  #app.nav-collapsed .nav-btn .lb{display:none}
+  #app.nav-collapsed .nav-btn .nav-tip{display:block;position:absolute;left:54px;top:50%;transform:translateY(-50%);white-space:nowrap;background:#13233D;border:1px solid var(--line);color:var(--cream);font-size:12.5px;padding:5px 10px;border-radius:8px;opacity:0;pointer-events:none;z-index:60;text-transform:none;letter-spacing:0}
+  #app.nav-collapsed .nav-btn:hover .nav-tip{opacity:1}
+  #app.nav-collapsed .side-foot{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:12px}
+  #app.nav-collapsed .side-foot .user-chip{justify-content:center;gap:0}
+  #app.nav-collapsed .side-foot .user-chip>div{display:none}
+  #app.nav-collapsed .side-foot .logout{display:none}
   #app.nav-collapsed .side-toggle{margin:0}
   #app.nav-collapsed .side-logo .lg{width:100%;height:auto;justify-content:center}
   #app.nav-collapsed .side-logo .lg img{width:100%;max-width:44px;height:auto}
@@ -452,6 +460,42 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
   .topbar{padding:10px 16px}.crumb{display:none}.role-switch{margin-left:0;width:100%}
   .main{padding:20px 16px}
 }
+
+/* ---- Inicio 2 columnas + riel de videos ---- */
+.nav-tip{display:none}
+.io-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:26px;align-items:start}
+.io-top{align-items:stretch}
+.io-bot{margin-top:6px}
+.io-main{min-width:0}
+.io-rail{min-width:0}
+.railwrap{display:flex;flex-direction:column}
+.tallwrap{height:100%}
+.rail-head{display:flex;justify-content:space-between;align-items:center;min-height:20px;margin-bottom:12px}
+.rail-head .rh{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.rail-head .rh-hide{font-size:12px;color:var(--soft);cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:4px 11px;background:transparent}
+.vbcard{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);cursor:pointer;flex:1;display:flex;flex-direction:column;min-height:170px}
+.vbthumb{position:relative;flex:1;min-height:150px;background:radial-gradient(circle at 35% 30%,#27406a,#0f1e39);display:flex;align-items:center;justify-content:center}
+.vbthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vbpin{position:absolute;top:8px;right:8px;z-index:2;background:rgba(10,20,38,.72);border:1px solid var(--accent-line);color:var(--accent-bright);font-size:10.5px;padding:3px 9px;border-radius:999px}
+.vbplay{position:relative;z-index:2;width:56px;height:56px;border-radius:50%;background:rgba(109,45,40,.92);box-shadow:0 6px 20px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.vbplay::after{content:'';width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:17px solid #f2e8d6;margin-left:4px}
+.vbplay.sm{width:34px;height:34px}
+.vbplay.sm::after{border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:12px solid #f2e8d6;margin-left:3px}
+.vbmeta{padding:12px 14px}
+.vbt{font-size:14px;font-weight:700}
+.vbs{font-size:12px;color:var(--soft);margin-top:3px}
+.sugbody{overflow:hidden}
+.railwrap.hid .sugbody{display:none}
+.suglist{display:flex;flex-direction:column;gap:10px}
+.sugc{display:flex;gap:11px;padding:9px;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;transition:border-color .15s}
+.sugc:hover{border-color:var(--accent-line)}
+.sugth{position:relative;width:108px;aspect-ratio:16/9;border-radius:8px;overflow:hidden;flex-shrink:0;background:radial-gradient(circle at 40% 35%,#1b3152,#0b1831);display:flex;align-items:center;justify-content:center}
+.sugth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.suginfo{min-width:0;display:flex;flex-direction:column;justify-content:center}
+.sugt{font-size:12.5px;font-weight:600;line-height:1.25}
+.sugs{font-size:11px;color:var(--soft);margin-top:4px}
+.sugempty{font-size:12px;color:var(--soft);line-height:1.5;border:1px dashed var(--line);border-radius:10px;padding:12px 14px}
+@media(max-width:1040px){ .io-grid{grid-template-columns:1fr} .io-rail{max-width:560px} .tallwrap{height:auto} .vbcard{min-height:200px} }
 </style>
 <style>
 .revista-hero{display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:26px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:22px;background:rgba(255,255,255,.02)}
@@ -1002,7 +1046,7 @@ function applyRole(reset){
 function buildMenu(){
   const nav=document.getElementById('navMenu');
   nav.innerHTML=MENUS[state.role].map(([k,ic,lb])=>
-    `<button class="nav-btn${k===state.view?' active':''}" onclick="nav('${k}')"><span class="ic">${svgIcon(ic)}</span> ${lb}</button>`).join('');
+    `<button class="nav-btn${k===state.view?' active':''}" onclick="nav('${k}')" title="${lb}"><span class="ic">${svgIcon(ic)}</span><span class="lb">${lb}</span><span class="nav-tip">${lb}</span></button>`).join('');
 }
 function nav(v){state.view=v;buildMenu();render();window.scrollTo(0,0);}
 function toggleSidebar(){const app=document.getElementById('app');if(!app)return;const c=app.classList.toggle('nav-collapsed');const b=document.querySelector('.side-toggle');if(b){b.textContent=c?'›':'‹';b.title=c?'Mostrar menú':'Ocultar menú';}}
@@ -1878,18 +1922,46 @@ if (PRELANZAMIENTO) {
       +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
       +'</div></div></details>';
   }
+  window.SUGERIDOS = window.SUGERIDOS || [];
+  function videoBienvenidaRail(){
+    var vid='uDHHxRDmZjM';
+    return '<div class="railwrap tallwrap">'
+      +'<div class="rail-head"><span class="rh">Para ver</span></div>'
+      +'<div class="vbcard" onclick="abrirVideoModal(\''+vid+'\',\'Video de bienvenida\')">'
+      +'<div class="vbthumb"><img src="https://img.youtube.com/vi/'+vid+'/hqdefault.jpg" alt="Video de bienvenida" onerror="this.remove()"><span class="vbpin">Siempre</span><span class="vbplay"></span></div>'
+      +'<div class="vbmeta"><div class="vbt">Video de bienvenida</div><div class="vbs">La visión de Nación Viva</div></div>'
+      +'</div></div>';
+  }
+  function sugeridosRail(){
+    var arr=window.SUGERIDOS||[];
+    var head='<div class="rail-head"><span class="rh">Videos sugeridos</span>'
+      +'<button class="rh-hide" onclick="var w=this.closest(\'.railwrap\');w.classList.toggle(\'hid\');this.textContent=w.classList.contains(\'hid\')?\'Mostrar\':\'Ocultar\'">Ocultar</button></div>';
+    var body = arr.length
+      ? '<div class="suglist">'+arr.map(function(v){
+          var id=ytId(v.yt||v.id||'');
+          var ti=String(v.t||'Video').replace(/[\'"\\]/g,'');
+          return '<div class="sugc" onclick="abrirVideoModal(\''+id+'\',\''+ti+'\')">'
+            +'<div class="sugth"><img src="https://img.youtube.com/vi/'+id+'/mqdefault.jpg" onerror="this.remove()"><span class="vbplay sm"></span></div>'
+            +'<div class="suginfo"><div class="sugt">'+String(v.t||'').replace(/</g,'&lt;')+'</div><div class="sugs">'+String(v.f||'').replace(/</g,'&lt;')+'</div></div></div>';
+        }).join('')+'</div>'
+      : '<div class="sugempty">Pronto agregaremos aquí videos sugeridos en español para profundizar en estos temas.</div>';
+    return '<div class="railwrap">'+head+'<div class="sugbody">'+body+'</div></div>';
+  }
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var premium=esPremium();
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
     var antorcha = (premium && hayRev) ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
     var artsDB='';
-    return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
+    return '<div class="io-grid io-top"><div class="io-main">'
+      +'<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. '+(clasesAbiertas()?'Tus clases ya están disponibles.':'Tu formación está por comenzar.')+'</div></div>'
       +(clasesAbiertas()
          ? heroProxima()
          : lanzamientoBanner())
+      +'</div><aside class="io-rail">'+videoBienvenidaRail()+'</aside></div>'
+      +'<div class="io-grid io-bot"><div class="io-main">'
       +miClaseCard()
       +antorcha + artsDB
       +miProgresoHtml()
@@ -1901,7 +1973,8 @@ if (PRELANZAMIENTO) {
       +'<div class="sec-title">Música · Nación Viva</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Acompaña tu formación con la música de <b>Nación Viva</b>. Escúchala aquí mismo o ábrela en Spotify.</div>'
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
-      +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>';
+      +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>'
+      +'</div><aside class="io-rail">'+sugeridosRail()+'</aside></div>';
   }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
@@ -2389,7 +2462,7 @@ function heroProxima(mod){
   return `<div class="hero glass"><div>
      <div class="lbl">📹 Tu clase de esta quincena</div>
      <div class="tt">Módulo ${m.num} · ${m.titulo}</div>
-     <div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}${m.reunion?' · incluye la reunión mensual (Meet)':''}</div>
+     <div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}</div>
      ${reunionHtml}
    </div><button class="btn btn-accent" onclick="goModule(${m.id})">Ver la clase</button></div>`;
 }
