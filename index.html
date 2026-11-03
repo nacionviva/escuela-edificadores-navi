@@ -499,6 +499,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .suginfo{min-width:0;display:flex;flex-direction:column;justify-content:center}
 .sugt{font-size:12.5px;font-weight:600;line-height:1.25}
 .sugs{font-size:11px;color:var(--soft);margin-top:4px}
+.sugdur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.8);color:#fff;font-size:10px;padding:1px 5px;border-radius:4px;z-index:2}
 .sugempty{font-size:12px;color:var(--soft);line-height:1.5;border:1px dashed var(--line);border-radius:10px;padding:12px 14px}
 @media(max-width:1040px){ .io-grid{grid-template-columns:1fr} .io-rail{max-width:560px} .tallwrap{height:auto} .vbcard{min-height:200px} }
 </style>
@@ -1939,16 +1940,16 @@ if (PRELANZAMIENTO) {
       +'</div></div>';
   }
   function sugeridosRail(){
-    var arr=window.SUGERIDOS||[];
+    var arr=(store.vidDB||[]).filter(function(v){return v.publicado!==false;});
     var head='<div class="rail-head"><span class="rh">Videos sugeridos</span>'
       +'<button class="rh-hide" onclick="var w=this.closest(\'.railwrap\');w.classList.toggle(\'hid\');this.textContent=w.classList.contains(\'hid\')?\'Mostrar\':\'Ocultar\'">Ocultar</button></div>';
     var body = arr.length
       ? '<div class="suglist">'+arr.map(function(v){
-          var id=ytId(v.yt||v.id||'');
-          var ti=String(v.t||'Video').replace(/[\'"\\]/g,'');
+          var id=ytId(v.youtube_id||'');
+          var ti=String(v.titulo||'Video').replace(/[\'"\\]/g,'');
           return '<div class="sugc" onclick="abrirVideoModal(\''+id+'\',\''+ti+'\')">'
-            +'<div class="sugth"><img src="https://img.youtube.com/vi/'+id+'/mqdefault.jpg" onerror="this.remove()"><span class="vbplay sm"></span></div>'
-            +'<div class="suginfo"><div class="sugt">'+String(v.t||'').replace(/</g,'&lt;')+'</div><div class="sugs">'+String(v.f||'').replace(/</g,'&lt;')+'</div></div></div>';
+            +'<div class="sugth"><img src="https://img.youtube.com/vi/'+id+'/mqdefault.jpg" onerror="this.remove()"><span class="vbplay sm"></span>'+(v.duracion?'<span class="sugdur">'+String(v.duracion).replace(/</g,'&lt;')+'</span>':'')+'</div>'
+            +'<div class="suginfo"><div class="sugt">'+String(v.titulo||'').replace(/</g,'&lt;')+'</div><div class="sugs">'+String(v.autor||'').replace(/</g,'&lt;')+'</div></div></div>';
         }).join('')+'</div>'
       : '<div class="sugempty">Pronto agregaremos aquí videos sugeridos en español para profundizar en estos temas.</div>';
     return '<div class="railwrap">'+head+'<div class="sugbody">'+body+'</div></div>';
@@ -2109,7 +2110,7 @@ if (PRELANZAMIENTO) {
     Object.keys(temas).forEach(function(tm){
       out+='<div class="sec-title">'+tm+'</div><div class="vid-grid">'+temas[tm].map(function(v){
         return '<div class="vid-card"><div class="vid-embed"><iframe src="https://www.youtube.com/embed/'+ytId(v.youtube_id)+'" title="'+(v.titulo||'')+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'
-          +'<div class="vid-meta"><div class="vid-t">'+(v.titulo||'')+'</div>'+(v.autor?'<div class="vid-a">'+v.autor+'</div>':'')+(v.nota?'<div class="vid-n">'+v.nota+'</div>':'')+'</div></div>';
+          +'<div class="vid-meta"><div class="vid-t">'+(v.titulo||'')+'</div>'+(v.autor?'<div class="vid-a">'+v.autor+'</div>':'')+(v.duracion?'<div class="vid-a">⏱ '+v.duracion+'</div>':'')+(v.nota?'<div class="vid-n">'+v.nota+'</div>':'')+'</div></div>';
       }).join('')+'</div>';
     });
     return h0+out;
