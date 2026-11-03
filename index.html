@@ -1927,7 +1927,9 @@ if (PRELANZAMIENTO) {
       +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
       +'</div></div></details>';
   }
-  window.SUGERIDOS = window.SUGERIDOS || [];
+  window.SUGERIDOS = window.SUGERIDOS || [
+    {t:'Legalidad y Legitimidad', f:'Ps. Alfredo Seres · Nación Viva', yt:'pWWrB-cWGd8'}
+  ];
   function videoBienvenidaRail(){
     var vid='uDHHxRDmZjM';
     return '<div class="railwrap tallwrap">'
