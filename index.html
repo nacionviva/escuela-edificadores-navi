@@ -823,7 +823,7 @@ const DB = {
   usuarioPorUser:u=>store.usuarios.find(x=>x.usuario===u),
   rubrica:()=>store.rubrica,
   foroDeModulo:id=>store.foro.filter(p=>p.mod===id),
-  foro:()=>store.foro,
+  foro:()=>((NAVI&&NAVI.sb&&store._foroLoaded)?store.foroDB:store.foro),
   avisos:()=>store.avisos,
   donativos:()=>store.donativos,
   grupos:()=>store.grupos,
@@ -844,7 +844,7 @@ const DB = {
    ============================================================ */
 const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod:1, editGrupo:null, showNuevoGrupo:false, editMentor:null, editAviso:null, editArt:null, editMod:null};
 const MENUS = {
-  participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['avance','chart','Mi Avance'],['midonativo','heart','Donativo']],
+  participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['avance','chart','Mi Avance'],['comunidad','chat','Comunidad'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
   director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   superadmin:[['dpanel','grid','Panel'],['davance','chart','Avance'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
@@ -1258,7 +1258,7 @@ comunidad:{title:'Comunidad',html(){
          <div class="msn-input"><textarea id="postText" placeholder="Escribe un mensaje…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();publicar();}"></textarea><button class="zumbido-btn" title="Enviar un zumbido" onclick="zumbido()">⚡</button><button class="btn btn-accent" onclick="publicar()">Enviar</button></div>
        </div>`
    + `</div>`;
-},after(){const f=document.getElementById('feed');if(f)f.scrollTop=f.scrollHeight;}},
+},after(){ if(typeof cargarForo==='function') cargarForo(); const f=document.getElementById('feed');if(f)f.scrollTop=f.scrollHeight;}},
 
 avisos:{title:'Avisos',html(){
   const av=store.avisos.filter(a=>a.publicado);
@@ -2669,7 +2669,20 @@ function bubbleHTML(p){
   return `<div class="bub ${me?'me':''}"><div class="avatar" style="background:${me?'var(--accent)':(p.color||colorFor(p.autor))}">${ini}</div><div class="body"><div class="who">${me?'Tú':p.autor}<span class="tm">${p.cuando}</span></div><div class="tx">${(p.texto||'').replace(/</g,'&lt;')}</div></div></div>`;
 }
 function insEmoji(e){const ta=document.getElementById('postText');if(!ta)return;ta.value+=e;ta.focus();}
-function publicar(){const ta=document.getElementById('postText');const t=(ta.value||'').trim();if(!t)return ta&&ta.focus();store.foro.push({id:Date.now(),mod:1,autor:state.user.nombre,ini:initials(state.user.nombre),cuando:'ahora',texto:t});render();}
+function foroCuando(iso){ try{ var d=new Date(iso); var s=(Date.now()-d.getTime())/1000;
+  if(s<60) return 'ahora'; if(s<3600) return 'hace '+Math.floor(s/60)+' min'; if(s<86400) return 'hace '+Math.floor(s/3600)+' h';
+  var mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return d.getDate()+' '+mes[d.getMonth()]+', '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+}catch(e){ return ''; } }
+async function cargarForo(force){ if(!(NAVI&&NAVI.sb)) return; if(store._foroLoaded&&!force) return; store._foroLoaded=true;
+  try{ const r=await NAVI.sb.schema('navi').rpc('foro_listar'); if(r.error) throw r.error;
+    store.foroDB=(r.data||[]).map(function(x){ return {id:x.id, autor:x.autor||'', ini:initials(x.autor||''), texto:x.texto||'', cuando:foroCuando(x.fecha)}; });
+    render(); var f=document.getElementById('feed'); if(f)f.scrollTop=f.scrollHeight;
+  }catch(e){ store._foroLoaded=false; }
+}
+function publicar(){const ta=document.getElementById('postText');const t=(ta.value||'').trim();if(!t)return ta&&ta.focus();
+  if(NAVI&&NAVI.sb){ ta.value=''; (async function(){ try{ const r=await NAVI.sb.schema('navi').rpc('foro_publicar',{p_texto:t}); if(r.error) throw r.error; store._foroLoaded=false; await cargarForo(true); }catch(e){ ta.value=t; toast('No se pudo enviar: '+String((e&&e.message)||e).slice(0,100)); } })(); return; }
+  store.foro.push({id:Date.now(),mod:1,autor:state.user.nombre,ini:initials(state.user.nombre),cuando:'ahora',texto:t});render();}
 function zumbido(){
   store.foro.push({id:Date.now(),sys:true,texto:'⚡ '+state.user.nombre.split(' ')[0]+' mandó un zumbido a la generación'});
   render();
