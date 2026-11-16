@@ -32,6 +32,7 @@
   --focus-ring:rgba(127,168,214,.55);
   --blue:#6FC7D0;
   --lime:#D1D972;--coral:#FF914D;--red:#E27B6B;--gold:#7FA8D6;
+  --award:#E6B450;--award-bright:#F2CF86;--award-tint:rgba(230,180,80,.13);--award-line:rgba(230,180,80,.40);--award-soft:rgba(230,180,80,.07);
   --glass:rgba(255,255,255,.06);--glassline:rgba(255,255,255,.16);--glasshi:inset 0 1px 0 rgba(255,255,255,.18);
   --ease:cubic-bezier(.22,1,.36,1);--font:'Roundelay',system-ui,-apple-system,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -226,6 +227,42 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .pill-soon{background:rgba(230,18,125,.16);color:#F48FBE;border:1px solid rgba(230,18,125,.36);font-weight:700}
 .pill-info{background:var(--accent-tint);color:var(--accent)}
 .pill-warn{background:rgba(255,145,77,.15);color:var(--coral)}
+/* ===== Acento dorado: recompensas (águilas / niveles) ===== */
+.pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
+.award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
+.stat-n.award{color:var(--award-bright)}
+.award-card .stat-l{color:var(--award)}
+/* ===== Motion: revelado escalonado + barras que crecen ===== */
+@keyframes itemIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes growBar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.view-anim .row,.view-anim .rowcard,.view-anim .eje-acc,.view-anim .cngr-row{animation:itemIn .42s cubic-bezier(.22,.61,.36,1) both}
+.view-anim .row:nth-child(2),.view-anim .rowcard:nth-child(2){animation-delay:.05s}
+.view-anim .row:nth-child(3),.view-anim .rowcard:nth-child(3){animation-delay:.10s}
+.view-anim .row:nth-child(4),.view-anim .rowcard:nth-child(4){animation-delay:.15s}
+.view-anim .row:nth-child(5),.view-anim .rowcard:nth-child(5){animation-delay:.20s}
+.view-anim .row:nth-child(n+6),.view-anim .rowcard:nth-child(n+6){animation-delay:.24s}
+.view-anim .progress-fill{transform-origin:left;animation:growBar .7s cubic-bezier(.22,.61,.36,1) both}
+@keyframes coinPop{0%{transform:scale(.4) rotate(-18deg);opacity:0}60%{transform:scale(1.08) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.view-anim .coin{animation:coinPop .6s cubic-bezier(.22,1,.36,1) both}
+.rc-agu .coin{height:18px;width:18px;flex:none}
+/* ===== Celebración al ganar águilas ===== */
+.agu-cele{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle at 50% 44%,rgba(230,180,80,.16),transparent 62%);animation:celeFade .3s ease both}
+.agu-cele.out{animation:celeFade .42s ease reverse both}
+.agu-cele-box{text-align:center}
+.agu-cele-coin{width:116px;height:116px;filter:drop-shadow(0 14px 32px rgba(0,0,0,.5));animation:coinSpin 1s cubic-bezier(.22,1,.36,1) both}
+.agu-cele-plus{font-family:var(--font);font-size:42px;font-weight:800;color:var(--award-bright);margin-top:8px;text-shadow:0 3px 14px rgba(230,180,80,.4);animation:plusUp .9s cubic-bezier(.22,1,.36,1) both}
+.agu-cele-txt{font-size:15px;color:var(--cream);margin-top:2px;animation:plusUp 1s .05s cubic-bezier(.22,1,.36,1) both}
+@keyframes celeFade{from{opacity:0}to{opacity:1}}
+@keyframes coinSpin{0%{transform:scale(.3) rotateY(-540deg);opacity:0}60%{transform:scale(1.12) rotateY(0);opacity:1}100%{transform:scale(1) rotateY(0)}}
+@keyframes plusUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+/* ===== Skeletons de carga (shimmer) ===== */
+.sk{position:relative;overflow:hidden;background:rgba(238,239,236,.06);border-radius:10px}
+.sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(238,239,236,.10),transparent);animation:skShine 1.35s infinite}
+@keyframes skShine{100%{transform:translateX(100%)}}
+.sk-line{height:12px;border-radius:7px;margin:7px 0}
+.sk-card{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card)}
+.sk-thumb{width:100%;aspect-ratio:16/9;border-radius:12px}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,172px));gap:24px 20px}
 
 /* next session hero */
 .hero{border-radius:20px;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:22px;position:relative;overflow:hidden}
@@ -457,9 +494,17 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 
 @media(max-width:880px){
   #app{flex-direction:column}
-  .sidebar{width:100%;height:auto;position:static;flex-direction:row;align-items:center;overflow-x:auto;padding:12px}
-  .side-logo{border:none;padding:0 10px 0 0;margin:0}.side-logo .t{display:none}.side-foot{display:none}
-  .nav-btn{white-space:nowrap;width:auto;margin:0 2px}
+  .sidebar{width:100%;height:auto;position:sticky;top:0;z-index:40;flex-direction:row;align-items:center;gap:6px;overflow-x:auto;overflow-y:hidden;padding:10px 12px;
+    background:rgba(10,20,38,.92);border-right:none;border-bottom:1px solid var(--line);
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .sidebar::-webkit-scrollbar{display:none}
+  .side-logo{border:none;padding:0 6px 0 2px;margin:0;flex:none}.side-logo .t{display:none}.side-foot{display:none}
+  .side-logo .lg{height:30px}
+  .nav-btn{white-space:nowrap;width:auto;margin:0;min-height:40px;padding:9px 15px;border-radius:999px;scroll-snap-align:start;flex:none;font-size:13.5px}
+  .nav-btn:hover{background:rgba(255,255,255,.08)}
+  .nav-btn.active{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent-bright);font-weight:700}
+  .nav-btn .ic{width:18px;height:18px}
+  .side-toggle{display:none}
   .topbar{padding:10px 16px}.crumb{display:none}.role-switch{margin-left:0;width:100%}
   .main{padding:20px 16px}
 }
@@ -523,8 +568,8 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .rc-form{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 .rc-form .mini-in{max-width:190px}
 .rc-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-.rc-agu{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border-radius:999px;padding:2px 8px}
-.rc-agu b{color:var(--cream);min-width:22px;text-align:center}
+.rc-agu{display:inline-flex;align-items:center;gap:8px;background:var(--award-tint);border:1px solid var(--award-line);border-radius:999px;padding:2px 8px}
+.rc-agu b{color:var(--award-bright);min-width:22px;text-align:center}
 .rc-chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--soft);cursor:pointer;white-space:nowrap}
 .rc-del{border-color:rgba(232,120,120,.45)!important;color:#E9A3A2!important}
 .list-search{width:100%;max-width:420px;margin-bottom:14px;display:block}
@@ -893,6 +938,14 @@ const ICONS={
 };
 function svgIcon(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[n]||'')+'</svg>';}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function celebrarAguilas(delta){
+  try{
+    var ov=document.createElement('div'); ov.className='agu-cele';
+    ov.innerHTML='<div class="agu-cele-box"><img src="assets/aguila-moneda.png" class="agu-cele-coin" alt="" onerror="this.style.display=\'none\'"><div class="agu-cele-plus">+'+delta+'</div><div class="agu-cele-txt">¡Ganaste '+delta+' águila'+(delta===1?'':'s')+'!</div></div>';
+    document.body.appendChild(ov);
+    setTimeout(function(){ ov.classList.add('out'); setTimeout(function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); }, 420); }, 1850);
+  }catch(e){}
+}
 function fmtFecha(d){const dias=['dom','lun','mar','mié','jue','vie','sáb'];const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return dias[d.getDay()]+' '+d.getDate()+' '+mes[d.getMonth()]+' '+d.getFullYear();}
 
 function doEnterWelcome(){
@@ -1709,7 +1762,7 @@ ialumnos:{title:'Alumnos',html(){
             </div>
             <div class="rc-actions">
               <button class="btn btn-sm ${p.acceso_congreso?'':'btn-accent'}" onclick="toggleAcceso('${p.auth_uid}',${p.acceso_congreso?1:0})">${p.acceso_congreso?'Quitar Congreso':'Activar Congreso'}</button>
-              <span class="rc-agu" title="Águilas"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button><b>${p.aguilas||0}</b><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></span>
+              <span class="rc-agu" title="Águilas"><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',-2)">−</button><img src="assets/aguila-moneda.png" class="coin" alt="" onerror="this.style.display='none'"><b>${p.aguilas||0}</b><button class="btn btn-sm" style="min-width:26px;padding:5px 8px" onclick="ajustarAguilas('${p.auth_uid}',2)">＋</button></span>
               ${p.felicitacion_enviada
                 ? `<span class="pill pill-ok" title="Correo de felicitación enviado">✓ Felicitado</span><button class="btn btn-sm" title="Volver a enviar la felicitación" onclick="enviarFelicitacion('${p.auth_uid}',this)">Reenviar</button>`
                 : `<button class="btn btn-sm" title="Enviar correo: Ya eres Edificador NAVI (recuerda su usuario)" onclick="enviarFelicitacion('${p.auth_uid}',this)">✉ Felicitar</button>`}
@@ -1861,8 +1914,12 @@ if (PRELANZAMIENTO) {
       var r1=await NAVI.sb.schema('navi').from('usuarios').select('aguilas,grupo,mentor,foto,acceso_congreso').eq('auth_uid',uid).maybeSingle();
       var r2=await NAVI.sb.schema('navi').from('donativos').select('mes').eq('auth_uid',uid);
       var meses=new Set((r2.data||[]).map(function(d){return String(d.mes).slice(0,7);})).size;
+      var _prevAg=(store.miProgreso&&store.miProgreso.aguilas)||0;
       store.miProgreso={aguilas:(r1.data&&r1.data.aguilas)||0, meses:meses, grupo:(r1.data&&r1.data.grupo)||'', mentor:(r1.data&&r1.data.mentor)||'', foto:(r1.data&&r1.data.foto)||''};
       if(state.user) state.user.acceso_congreso=!!(r1.data&&r1.data.acceso_congreso);
+      var _newAg=store.miProgreso.aguilas;
+      if(store._miProgSeen && _newAg>_prevAg && typeof celebrarAguilas==='function') celebrarAguilas(_newAg-_prevAg);
+      store._miProgSeen=true;
       render();
     }catch(e){ store._miProgLoaded=false; }
   }
@@ -1924,8 +1981,8 @@ if (PRELANZAMIENTO) {
       +'<span style="flex:none;width:38px;height:38px;border-radius:10px;background:rgba(127,168,214,.18);display:flex;align-items:center;justify-content:center;color:var(--accent)">'+svgIcon('layers')+'</span>'
       +'<div><div style="font-size:11.5px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em">Tu grupo</div><div style="font-size:14.5px;color:var(--dim)">'+grupoTxt+'</div></div></div>'
       +'<div class="grid g2" style="margin-bottom:20px">'
-      +'<div class="card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" style="height:48px" onerror="this.style.display=\'none\'"><div><div class="stat-n" style="font-size:32px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver tus clases y participar. ¡Sigue sumando!</div></div>'
-      +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-ok':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
+      +'<div class="card award-card"><div style="display:flex;align-items:center;gap:12px"><img src="assets/aguila-moneda.png" class="coin" style="height:48px" onerror="this.style.display=\'none\'"><div><div class="stat-n award" style="font-size:32px">'+mp.aguilas+'</div><div class="stat-l">Mis águilas'+(niv!=='—'?' · nivel '+niv:'')+'</div></div></div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Ganas águilas al responder preguntas, ver tus clases y participar. ¡Sigue sumando!</div></div>'
+      +'<div class="card"><div class="stat-l" style="margin-bottom:8px">Recompensas por nivel</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+['A·60','B·150','C·300'].map(function(t){var n=parseInt(t.split('·')[1]);var ok=mp.aguilas>=n;return '<span class="pill '+(ok?'pill-award':'pill-wait')+'">'+t+'</span>';}).join('')+'</div><div style="font-size:11.5px;color:var(--soft);margin-top:8px">Al alcanzar cada nivel de águilas eliges un souvenir; se entregan al graduarte.</div></div>'
       +'</div></div></details>';
   }
   window.SUGERIDOS = window.SUGERIDOS || [
@@ -1951,7 +2008,9 @@ if (PRELANZAMIENTO) {
             +'<div class="sugth"><img src="https://img.youtube.com/vi/'+id+'/mqdefault.jpg" onerror="this.remove()"><span class="vbplay sm"></span>'+(v.duracion?'<span class="sugdur">'+String(v.duracion).replace(/</g,'&lt;')+'</span>':'')+'</div>'
             +'<div class="suginfo"><div class="sugt">'+String(v.titulo||'').replace(/</g,'&lt;')+'</div><div class="sugs">'+String(v.autor||'').replace(/</g,'&lt;')+'</div></div></div>';
         }).join('')+'</div>'
-      : '<div class="sugempty">Pronto agregaremos aquí videos sugeridos en español para profundizar en estos temas.</div>';
+      : (store._contLoading
+          ? '<div class="suglist">'+[0,1,2].map(function(){return '<div class="sugc"><div class="sugth sk"></div><div class="suginfo" style="flex:1"><div class="sk sk-line" style="width:82%"></div><div class="sk sk-line" style="width:48%"></div></div></div>';}).join('')+'</div>'
+          : '<div class="sugempty">Pronto agregaremos aquí videos sugeridos en español para profundizar en estos temas.</div>');
     return '<div class="railwrap">'+head+'<div class="sugbody">'+body+'</div></div>';
   }
   VIEWS.inicio = {title:'Inicio', html:function(){
@@ -2046,11 +2105,12 @@ if (PRELANZAMIENTO) {
   window.cargarContenido = async function(force){
     if(!(NAVI&&NAVI.sb)) return;
     if(store._contLoaded && !force) return; store._contLoaded=true;
+    if(!(store.vidDB&&store.vidDB.length)){ store._contLoading=true; render(); }
     try{
       var a=await NAVI.sb.schema('navi').from('articulos').select('*').order('created_at',{ascending:false});
       var v=await NAVI.sb.schema('navi').from('videos').select('*').order('created_at',{ascending:false});
-      store.artDB=a.data||[]; store.vidDB=v.data||[]; render();
-    }catch(e){ store._contLoaded=false; }
+      store._contLoading=false; store.artDB=a.data||[]; store.vidDB=v.data||[]; render();
+    }catch(e){ store._contLoaded=false; store._contLoading=false; }
   };
   function ytId(u){ u=(u||'').trim(); var m=u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{6,})/); return m?m[1]:u; }
   window.artDBListHtml=function(titulo,hideIfEmpty){
@@ -2104,7 +2164,9 @@ if (PRELANZAMIENTO) {
       + candadoAporte('Videos seleccionados','Los videos nuevos y sugeridos de Nación Viva se desbloquean con tu aportación mensual.');
     var vids=(store.vidDB||[]).filter(function(v){return v.publicado!==false;});
     var h0=head('Nación Viva','Videos sugeridos','Una selección de videos, organizados por tema.');
-    if(!vids.length) return h0+'<div class="empty">Muy pronto encontrarás aquí videos seleccionados por tema. Vuelve pronto.</div>';
+    if(!vids.length) return h0+(store._contLoading
+      ? '<div class="vid-grid">'+[0,1,2,3].map(function(){return '<div class="vid-card"><div class="sk sk-thumb" style="border-radius:0"></div><div class="vid-meta"><div class="sk sk-line" style="width:75%"></div><div class="sk sk-line" style="width:40%"></div></div></div>';}).join('')+'</div>'
+      : '<div class="empty">Muy pronto encontrarás aquí videos seleccionados por tema. Vuelve pronto.</div>');
     var temas={}; vids.forEach(function(v){ var k=v.tema||'General'; (temas[k]=temas[k]||[]).push(v); });
     var out='';
     Object.keys(temas).forEach(function(tm){
