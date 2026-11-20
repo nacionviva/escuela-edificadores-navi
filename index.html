@@ -231,6 +231,35 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .pill-info{background:var(--accent-tint);color:var(--accent)}
 .pill-warn{background:rgba(255,145,77,.15);color:var(--coral)}
 /* ===== Acento dorado: recompensas (águilas / niveles) ===== */
+.mg-card{margin:0 0 18px;padding:22px 22px 18px}
+.mg-card.is-live{border-color:var(--award-line);background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))}
+.mg-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.mg-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--award)}
+.mg-title{font-size:22px;font-weight:800;color:var(--cream);margin-top:2px;line-height:1.15}
+.mg-ments{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+.mg-lab{font-size:12px;color:var(--soft);margin-right:2px}
+.mg-chip{font-size:12.5px;font-weight:600;color:var(--accent-bright);background:var(--accent-tint);border:1px solid var(--accent-line);border-radius:999px;padding:3px 10px}
+.mg-when{margin-top:16px;font-size:15px;font-weight:700;color:var(--cream)}
+.mg-cd{margin-top:10px}
+.mg-go{margin-top:16px;display:inline-flex;text-decoration:none!important}
+.mg-note{font-size:12.5px;color:var(--soft);margin-top:10px;line-height:1.55}
+.mg-live{margin-top:16px;display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:var(--award-bright)}
+.mg-dot{width:10px;height:10px;border-radius:50%;background:#8FD694;box-shadow:0 0 0 0 rgba(143,214,148,.6);animation:mgPulse 1.6s infinite}
+@keyframes mgPulse{0%{box-shadow:0 0 0 0 rgba(143,214,148,.55)}70%{box-shadow:0 0 0 10px rgba(143,214,148,0)}100%{box-shadow:0 0 0 0 rgba(143,214,148,0)}}
+.mg-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);cursor:pointer}
+.mg-faces{display:flex;align-items:center}.mg-faces .mg-av{margin-left:-8px;border:2px solid #0E1B33}.mg-faces .mg-av:first-child{margin-left:0}
+.mg-av{border-radius:50%;object-fit:cover;flex:none;display:inline-flex;align-items:center;justify-content:center}
+.mg-ini{background:var(--accent-tint);color:var(--accent-bright);font-weight:700;border:1px solid var(--accent-line)}
+.mg-more{width:34px;height:34px;font-size:11px}
+.mg-link{font-size:13px;font-weight:700;color:var(--accent-bright)}
+.mg-foot:hover .mg-link{color:var(--cream)}
+.mg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.mg-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--glassline);border-radius:14px;background:rgba(255,255,255,.03)}
+.mg-row.is-me{border-color:var(--award-line);background:var(--award-soft)}
+.mg-rn{font-size:14px;color:var(--cream);line-height:1.3;flex:1;min-width:0}
+.mg-tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:999px;background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);vertical-align:1px}
+.mg-tag-m{background:var(--accent-tint);color:var(--accent-bright);border-color:var(--accent-line)}
+@media(max-width:560px){.mg-card{padding:18px 16px 14px}.mg-go{display:flex;justify-content:center;width:100%}.mg-grid{grid-template-columns:1fr}}
 .pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
 .award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
 .stat-n.award{color:var(--award-bright)}
@@ -763,7 +792,7 @@ const store = {
     {id:2,tri:1,num:2,titulo:'Propósito y límites del gobierno civil',pf:'¿Para qué existe el gobierno civil ante Dios y qué cosas no debe pretender hacer?',fecha:iso(2026,10,1),prof:'Mtro. José Pablo Sánchez'},
     {id:3,tri:1,num:3,titulo:'Corrupción y Estado de Derecho',pf:'¿Por qué la corrupción es más que una falla administrativa o de eficiencia?',fecha:iso(2026,10,15),prof:'Mtro. José Pablo Sánchez'},
     {id:4,tri:1,num:4,titulo:'Secularismo, Estado secular y libertad religiosa',pf:'¿Cómo debe servir un cristiano en un Estado secular sin privatizar su fe?',fecha:iso(2026,10,29),prof:'Mtro. José Pablo Sánchez'},
-    {id:5,tri:1,num:5,titulo:'Función pública como vocación',pf:'¿Qué carácter, criterio y hábitos necesita el cristiano que sirve dentro del Estado?',fecha:iso(2026,11,12),prof:'Yishmael Parady'},
+    {id:5,tri:1,num:5,titulo:'¿Qué es NAVI? Parte 1',pf:'¿Qué entendemos por vida pública y servicio público, y qué carácter necesita el cristiano para servir en ellos?',fecha:iso(2026,11,20,0),prof:'Rab Yishmael'},
     {id:6,tri:2,num:1,titulo:'El propósito general de la educación',pf:'¿Qué significa educar a una persona y no solo transmitirle información?',fecha:iso(2027,1,7),prof:''},
     {id:7,tri:2,num:2,titulo:'Educación y formación moral del ciudadano',pf:'¿Qué tipo de ciudadano forma una educación que nunca es moralmente neutral?',fecha:iso(2027,1,21),prof:''},
     {id:8,tri:2,num:3,titulo:'Autoridades formativas: familia, Iglesia, escuela, Estado y cultura digital',pf:'¿Qué funciones formativas corresponden a cada autoridad y cuáles son sus límites?',fecha:iso(2027,2,4),prof:''},
@@ -1236,26 +1265,79 @@ function videoBienvenidaCard(){
    +'<div style="color:rgba(242,232,214,.82);font-size:13px;margin-top:2px">Toca para ver el video de bienvenida</div></div>'
    +'</div></div>';
 }
-function miClaseCard(){
-  var u=state.user||{}; if(state.role!=='participante') return '';
-  var gname=(u.grupo||'')||((store.miProgreso&&store.miProgreso.grupo)||'');
-  var g=(store.naviGrupos||[]).find(function(x){return x.nombre===gname;});
-  if(!g) return '';
-  var horario=(g.dia||'')+((g.dia&&g.hora)?' · ':'')+(g.hora||'');
-  var link=g.link_clase||'';
-  var emb=g.en_vivo?ytEmbed(link):'';
-  var top='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><div class="sec-title" style="margin:0">Mi clase en vivo · '+up(g.nombre)+'</div>'+(g.en_vivo?'<span class="pill pill-ok">● EN VIVO</span>':(horario?'<span class="pill pill-info">'+horario+'</span>':''))+'</div>';
-  var body;
-  if(emb){
-    body='<div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden"><iframe src="'+emb+'" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>'
-      +(link?'<a class="btn btn-sm" style="margin-top:10px" href="'+link.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a>':'');
-  } else if(link){
-    body='<div style="font-size:13px;color:var(--soft);margin-bottom:12px">'+(g.en_vivo?'Tu clase se está transmitiendo ahora.':'Aquí entrarás a tu clase'+(horario?(' ('+horario+')'):'')+'.')+'</div><a class="btn btn-solid btn-lg" href="'+link.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">Entrar a mi clase →</a>';
-  } else {
-    body='<div style="font-size:13px;color:var(--soft)">Tu mentor publicará aquí el enlace de la clase'+(horario?(' ('+horario+')'):'')+'.</div>';
-  }
-  return '<div class="card" style="margin:0 0 18px;border-color:'+(g.en_vivo?'var(--accent-line)':'var(--glassline)')+';background:'+(g.en_vivo?'var(--accent-tint)':'transparent')+'">'+top+body+'</div>';
+/* ===== Mi grupo: compañeros, mentores, reunión en vivo con contador ===== */
+function _norm(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim(); }
+function _esc(x){ return (x==null?'':String(x)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function _ini(n){ var p=nombreBonito(n).split(' ').filter(Boolean); return ((p[0]||'')[0]||'')+((p[1]||'')[0]||''); }
+async function cargarMiGrupo(force){
+  if(!(NAVI&&NAVI.sb)||state.role!=='participante') return;
+  if(store._mgLoaded && !force) return; store._mgLoaded=true;
+  try{ var r=await NAVI.sb.schema('navi').rpc('mi_grupo'); if(r.error) throw r.error; store.miGrupo=r.data||null; }
+  catch(e){ store._mgLoaded=false; store.miGrupo=null; }
+  render();
 }
+window.cargarMiGrupo=cargarMiGrupo;
+function grupoData(){
+  var g=store.miGrupo; if(g&&g.grupo) return g;
+  var u=state.user||{}; var gname=(u.grupo||'')||((store.miProgreso&&store.miProgreso.grupo)||'');
+  var n=(store.naviGrupos||[]).find(function(x){return x.nombre===gname;}); if(!n) return null;
+  return {grupo:n.nombre,mentor:n.mentor,link:n.link_clase,proxima:n.proxima_clase,dia:n.dia,hora:n.hora,en_vivo:n.en_vivo,miembros:null};
+}
+function mentoresDe(g){ return String((g&&g.mentor)||'').split(/\s+y\s+|,\s*/).map(function(x){return x.trim();}).filter(Boolean); }
+function esMentorNombre(nombre,ments){ var n=_norm(nombre); return ments.some(function(m){ var w=_norm(m).split(' '); if(w.length<2) return false; var nn=' '+n+' '; return nn.indexOf(' '+w[0]+' ')>-1 && nn.indexOf(' '+w[w.length-1]+' ')>-1; }); }
+function estadoReunion(g){
+  var t=g&&g.proxima?new Date(g.proxima).getTime():NaN; if(isNaN(t)) return {fase:'sin'};
+  var now=Date.now();
+  if(g.en_vivo || (now>=t-15*60000 && now<t+120*60000)) return {fase:'vivo',t:t};
+  if(now<t) return {fase:'antes',t:t};
+  return {fase:'paso',t:t};
+}
+function fechaLarga(t){ try{ var d=new Date(t); var s=d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',timeZone:'America/Mexico_City'}); var h=d.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/Mexico_City'}).replace(/\s?a\.?\s?m\.?/i,' am').replace(/\s?p\.?\s?m\.?/i,' pm'); s=s.replace(',',''); return s.charAt(0).toUpperCase()+s.slice(1)+' · '+h+' (hora de CDMX)'; }catch(e){ return ''; } }
+function avatarMg(m,big){ var sz=big?46:34; return m.foto?'<img class="mg-av" style="width:'+sz+'px;height:'+sz+'px" src="'+_esc(m.foto)+'" alt="">':'<span class="mg-av mg-ini" style="width:'+sz+'px;height:'+sz+'px;font-size:'+(big?15:12)+'px">'+_esc(_ini(m.nombre))+'</span>'; }
+function reunionGrupoBlock(g){
+  var st=estadoReunion(g), link=g.link||'';
+  var btn=function(cls,txt){ return link?'<a class="btn '+cls+' btn-lg mg-go" href="'+_esc(link)+'" target="_blank" rel="noopener">'+txt+'</a>':'<div class="mg-note">Tu mentor publicará aquí el enlace de la reunión.</div>'; };
+  if(st.fase==='vivo') return '<div class="mg-live"><span class="mg-dot"></span>La reunión de tu grupo está por comenzar o ya comenzó</div>'+btn('btn-solid','Entrar ahora a la reunión en vivo →');
+  if(st.fase==='antes') return '<div class="mg-when">'+fechaLarga(st.t)+' · Google Meet</div>'
+     +'<div class="countdown mg-cd" data-t="'+st.t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>'
+     +btn('btn-accent','Entrar a la reunión de mi grupo →')+'<div class="mg-note">El botón te lleva a la sala de Google Meet de tu grupo. Te recomendamos entrar 5 minutos antes.</div>';
+  if(st.fase==='paso') return '<div class="mg-note">La última reunión fue el '+fechaLarga(st.t)+'. Te avisaremos aquí la próxima fecha.</div>';
+  return (g.dia||g.hora)?'<div class="mg-when">'+_esc([g.dia,g.hora].filter(Boolean).join(' · '))+'</div>'+btn('btn-accent','Entrar a la reunión de mi grupo →'):'<div class="mg-note">Pronto publicaremos aquí la fecha de tu próxima reunión en vivo.</div>';
+}
+function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus mentores</span>'+ms.map(function(m){return '<span class="mg-chip">'+_esc(m)+'</span>';}).join('')+'</div>'; }
+function miClaseCard(enVista){
+  if(state.role!=='participante') return '';
+  var g=grupoData(); if(!g) return '';
+  var st=estadoReunion(g);
+  var mem=(g.miembros||[]); var ments=mentoresDe(g);
+  var faces=mem.slice(0,8).map(function(m){return avatarMg(m,false);}).join('')+(mem.length>8?'<span class="mg-av mg-ini mg-more">+'+(mem.length-8)+'</span>':'');
+  return '<div class="card mg-card'+(st.fase==='vivo'?' is-live':'')+'">'
+    +'<div class="mg-top"><div><div class="mg-eyebrow">Mi grupo</div><div class="mg-title">'+_esc(g.grupo)+'</div></div>'
+    +(st.fase==='vivo'?'<span class="pill pill-ok">● EN VIVO</span>':(st.fase==='antes'?'<span class="pill pill-award">Reunión en vivo</span>':''))+'</div>'
+    +mentoresChips(g)
+    +reunionGrupoBlock(g)
+    +(mem.length&&!enVista?'<div class="mg-foot" onclick="nav(\'migrupo\')"><div class="mg-faces">'+faces+'</div><span class="mg-link">Ver a mis '+(mem.length-1)+' compañeros →</span></div>':'')
+    +'</div>';
+}
+function miGrupoVista(){
+  var g=grupoData();
+  if(!g) return '<div class="card"><div class="mg-note">Aún no tienes grupo asignado. En cuanto te asignemos uno, aquí verás a tus compañeros y a tus mentores.</div></div>';
+  var mem=(g.miembros||[]); var ments=mentoresDe(g);
+  var lista=mem.length?mem.map(function(m){ var men=esMentorNombre(m.nombre,ments);
+      return '<div class="mg-row'+(m.yo?' is-me':'')+'">'+avatarMg(m,true)+'<div class="mg-rn">'+_esc(nombreBonito(m.nombre))+(m.yo?' <span class="mg-tag">Tú</span>':'')+(men?' <span class="mg-tag mg-tag-m">Mentor</span>':'')+'</div></div>'; }).join('')
+    :(store._mgLoaded?'<div class="mg-note">No pudimos cargar la lista de tu grupo. Intenta de nuevo en un momento.</div>':'<div class="mg-grid">'+[0,1,2,3,4,5].map(function(){return '<div class="mg-row"><span class="mg-av sk" style="width:46px;height:46px"></span><div class="sk sk-line" style="width:60%"></div></div>';}).join('')+'</div>');
+  return miClaseCard(true)
+    +'<div class="sec-title">Integrantes del '+_esc(g.grupo)+(mem.length?' · '+mem.length:'')+'</div>'
+    +(mem.length?'<div class="mg-grid">'+lista+'</div>':lista);
+}
+function tickGrupo(){
+  var els=document.querySelectorAll('.mg-cd'); if(!els.length) return;
+  els.forEach(function(el){ var diff=+el.dataset.t-15*60000-Date.now();
+    if(diff<=0){ if(!el.dataset.done){ el.dataset.done=1; render(); } return; }
+    var s=Math.floor((diff+15*60000)/1000), v={d:Math.floor(s/86400),h:Math.floor(s%86400/3600),m:Math.floor(s%3600/60),s:s%60};
+    el.querySelectorAll('[data-u]').forEach(function(n){ n.textContent=String(v[n.dataset.u]).padStart(2,'0'); }); });
+}
+setInterval(tickGrupo,1000);
 
 const VIEWS = {
 
@@ -1921,6 +2003,7 @@ if (PRELANZAMIENTO) {
   MENUS.participante = [
     ['inicio','home','Inicio'],
     ['clases','book','Mis Clases'],
+    ['migrupo','users','Mi grupo'],
     ['congreso','cap','Congreso'],
     ['revista','news','Revista'],
     ['avisos','mega','Avisos'],
@@ -1933,7 +2016,7 @@ if (PRELANZAMIENTO) {
     {cf:'Los mecanismos que conforman una Nación Viva', nm:'Dr. Natividad Ramos', yt:'8sG-2wC3gZU', ph:'data:image/jpeg;base64,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'}
   ];
   // Temas ya cubiertos (con maestro confirmado). Los demás se muestran como "Próximamente".
-  var REVELADOS={1:{1:'Mtro. José Pablo Sánchez',2:'Mtro. José Pablo Sánchez',3:'Mtro. José Pablo Sánchez',4:'Mtro. José Pablo Sánchez',5:'Yishmael Parady'}};
+  var REVELADOS={1:{1:'Mtro. José Pablo Sánchez',2:'Mtro. José Pablo Sánchez',3:'Mtro. José Pablo Sánchez',4:'Mtro. José Pablo Sánchez',5:'Rab Yishmael'}};
   function ejesPL(extra){
     var MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
     function fd(d){ try{ var x=(d instanceof Date)?d:new Date(d); if(isNaN(x)) return ''; return x.getDate()+' '+MES[x.getMonth()]+' '+x.getFullYear(); }catch(e){ return ''; } }
@@ -2099,7 +2182,10 @@ if (PRELANZAMIENTO) {
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
       +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>'
       +'</div><aside class="io-rail">'+sugeridosRail()+'</aside></div>';
-  }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
+  }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); if(typeof cargarMiGrupo==='function') cargarMiGrupo(); }};
+  VIEWS.migrupo = {title:'Mi grupo', html:function(){
+    return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus mentores y el acceso a la reunión en vivo de tu grupo.')+miGrupoVista();
+  }, after:function(){ cargarMiGrupo(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
       + ejesPL(true);
@@ -2577,8 +2663,10 @@ function heroProxima(mod){
     .map(function(x){var d=new Date(x.reunionFecha);d.setHours(19,0,0,0);return d;})
     .filter(function(d){return d.getTime()>_now;}).sort(function(a,b){return a-b;});
   var _nm=_meets[0]||null;
+  var _gp=(typeof grupoData==='function')?grupoData():null; var _gpt=_gp&&_gp.proxima?new Date(_gp.proxima):null;
+  if(_gpt && !isNaN(_gpt) && _gpt.getTime()>_now-2*3600000) _nm=_gpt;
   window.__cdTarget=_nm?_nm.getTime():0;
-  var _cerca=_nm?(_nm.getTime()-_now<=7*86400000):false;
+  var _cerca=(_nm&&!_gpt)?(_nm.getTime()-_now<=7*86400000):false;
   var reunionHtml='';
   if(_nm && _cerca){
     reunionHtml='<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div>'
@@ -3107,7 +3195,7 @@ async function cargarGrupos(force){
   if(store._grpLoaded && !force) return;
   store._grpLoaded=true;
   try{
-    let { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor,dia,hora,link_clase,en_vivo').order('nombre');
+    let { data, error } = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor,dia,hora,link_clase,en_vivo,proxima_clase').order('nombre');
     if(error){
       // Reintento sin las columnas del paso 28 (por si aún no se corrió)
       const r2 = await NAVI.sb.schema('navi').from('grupos').select('id,nombre,mentor').order('nombre');
@@ -3125,20 +3213,24 @@ function claseGrupoBlock(gr){
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">'
     +'<div style="flex:1;min-width:90px"><label style="font-size:11px;color:var(--soft);display:block;margin-bottom:3px">Día</label><input id="gd_'+gr.id+'" class="mini-in" style="width:100%" value="'+(gr.dia||'').replace(/"/g,'&quot;')+'" placeholder="Martes"></div>'
     +'<div style="flex:1;min-width:80px"><label style="font-size:11px;color:var(--soft);display:block;margin-bottom:3px">Hora</label><input id="gh_'+gr.id+'" class="mini-in" style="width:100%" value="'+(gr.hora||'').replace(/"/g,'&quot;')+'" placeholder="7:00 pm"></div>'
-    +'<div style="flex:2;min-width:180px"><label style="font-size:11px;color:var(--soft);display:block;margin-bottom:3px">Enlace de la clase (Zoom o YouTube)</label><input id="gl_'+gr.id+'" class="mini-in" style="width:100%" value="'+(gr.link_clase||'').replace(/"/g,'&quot;')+'" placeholder="https://..."></div>'
+    +'<div style="flex:1.4;min-width:170px"><label style="font-size:11px;color:var(--soft);display:block;margin-bottom:3px">Fecha y hora (contador)</label><input type="datetime-local" id="gt_'+gr.id+'" class="mini-in" style="width:100%" value="'+dtLocalCDMX(gr.proxima_clase)+'"></div>'
+    +'<div style="flex:2;min-width:180px"><label style="font-size:11px;color:var(--soft);display:block;margin-bottom:3px">Enlace de la reunión (Meet, Zoom o YouTube)</label><input id="gl_'+gr.id+'" class="mini-in" style="width:100%" value="'+(gr.link_clase||'').replace(/"/g,'&quot;')+'" placeholder="https://..."></div>'
     +'<button class="btn btn-sm btn-accent" onclick="guardarClaseGrupo(\''+gr.id+'\')">Guardar clase</button>'
     +'<button class="btn btn-sm '+(env?'btn-solid':'')+'" onclick="toggleEnVivo(\''+gr.id+'\','+(env?1:0)+')">'+(env?'● En vivo ahora':'Marcar en vivo')+'</button>'
     +'</div></div>';
 }
+function dtLocalCDMX(v){ if(!v) return ''; try{ var d=new Date(new Date(v).getTime()-6*3600000); return d.toISOString().slice(0,16); }catch(e){ return ''; } }
 async function guardarClaseGrupo(id){
   if(!(NAVI&&NAVI.sb)){ toast('Inicia sesión como administrador.'); return; }
   const d=(document.getElementById('gd_'+id)||{}).value||'';
   const h=(document.getElementById('gh_'+id)||{}).value||'';
   const l=(document.getElementById('gl_'+id)||{}).value||'';
+  const t=(document.getElementById('gt_'+id)||{}).value||'';
+  const prox=t?(t.length===16?t+':00':t)+'-06:00':null;
   try{
-    const { error } = await NAVI.sb.schema('navi').from('grupos').update({dia:d.trim()||null,hora:h.trim()||null,link_clase:l.trim()||null}).eq('id',id);
+    const { error } = await NAVI.sb.schema('navi').from('grupos').update({dia:d.trim()||null,hora:h.trim()||null,link_clase:l.trim()||null,proxima_clase:prox}).eq('id',id);
     if(error) throw error;
-    const gr=(store.naviGrupos||[]).find(x=>x.id===id); if(gr){ gr.dia=d.trim(); gr.hora=h.trim(); gr.link_clase=l.trim(); }
+    const gr=(store.naviGrupos||[]).find(x=>x.id===id); if(gr){ gr.dia=d.trim(); gr.hora=h.trim(); gr.link_clase=l.trim(); gr.proxima_clase=prox; }
     toast('Clase del grupo guardada'); render();
   }catch(e){ toast('No se pudo guardar (¿corriste el paso 28?).'); }
 }
@@ -3586,5 +3678,24 @@ setInterval(tick,1000);
   }catch(e){ /* flujo normal de bienvenida/login */ }
 })();
 </script>
+<!-- ===== Navidad 2026: Estrella de Belén + luces (se quita sola el 7 de enero) ===== -->
+<script>(function(){
+  if(Date.now()>=new Date(2027,0,7,0,0,0).getTime()) return;
+  var st=document.createElement('style'); st.textContent="\n#navidad{position:fixed;inset:0;pointer-events:none;z-index:60}\n#navidad .luces{position:absolute;left:0;right:0;top:0;height:30px;overflow:visible}\n#navidad .luces svg{width:100%;height:30px;display:block;overflow:visible}\nbody.nv-on .topbar{padding-top:26px}body.nv-on .side-logo{padding-top:22px}\n#navidad .foco{animation:nvBlink 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}\n@keyframes nvBlink{0%,100%{opacity:1}50%{opacity:.35}}\n#navidad .estrella{position:absolute;right:34px;top:34px;width:74px;height:74px}\n#navidad .estrella .halo{position:absolute;inset:-34px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,180,.55) 0%,rgba(242,207,134,.22) 30%,rgba(242,207,134,0) 66%);animation:nvHalo 3.6s ease-in-out infinite}\n#navidad .estrella svg{position:relative;width:100%;height:100%;filter:drop-shadow(0 0 10px rgba(255,226,150,.85));animation:nvStar 3.6s ease-in-out infinite;transform-origin:50% 50%}\n#navidad .chispa{position:absolute;width:6px;height:6px;border-radius:50%;background:#FFF6DC;box-shadow:0 0 8px 2px rgba(255,236,180,.9);opacity:0;animation:nvSpark 3.6s ease-in-out infinite}\n#navidad .cola{position:absolute;right:62px;top:98px;width:18px;height:90px;background:radial-gradient(50% 100% at 50% 0%,rgba(255,236,180,.38),rgba(255,236,180,0) 100%);filter:blur(2px);animation:nvHalo 3.6s ease-in-out infinite}\n@keyframes nvStar{0%,100%{transform:scale(1) rotate(0deg);opacity:.95}50%{transform:scale(1.09) rotate(4deg);opacity:1}}\n@keyframes nvHalo{0%,100%{transform:scale(.9);opacity:.75}50%{transform:scale(1.12);opacity:1}}\n@keyframes nvSpark{0%,60%,100%{opacity:0;transform:scale(.4)}70%{opacity:1;transform:scale(1)}85%{opacity:0;transform:scale(.3)}}\n#navidad .verso{position:absolute;right:122px;top:52px;text-align:right;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:13px;line-height:1.35;color:rgba(242,207,134,.92);text-shadow:0 1px 8px rgba(0,0,0,.5)}\n#navidad .verso small{display:block;font-style:normal;font-family:inherit;font-size:10.5px;letter-spacing:.14em;color:rgba(238,239,236,.55);margin-top:3px}\n@media(max-width:880px){#navidad .estrella{right:16px;top:96px;width:40px;height:40px}#navidad .estrella .halo{inset:-18px}#navidad .cola{display:none}#navidad .verso{display:none}body.nv-on .topbar{padding-top:24px}}\n@media(prefers-reduced-motion:reduce){#navidad *{animation:none!important}}\n"; document.head.appendChild(st);
+  var w=document.createElement('div'); w.innerHTML="<div id=\"navidad\" aria-hidden=\"true\"><div class=\"luces\"></div><div class=\"cola\"></div><div class=\"estrella\"><div class=\"halo\"></div><svg viewBox=\"0 0 100 100\"><defs><radialGradient id=\"nvG\" cx=\"50%\" cy=\"46%\" r=\"55%\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".35\" stop-color=\"#FFF1C9\"/><stop offset=\"1\" stop-color=\"#E6B450\"/></radialGradient></defs><polygon points=\"50.0,10.0 52.5,44.0 62.0,38.0 56.0,47.5 84.0,50.0 56.0,52.5 62.0,62.0 52.5,56.0 50.0,96.0 47.5,56.0 38.0,62.0 44.0,52.5 16.0,50.0 44.0,47.5 38.0,38.0 47.5,44.0\" fill=\"url(#nvG)\" stroke=\"#FFF6DC\" stroke-width=\".6\" stroke-linejoin=\"round\"/><circle cx=\"50\" cy=\"50\" r=\"4.2\" fill=\"#FFFFFF\"/></svg><span class=\"chispa\" style=\"left:-18%;top:10%;animation-delay:0s\"></span><span class=\"chispa\" style=\"left:108%;top:24%;animation-delay:1.2s\"></span><span class=\"chispa\" style=\"left:84%;top:104%;animation-delay:2.3s\"></span><span class=\"chispa\" style=\"left:4%;top:92%;animation-delay:0.6s\"></span></div><div class=\"verso\">\u00abVimos su estrella y venimos a adorarle\u00bb<small>MATEO 2:2</small></div></div>\n"; document.body.appendChild(w.firstChild);
+(function(){
+  var C=["#F2CF86", "#FFF3D6", "#E6B450", "#FFE7A8"]; var host=document.querySelector('#navidad .luces'); if(!host) return;
+  function draw(){
+    var W=window.innerWidth, step=W<600?42:58, n=Math.ceil(W/step)+1, d='M0 2', b='';
+    for(var i=0;i<n;i++){ var x0=i*step, x1=x0+step, xm=x0+step/2; d+=' Q'+xm+' 18 '+x1+' 2';
+      var bx=xm, by=10, c=C[i%C.length], dl=((i*37)%28)/10;
+      b+='<g class="foco" style="animation-delay:'+dl+'s"><rect x="'+(bx-2.2)+'" y="'+(by-1)+'" width="4.4" height="3.6" rx="1" fill="#2B3550"/>'
+        +'<ellipse cx="'+bx+'" cy="'+(by+7.6)+'" rx="3.6" ry="5.6" fill="'+c+'" style="filter:drop-shadow(0 0 6px '+c+')"/>'
+        +'<ellipse cx="'+(bx-1.4)+'" cy="'+(by+5.6)+'" rx=".9" ry="1.8" fill="#fff" opacity=".7"/></g>'; }
+    host.innerHTML='<svg viewBox="0 0 '+W+' 30" preserveAspectRatio="none"><path d="'+d+'" fill="none" stroke="#1E2A44" stroke-width="1.6"/>'+b+'</svg>';
+  }
+  document.body.classList.add('nv-on'); draw(); var t; window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(draw,150);});
+})();
+})();</script>
 </body>
 </html>
