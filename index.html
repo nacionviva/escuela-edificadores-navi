@@ -260,6 +260,38 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .mg-tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:999px;background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);vertical-align:1px}
 .mg-tag-m{background:var(--accent-tint);color:var(--accent-bright);border-color:var(--accent-line)}
 @media(max-width:560px){.mg-card{padding:18px 16px 14px}.mg-go{display:flex;justify-content:center;width:100%}.mg-grid{grid-template-columns:1fr}}
+.duo>.hero.has-thumb{justify-content:flex-start;align-items:stretch}
+.hero-thumb{position:relative;width:100%;aspect-ratio:2.25/1;border-radius:14px;overflow:hidden;cursor:pointer;background:#0A1426;border:1px solid var(--glassline)}
+.hero-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease}
+.hero-thumb:hover img{transform:scale(1.03)}
+.hero-thumb .vbplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.duo>.hero.has-thumb .btn{align-self:flex-start;margin-top:auto}
+.duo>.hero.has-thumb .hero-thumb{flex:1 1 auto;aspect-ratio:auto;min-height:170px}
+.duo>.hero.has-thumb .btn{margin-top:0}
+@media(max-width:1100px){.duo>.hero.has-thumb .hero-thumb{flex:none;aspect-ratio:16/9;min-height:0}}
+.duo>.mg-card{display:flex;flex-direction:column}.duo>.mg-card .mg-foot{margin-top:auto}
+.duo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--gap-sec,20px);align-items:stretch}
+.duo>*{margin:0!important;min-width:0}
+.duo>.hero{flex-direction:column;align-items:flex-start;justify-content:center}
+.duo>.hero .btn{margin-top:4px}
+.io-antorcha{display:flex;flex-direction:column}
+.io-antorcha>.carousel{margin:0!important}
+@media(min-width:1041px){.io-top .vbcard{min-height:0}.io-top .vbthumb{min-height:0}}
+.io-top .io-rail{display:flex;flex-direction:column}.io-top .io-rail>.railwrap{flex:1}
+.io-bot .io-rail>.railwrap{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:16px 18px}
+.io-bot .io-rail>.railwrap.hid{padding-bottom:16px}
+.io-bot .io-rail>.railwrap .rail-head{margin-bottom:12px}
+@media(max-width:1100px){.duo{grid-template-columns:1fr}}
+.cg-card{padding:20px}
+.cg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.cg-head img{height:64px;width:auto;display:block}
+.cg-sub{font-size:12.5px;color:var(--soft);letter-spacing:.04em}
+.cg-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;cursor:pointer}
+.cg-ph{padding-top:68%;border-radius:12px;background:#0A1426 center/cover no-repeat;border:1px solid var(--glassline);transition:transform .25s ease,filter .25s ease;filter:saturate(.95)}
+.cg-strip:hover .cg-ph{filter:saturate(1.05)}.cg-ph:hover{transform:translateY(-2px)}
+.cg-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:14px}
+.cg-txt{font-size:13.5px;color:var(--dim);flex:1;min-width:200px}
+@media(max-width:560px){.cg-strip{grid-template-columns:repeat(2,1fr)}}
 .pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
 .award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
 .stat-n.award{color:var(--award-bright)}
@@ -1217,7 +1249,14 @@ function renderNow(){
   const crumb=document.getElementById('crumb');
   const V=VIEWS[state.view];
   if(crumb){ var _cb='<b>'+ROLE_LABEL[state.role]+'</b> \u00b7 '+(V?V.title:state.view); if(state.role==='participante'&&state.user){ var _u=state.user; _cb+='<span class="crumb-id">'+(typeof nombreBonito==='function'?nombreBonito(_u.nombre):(_u.nombre||''))+(_u.causa?(' \u00b7 Causa: '+_u.causa):'')+' \u00b7 Generaci\u00f3n 2026\u20132027</span>'; } crumb.innerHTML=_cb; }
-  if(m){ m.innerHTML=V?V.html():'<div class="empty">Vista no encontrada</div>'; var _mw=document.querySelector('.main-wrap'); if(_mw)_mw.classList.toggle('io-wide', state.view==='inicio'); if(window._lastView!==state.view){ window._lastView=state.view; m.classList.remove('view-anim','view-fresh'); void m.offsetWidth; m.classList.add('view-anim','view-fresh'); clearTimeout(window._freshT); window._freshT=setTimeout(function(){ m.classList.remove('view-fresh'); },950);
+  if(m){ var _html=V?V.html():'<div class="empty">Vista no encontrada</div>';
+    // Sin cambios: no repintar (evita parpadeos de imágenes y del carrusel)
+    if(_html===window._lastHtml && window._lastView===state.view){ return; }
+    window._lastHtml=_html;
+    // Reutiliza las imágenes ya cargadas para que no "parpadeen" al redibujar
+    var _oldImgs={}; try{ m.querySelectorAll('img').forEach(function(im){ if(im.complete&&im.naturalWidth) _oldImgs[im.outerHTML]=im; }); }catch(e){}
+    m.innerHTML=_html;
+    try{ m.querySelectorAll('img').forEach(function(im){ var o=_oldImgs[im.outerHTML]; if(o&&o!==im){ im.replaceWith(o); delete _oldImgs[im.outerHTML]; } }); }catch(e){} var _mw=document.querySelector('.main-wrap'); if(_mw)_mw.classList.toggle('io-wide', state.view==='inicio'); if(window._lastView!==state.view){ window._lastView=state.view; m.classList.remove('view-anim','view-fresh'); void m.offsetWidth; m.classList.add('view-anim','view-fresh'); clearTimeout(window._freshT); window._freshT=setTimeout(function(){ m.classList.remove('view-fresh'); },950);
       if(window.innerWidth<=880){ var _ab=document.querySelector('#navMenu .nav-btn.active'); if(_ab&&_ab.scrollIntoView){ try{ _ab.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'}); }catch(e){} } } } }
   if(V&&V.after)V.after();
 }
@@ -1273,7 +1312,7 @@ async function cargarMiGrupo(force){
   if(!(NAVI&&NAVI.sb)||state.role!=='participante') return;
   if(store._mgLoaded && !force) return; store._mgLoaded=true;
   try{ var r=await NAVI.sb.schema('navi').rpc('mi_grupo'); if(r.error) throw r.error; store.miGrupo=r.data||null; }
-  catch(e){ store._mgLoaded=false; store.miGrupo=null; }
+  catch(e){ store._mgLoaded=false; store.miGrupo=null; store._mgTries=(store._mgTries||0)+1; if(store._mgTries<6) setTimeout(function(){ cargarMiGrupo(true); },1200*store._mgTries); return; }
   render();
 }
 window.cargarMiGrupo=cargarMiGrupo;
@@ -2154,6 +2193,17 @@ if (PRELANZAMIENTO) {
           : '<div class="sugempty">Pronto agregaremos aquí videos sugeridos en español para profundizar en estos temas.</div>');
     return '<div class="railwrap">'+head+'<div class="sugbody">'+body+'</div></div>';
   }
+  function congresoInicioHtml(premium){
+    var fotos=[1,2,4,5];
+    var strip='<div class="cg-strip" onclick="nav(\'congreso\')">'+fotos.map(function(n){return '<div class="cg-ph" style="background-image:url(assets/fotos/foto'+n+'.jpg)"></div>';}).join('')+'</div>';
+    return '<div class="card cg-card">'
+      +'<div class="cg-head"><img src="assets/logo_congreso.png" alt="Congreso Nación Viva 2026" onerror="this.style.display=\'none\'"><div class="cg-sub">28 y 29 de agosto · Monterrey</div></div>'
+      +strip
+      +(premium
+         ? '<div class="cg-foot"><div class="cg-txt">Revive las ponencias y la galería del Congreso.</div><button class="btn btn-accent" onclick="nav(\'congreso\')">Ver el Congreso →</button></div>'
+         : '<div class="cg-foot"><div class="cg-txt">Mira la galería del Congreso. Las conferencias se desbloquean con tu aportación mensual.</div><button class="btn btn-accent" onclick="nav(\'congreso\')">Ver la galería →</button></div>')
+      +'</div>';
+  }
   VIEWS.inicio = {title:'Inicio', html:function(){
     var u=state.user||{nombre:'edificador'};
     var premium=esPremium();
@@ -2163,20 +2213,19 @@ if (PRELANZAMIENTO) {
     return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
       +'<div class="page-sub">Bienvenido a la Escuela de Edificadores NAVI. '+(clasesAbiertas()?'Tus clases ya están disponibles.':'Tu formación está por comenzar.')+'</div></div>'
-      +'<div class="io-grid io-top"><div class="io-main">'
-      +(clasesAbiertas()
-         ? heroProxima()
-         : lanzamientoBanner())
-      +'</div><aside class="io-rail">'+videoBienvenidaRail()+'</aside></div>'
-      +'<div class="io-grid io-bot"><div class="io-main">'
-      +miClaseCard()
-      +antorcha + artsDB
-      +miProgresoHtml()
-      +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
-      +'<div class="sec-title">Congreso Nación Viva 2026</div>'
-      +(premium
-         ? '<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Revive las ponencias del Congreso. Las grabaciones estarán disponibles muy pronto.</div><button class="btn btn-accent" onclick="nav(\'congreso\')">Ver las conferencias</button></div>'
-         : candadoAporte('La Antorcha, el Congreso y los videos','Tu acceso a las clases es gratuito. El contenido para edificadores —la revista La Antorcha, las conferencias del Congreso y los videos seleccionados— se desbloquea con tu aportación mensual.'))
+      +(function(){
+        var claseHtml = clasesAbiertas() ? heroProxima(null,true) : lanzamientoBanner();
+        var grupoHtml = miClaseCard();
+        var duo = grupoHtml ? '<div class="duo">'+claseHtml+grupoHtml+'</div>' : claseHtml;
+        var top = antorcha ? '<div class="io-antorcha">'+articulosCarousel()+'</div>' : duo;
+        return '<div class="io-grid io-top"><div class="io-main">'+top+'</div><aside class="io-rail">'+videoBienvenidaRail()+'</aside></div>'
+          +'<div class="io-grid io-bot"><div class="io-main">'
+          +(antorcha ? duo : '')
+          +miProgresoHtml()
+          +'<div class="sec-title">Los tres ejes de tu formación</div>'+ejesPL(false)
+          +'<div class="sec-title">Congreso Nación Viva 2026</div>'
+          +congresoInicioHtml(premium);
+      })()
       +'<div class="sec-title">Música · Nación Viva</div>'
       +'<div class="card"><div style="font-size:13.5px;color:var(--dim);margin-bottom:12px">Acompaña tu formación con la música de <b>Nación Viva</b>. Escúchala aquí mismo o ábrela en Spotify.</div>'
       +'<iframe style="border-radius:12px;border:0;display:block" src="https://open.spotify.com/embed/artist/2aKcjaKk9ShhA26lcAXmHR?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
@@ -2253,7 +2302,13 @@ if (PRELANZAMIENTO) {
     try{
       var a=await NAVI.sb.schema('navi').from('articulos').select('*').order('created_at',{ascending:false});
       var v=await NAVI.sb.schema('navi').from('videos').select('*').order('created_at',{ascending:false});
-      store._contLoading=false; store.artDB=a.data||[]; store.vidDB=v.data||[]; render();
+      store._contLoading=false;
+      if(!a.error && a.data) store.artDB=a.data; else store.artDB=store.artDB||[];
+      if(!v.error && v.data && v.data.length){ store.vidDB=v.data; store._contTries=0; }
+      else { store.vidDB=store.vidDB||[]; store._contTries=(store._contTries||0)+1;
+        // La sesión a veces aún no está lista al entrar: reintenta unas veces
+        if(store._contTries<6) setTimeout(function(){ store._contLoaded=false; cargarContenido(true); }, 1200*store._contTries); }
+      render();
     }catch(e){ store._contLoaded=false; store._contLoading=false; }
   };
   function ytId(u){ u=(u||'').trim(); var m=u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{6,})/); return m?m[1]:u; }
@@ -2655,7 +2710,7 @@ function libroFallback(host,r){
 function cerrarRevista(){ var ov=document.getElementById('pdfModal'); if(ov) ov.classList.remove('on'); document.body.style.overflow=''; }
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarRevista(); });
 function fmtDM(d){const mes=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return d.getDate()+' '+mes[d.getMonth()];}
-function heroProxima(mod){
+function heroProxima(mod,sinReunion){
   const m=mod||DB.proximaSesion();
   var _now=Date.now();
   function _fr(d){var dd=['dom','lun','mar','mié','jue','vie','sáb'];var mm=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return dd[d.getDay()]+' '+d.getDate()+' '+mm[d.getMonth()]+' '+d.getFullYear();}
@@ -2668,16 +2723,19 @@ function heroProxima(mod){
   window.__cdTarget=_nm?_nm.getTime():0;
   var _cerca=(_nm&&!_gpt)?(_nm.getTime()-_now<=7*86400000):false;
   var reunionHtml='';
+  if(sinReunion){ _nm=null; }
   if(_nm && _cerca){
     reunionHtml='<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div>'
       +'<div style="font-size:11.5px;color:var(--soft);margin-top:8px">Reunión en vivo: '+_fr(_nm)+' · 7:00 pm (CDMX).</div>';
   } else if(_nm){
     reunionHtml='<div style="margin-top:12px;font-size:13px;color:var(--dim)">🗓️ Próxima reunión en vivo: <b style="color:var(--cream)">'+_fr(_nm)+' · 7:00 pm (CDMX)</b></div>';
   }
-  return `<div class="hero glass"><div>
+  var _vid=(m.videoUrl&&/^[A-Za-z0-9_-]{6,15}$/.test(m.videoUrl))?m.videoUrl:'';
+  var _thumb=(sinReunion&&_vid)?('<div class="hero-thumb" onclick="goModule('+m.id+')"><img src="https://img.youtube.com/vi/'+_vid+'/hqdefault.jpg" alt="" onerror="this.parentNode.remove()"><span class="vbplay"></span></div>'):'';
+  return `<div class="hero glass${_thumb?' has-thumb':''}">${_thumb}<div>
      <div class="lbl">📹 Tu clase de esta quincena</div>
      <div class="tt">Módulo ${m.num} · ${m.titulo}</div>
-     <div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}</div>
+     ${(sinReunion&&m.prof)?'<div class="dt" style="color:var(--accent-bright);font-weight:600;margin-bottom:2px">Con '+m.prof+'</div>':''}<div class="dt">Video pregrabado · disponible del ${fmtDM(m.ventanaIni)} al ${fmtDM(m.ventanaFin)}</div>
      ${reunionHtml}
    </div><button class="btn btn-accent" onclick="goModule(${m.id})">Ver la clase</button></div>`;
 }
@@ -2863,7 +2921,7 @@ function articulosCarousel(){
    + '<div class="dots">'+arts.map(function(a,i){ return '<button class="dot'+(i===0?' on':'')+'" onclick="goSlide('+i+')" aria-label="Art\u00edculo '+(i+1)+'"></button>'; }).join('')+'</div></div>';
 }
 function goSlide(i){const c=document.getElementById('carousel');if(!c)return;const s=c.querySelectorAll('.slide'),d=c.querySelectorAll('.dot');if(!s.length)return;carIdx=(i+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('on',j===carIdx));d.forEach((x,j)=>x.classList.toggle('on',j===carIdx));}
-function startCarousel(){carIdx=0;if(carInt)clearInterval(carInt);carInt=setInterval(()=>{const c=document.getElementById('carousel');if(!c){clearInterval(carInt);carInt=null;return;}goSlide(carIdx+1);},5000);}
+function startCarousel(){var _c=document.getElementById('carousel');var _n=_c?_c.querySelectorAll('.slide').length:0;carIdx=_n?((carIdx||0)%_n):0;if(_c)goSlide(carIdx);if(carInt)clearInterval(carInt);carInt=setInterval(()=>{const c=document.getElementById('carousel');if(!c){clearInterval(carInt);carInt=null;return;}goSlide(carIdx+1);},5000);}
 function feedbackBlock(ent){
   if(!ent||!ent.retro)return '';
   return `<div class="reunion-card" style="margin-top:16px"><div class="reunion-h">✍ Retroalimentación de tu profesor</div><p style="margin:0;color:var(--cream)">${ent.retro.replace(/</g,'&lt;')}</p></div>`;
@@ -3203,7 +3261,7 @@ async function cargarGrupos(force){
       data = r2.data;
     }
     store.naviGrupos = data||[];
-  }catch(e){ store._grpLoaded=false; store._grpErr=(e&&e.message)||'error'; }
+  }catch(e){ store._grpLoaded=false; store._grpErr=(e&&e.message)||'error'; store._grpTries=(store._grpTries||0)+1; if(store._grpTries<6) setTimeout(function(){ cargarGrupos(true); },1200*store._grpTries); return; }
   render();
 }
 function claseGrupoBlock(gr){
