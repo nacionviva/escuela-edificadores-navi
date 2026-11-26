@@ -2310,7 +2310,7 @@ if (PRELANZAMIENTO) {
     var u=state.user||{nombre:'edificador'};
     var premium=esPremium();
     var hayRev=DB.articulos().filter(function(a){return a.publicado;}).length;
-    var antorcha = (premium && hayRev) ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : '';
+    var conRev=(premium && hayRev); var antorcha = conRev ? ('<div class="sec-title" style="margin-top:0">La Antorcha</div>'+articulosCarousel()) : (anunciosActivos().length ? articulosCarousel(true) : '');
     var artsDB='';
     return '<div class="page-head"><div class="eyebrow">Generación 2026–2027</div>'
       +'<h1 class="page">Hola, '+nombreBonito(u.nombre).split(' ')[0]+'</h1>'
@@ -2319,7 +2319,7 @@ if (PRELANZAMIENTO) {
         var claseHtml = clasesAbiertas() ? heroProxima(null,true) : lanzamientoBanner();
         var grupoHtml = miClaseCard();
         var duo = grupoHtml ? '<div class="duo">'+claseHtml+grupoHtml+'</div>' : claseHtml;
-        var top = antorcha ? '<div class="io-antorcha">'+articulosCarousel()+'</div>' : duo;
+        var top = antorcha ? '<div class="io-antorcha">'+articulosCarousel(!conRev)+'</div>' : duo;
         return '<div class="io-grid io-top"><div class="io-main">'+top+'</div><aside class="io-rail">'+videoBienvenidaRail()+'</aside></div>'
           +'<div class="io-grid io-bot"><div class="io-main">'
           +(antorcha ? duo : '')
@@ -3120,10 +3120,15 @@ function guardarPreguntas(mod){captureClase(mod);const m=DB.modulo(mod);
   render(); toast('Clase actualizada');}
 /* carrusel de artículos (revista Nación Viva) */
 let carIdx=0, carInt=null;
-function articulosCarousel(){
+var ANUNCIOS=[
+  {img:'https://cyiwuolmjihdrhdagrgk.supabase.co/storage/v1/object/public/publico/anuncios/mesa-consejo-26nov.png', go:"nav('migrupo')", lbl:'Entrar a la Mesa de consejo', hasta:'2026-11-27T04:00:00Z'}
+];
+function anunciosActivos(){ var now=Date.now(); return ANUNCIOS.filter(function(a){ return !a.hasta || now < new Date(a.hasta).getTime(); }); }
+function articulosCarousel(soloAnuncios){
+  var a0=anunciosActivos().map(function(a){return {img:a.img,bg:'',titulo:'',autor:'',edicion:'',go:a.go,lbl:a.lbl};});
   var a1=DB.articulos().filter(function(a){return a.publicado;}).map(function(a){return {img:a.img,bg:a.bg,titulo:a.titulo,autor:a.autor,edicion:a.edicion,go:"nav('revista')",lbl:'Leer la revista'};});
   var a2=(store.artDB||[]).filter(function(a){return a.publicado!==false;}).map(function(a){return {img:a.portada,bg:'',titulo:a.titulo,autor:a.autor,edicion:a.edicion,go:"abrirArticulo('"+a.id+"')",lbl:'Leer el art\u00edculo'};});
-  var arts=a2.concat(a1);
+  var arts=a0.concat(soloAnuncios?[]:a2.concat(a1));
   if(!arts.length) return '';
   return '<div class="carousel" id="carousel">'
    + arts.map(function(a,i){ return '<div class="slide'+(i===0?' on':'')+(a.img?' has-img':'')+'" onclick="'+a.go+'"><div class="slide-bg" style="background:'+(a.img?("url('"+a.img+"') center/cover"):a.bg)+'"></div>'+(a.img?('<div class="slide-read-only">'+a.lbl+' \u2192</div>'):('<div class="slide-txt"><span class="slide-tag">La Antorcha'+(a.edicion?' \u00b7 '+a.edicion:'')+'</span><div class="slide-tit">'+a.titulo+'</div><div class="slide-aut">Por '+a.autor+'</div><div class="slide-read">'+a.lbl+' \u2192</div></div>'))+'</div>'; }).join('')
