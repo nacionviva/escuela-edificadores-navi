@@ -292,6 +292,41 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .cg-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:14px}
 .cg-txt{font-size:13.5px;color:var(--dim);flex:1;min-width:200px}
 @media(max-width:560px){.cg-strip{grid-template-columns:repeat(2,1fr)}}
+.nav-sep{margin:14px 13px 6px;padding-top:12px;border-top:1px solid var(--line);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--award);font-weight:700}
+.nav-btn .nav-bd{margin-left:auto;background:var(--award);color:#0E1B33;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;line-height:1.5}
+#app.nav-collapsed .nav-sep{display:none}#app.nav-collapsed .nav-btn .nav-bd{display:none}
+@media(max-width:880px){.nav-sep{display:none}.nav-btn .nav-bd{display:none}}
+.cj-tabs{display:flex;gap:6px;margin:0 0 20px;border-bottom:1px solid var(--line);overflow-x:auto}
+.cj-tab{flex:none;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;padding:10px 14px;font:inherit;font-weight:700;font-size:14px;color:var(--soft);cursor:pointer}
+.cj-tab.on{color:var(--cream);border-bottom-color:var(--award)}
+.cj-g2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:var(--gap-sec,20px);align-items:stretch}
+.cj-g2>.card{margin:0}.cj-eq{display:flex;flex-direction:column}.cj-eq>.cj-btns{margin-top:auto;padding-top:14px}
+.cj-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:var(--gap-sec,20px)}.cj-g4>.card{margin:0}
+.cj-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.cj-btns a,.cj-act a{text-decoration:none!important}
+.cj-wa{background:#25D366!important;border-color:#25D366!important;color:#04361A!important;font-weight:800;text-decoration:none}
+.cj-nowa{font-size:12px;color:var(--soft)}
+.cj-count{margin:14px 0 8px;font-size:13.5px;color:var(--dim)}.cj-count b{font-size:22px;color:var(--award-bright);margin-right:4px}
+.cj-dots{display:flex;gap:5px;margin:10px 0}.cj-dots i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.1)}.cj-dots i.on{background:var(--award)}
+.cj-list{padding:6px 18px}
+.cj-row{display:grid;grid-template-columns:40px minmax(0,1fr) 190px 128px;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}.cj-row:first-child{border-top:0}
+.cj-nm{font-weight:600;font-size:14.5px;min-width:0}.cj-meta{font-size:12.5px;color:var(--soft)}.cj-act{justify-self:end}
+.cj-cards{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.cj-card{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:16px}.cj-ctop{display:flex;align-items:center;gap:12px}
+.cj-cfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto}
+.cj-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.cj-chip{border:1px solid var(--line);background:var(--card);color:var(--dim);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.cj-chip.on{background:var(--award);border-color:var(--award);color:#0E1B33}
+.cj-temahead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.cj-ans{border:1px solid var(--line);border-radius:16px;margin-bottom:10px;background:var(--card);overflow:hidden}
+.cj-ans summary{list-style:none;display:grid;grid-template-columns:40px minmax(0,1fr) auto 18px;align-items:center;gap:12px;padding:13px 16px;cursor:pointer}.cj-ans summary::-webkit-details-marker{display:none}
+.cj-chev{color:var(--soft);transition:transform .2s}.cj-ans[open] .cj-chev{transform:rotate(180deg)}
+.cj-body{padding:2px 18px 18px 68px}
+.cj-q{font-size:12.5px;color:var(--accent-bright);font-weight:700;margin:14px 0 5px}
+.cj-a{font-size:14.5px;line-height:1.65;color:var(--dim);background:rgba(255,255,255,.03);border-left:3px solid var(--accent-line);padding:10px 14px;border-radius:0 10px 10px 0;white-space:normal}
+.cj-ta{width:100%;min-height:76px;border-radius:12px;border:1px solid var(--accent-line);background:rgba(10,20,38,.5);color:var(--cream);padding:10px 12px;font:inherit;font-size:14px;resize:vertical}
+.cj-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.cj-res>.card{margin:0}
+@media(max-width:1000px){.cj-g2{grid-template-columns:1fr}.cj-g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.cj-row{grid-template-columns:36px minmax(0,1fr) auto}.cj-meta{display:none}.cj-body{padding-left:18px}}
 .pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
 .award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
 .stat-n.award{color:var(--award-bright)}
@@ -1004,12 +1039,13 @@ function nombreBonito(s){
   var min={de:1,del:1,la:1,las:1,los:1,y:1,e:1,da:1,do:1,van:1,von:1,di:1,du:1};
   return s.split(' ').map(function(w,i){ if(!w) return w; if(i>0 && min[w]) return w; return w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
 }
-const ROLE_LABEL={participante:'Participante',profesor:'Mentor',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
+const ROLE_LABEL={participante:'Participante',profesor:'Consejero',director:'Director Académico',inscripciones:'Coordinación de Inscripciones',superadmin:'Superadministrador'};
 const ROLE_USER={participante:'u1',profesor:'p1',director:'d1',inscripciones:'i1',superadmin:'d1'};
 const DEFVIEW={participante:'inicio',profesor:'pinicio',director:'dpanel',inscripciones:'ialta',superadmin:'dpanel'};
 
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
 const ICONS={
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
  book:'<path d="M12 6c-2-1.1-4-1.4-7-1.4V18c3 0 5 .3 7 1.4 2-1.1 4-1.4 7-1.4V4.6c-3 0-5 .3-7 1.4z"/><path d="M12 6v13.4"/>',
  cap:'<path d="M22 9 12 5 2 9l10 4 10-4z"/><path d="M6 11v4.5c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5V11"/>',
@@ -1224,6 +1260,15 @@ function buildMenu(){
   const nav=document.getElementById('navMenu');
   nav.innerHTML=MENUS[state.role].map(([k,ic,lb])=>
     `<button class="nav-btn${k===state.view?' active':''}" onclick="nav('${k}')" title="${lb}"><span class="ic">${svgIcon(ic)}</span><span class="lb">${lb}</span><span class="nav-tip">${lb}</span></button>`).join('');
+  // Consejería: solo para consejeros (datos de navi.mi_consejeria)
+  if(state.role==='participante'){
+    if(typeof cargarConsejeria==='function' && !store._cjLoaded && typeof NAVI!=='undefined' && NAVI.sb) setTimeout(function(){ cargarConsejeria(); },0);
+    if(store.consej){
+      var _ta=(typeof cjTemaActual==='function')?cjTemaActual():null;
+      var _n=_ta?(store.consej.miembros||[]).filter(function(x){return cjDone(x,_ta);}).length:0;
+      nav.innerHTML+=`<div class="nav-sep">Consejería</div><button class="nav-btn${state.view==='misedificadores'?' active':''}" onclick="nav('misedificadores')" title="Mis edificadores"><span class="ic">${svgIcon('compass')}</span><span class="lb">Mis edificadores</span>${_n?`<span class="nav-bd">${_n}</span>`:''}<span class="nav-tip">Mis edificadores</span></button>`;
+    }
+  }
 }
 function nav(v){state.view=v;buildMenu();render();window.scrollTo(0,0);}
 function toggleSidebar(){const app=document.getElementById('app');if(!app)return;const c=app.classList.toggle('nav-collapsed');const b=document.querySelector('.side-toggle');if(b){b.textContent=c?'›':'‹';b.title=c?'Mostrar menú':'Ocultar menú';}}
@@ -1532,7 +1577,7 @@ avance:{title:'Mi Avance',html(){
        <div class="card"><div class="stat-n">${retros.length}</div><div class="stat-l">Retroalimentaciones recibidas</div></div></div>`
    + `<div class="sec-title">Retroalimentación de tus profesores</div>`
    + (retros.length?retros.map(x=>`<div class="reunion-card" style="margin:0 0 10px"><div class="reunion-h">Módulo ${x.m.num} · ${x.m.titulo}</div><p style="margin:0;color:var(--cream)">${x.e.retro.replace(/</g,'&lt;')}</p></div>`).join('')
-       :`<div class="empty">Aún no tienes retroalimentaciones. Aparecerán aquí cuando tu profesor lea tus respuestas.</div>`)
+       :`<div class="empty">Aún no tienes retroalimentaciones. Aparecerán aquí cuando tu consejero lea tus respuestas.</div>`)
    + `<div class="sec-title">Cómo se te acompaña en el trimestre</div>`
    + `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Dimensión</th><th>Qué observamos</th></tr></thead><tbody>`
    + DB.rubrica().map(r=>`<tr><td class="nm">${r.criterio}</td><td>${r.desc}</td></tr>`).join('')
@@ -2232,6 +2277,112 @@ if (PRELANZAMIENTO) {
       +'<div style="margin-top:12px"><a class="btn btn-accent" href="https://open.spotify.com/artist/2aKcjaKk9ShhA26lcAXmHR" target="_blank" rel="noopener">Abrir en Spotify →</a></div></div>'
       +'</div><aside class="io-rail">'+sugeridosRail()+'</aside></div>';
   }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); if(typeof cargarMiGrupo==='function') cargarMiGrupo(); }};
+  /* ================= CONSEJERÍA: apartado "Mis edificadores" (solo consejeros) ================= */
+  store.cjResp = store.cjResp || {};
+  state.cjSub = state.cjSub || 'resumen';
+  window.cargarConsejeria = async function(force){
+    if(!(NAVI&&NAVI.sb) || state.role!=='participante') return;
+    if(store._cjLoaded && !force) return; store._cjLoaded=true;
+    try{ var r=await NAVI.sb.schema('navi').rpc('mi_consejeria'); if(r.error) throw r.error;
+      store.consej = r.data || null; store._cjTries=0;
+    }catch(e){ store._cjLoaded=false; store._cjTries=(store._cjTries||0)+1; if(store._cjTries<6) setTimeout(function(){ cargarConsejeria(true); },1200*store._cjTries); return; }
+    buildMenu(); render();
+  };
+  function cjTemas(){ return (store.modulos||[]).filter(function(m){return m.tri===1 && moduloAbierto(m);}).sort(function(a,b){return a.num-b.num;}); }
+  function cjTemaActual(){ var t=cjTemas(); return t.length? t[t.length-1] : null; }
+  function cjDone(mb,m){ return (mb.resp||[]).some(function(r){ return r.tri===m.tri && r.num===m.num && r.estatus && r.estatus!=='borrador'; }); }
+  function cjWa(tel,txt){ return tel? ('https://wa.me/52'+String(tel).replace(/\D/g,'').slice(-10)+'?text='+encodeURIComponent(txt||'')) : ''; }
+  function cjUlt(f){ if(!f) return 'sin registro'; var d=Math.floor((Date.now()-new Date(f).getTime())/86400000); return d<=0?'hoy':d===1?'ayer':d<7?('hace '+d+' días'):d<30?('hace '+Math.floor(d/7)+' sem.'):('hace '+Math.floor(d/30)+' mes'+(Math.floor(d/30)>1?'es':'')); }
+  function cjAv(m,sz){ return avatarMg({nombre:m.nombre,foto:m.foto},sz>40).replace(/width:\d+px;height:\d+px/,'width:'+sz+'px;height:'+sz+'px'); }
+  function cjWaBtn(tel,txt,label){ var u=cjWa(tel,txt); return u? '<a class="btn btn-sm cj-wa" target="_blank" rel="noopener" href="'+u+'">'+(label||'WhatsApp')+'</a>' : '<span class="cj-nowa">Sin teléfono</span>'; }
+  function cjResumen(c){
+    var mb=c.miembros||[], temas=cjTemas(), ta=cjTemaActual(), nT=temas.length||1;
+    var entregadas=mb.reduce(function(a,x){return a+temas.filter(function(t){return cjDone(x,t);}).length;},0);
+    var resp=ta? mb.filter(function(x){return cjDone(x,ta);}).length : 0;
+    var atn=mb.filter(function(x){ return temas.filter(function(t){return cjDone(x,t);}).length < Math.max(1,nT-1); });
+    var st=estadoReunion({proxima:c.proxima,en_vivo:false}), t=st.t;
+    var cd = (st.fase==='antes') ? '<div class="countdown mg-cd" data-t="'+t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>' : (st.fase==='vivo'?'<div class="mg-live"><span class="mg-dot"></span>La reunión está por comenzar o ya comenzó</div>':'');
+    var aviso='¡Hola, Grupo '+c.grupo.replace('Grupo ','')+'! 👋 Les recordamos nuestra reunión en vivo'+(t?(' el '+fechaLarga(t)):'')+'. Entren aquí: '+(c.link||'')+' ¡Los esperamos!';
+    return '<div class="cj-g2">'
+      +'<div class="card mg-card is-live cj-eq"><div class="mg-eyebrow">Sesión en vivo · '+_esc(c.grupo)+'</div><div class="mg-title" style="font-size:19px">'+(t?fechaLarga(t):'Pronto publicaremos la fecha')+'</div><div class="mg-note" style="margin-top:4px">Google Meet · sala de tu grupo</div>'+cd
+      +'<div class="cj-btns">'+(c.link?'<a class="btn btn-solid" target="_blank" rel="noopener" href="'+_esc(c.link)+'">Entrar a la reunión →</a>':'')
+      +'<a class="btn btn-sm" target="_blank" rel="noopener" href="assets/consejeros/Guion-de-Sesion.pdf">Guion de la sesión</a>'
+      +'<a class="btn btn-sm cj-wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(aviso)+'">Avisar al grupo</a></div></div>'
+      +'<div class="card cj-eq"><div class="mg-eyebrow" style="color:var(--accent)">Tema de esta quincena</div>'
+      +(ta?('<div class="mg-title" style="font-size:19px">'+ta.tri+'.'+ta.num+' · '+_esc(ta.titulo)+'</div><div class="mg-note" style="margin-top:4px">'+(ta.prof?('Con '+_esc(ta.prof)):'')+'</div>'
+        +'<div class="cj-count"><b>'+resp+'</b> de '+mb.length+' ya respondieron</div>'
+        +'<div class="cj-dots">'+mb.map(function(x){return '<i class="'+(cjDone(x,ta)?'on':'')+'"></i>';}).join('')+'</div>'
+        +'<div class="cj-btns"><button class="btn btn-sm btn-accent" onclick="state.cjSub=\'respuestas\';state.cjTema=\''+ta.tri+'-'+ta.num+'\';render()">Leer sus respuestas →</button></div>'):'<div class="mg-note">Aún no hay temas abiertos.</div>')
+      +'</div></div>'
+      +'<div class="cj-g4">'
+      +'<div class="card"><div class="stat-n">'+mb.length+'</div><div class="stat-l">Edificadores en tu grupo</div></div>'
+      +'<div class="card award-card"><div class="stat-n award">'+entregadas+'</div><div class="stat-l">Respuestas entregadas</div></div>'
+      +'<div class="card"><div class="stat-n">'+Math.round(entregadas/Math.max(1,mb.length*nT)*100)+'%</div><div class="stat-l">Avance del grupo</div></div>'
+      +'<div class="card"><div class="stat-n" style="color:#F0A091">'+atn.length+'</div><div class="stat-l">Necesitan tu atención</div></div></div>'
+      +'<div class="sec-title">Necesitan tu atención</div>'
+      +'<div class="card cj-list">'+(atn.length?atn.map(function(x){ var n=temas.filter(function(t){return cjDone(x,t);}).length;
+          return '<div class="cj-row">'+cjAv(x,38)+'<div class="cj-nm">'+_esc(nombreBonito(x.nombre))+'</div><div class="cj-meta">'+n+' de '+temas.length+' temas · '+cjUlt(x.ultimo)+'</div><div class="cj-act">'+cjWaBtn(x.tel,'¡Hola, '+nombreBonito(x.nombre).split(' ')[0]+'! 👋 Soy tu consejero(a) de la Escuela de Edificadores NAVI. ¿Cómo vas? Te recuerdo que tienes temas pendientes por responder en la plataforma; aquí estoy para apoyarte.')+'</div></div>'; }).join(''):'<div class="mg-note">¡Todo tu grupo va al día! 🙌</div>')+'</div>';
+  }
+  function cjGrupo(c){
+    var temas=cjTemas();
+    return '<div class="mg-grid cj-cards">'+(c.miembros||[]).map(function(x){ var n=temas.filter(function(t){return cjDone(x,t);}).length;
+      return '<div class="mg-row cj-card"><div class="cj-ctop">'+cjAv(x,46)+'<div style="min-width:0"><div class="mg-rn" style="font-weight:700">'+_esc(nombreBonito(x.nombre))+'</div><div class="mg-note" style="margin-top:2px">Último acceso: '+cjUlt(x.ultimo)+'</div></div></div>'
+        +'<div class="cj-dots">'+temas.map(function(t){return '<i class="'+(cjDone(x,t)?'on':'')+'" title="Tema '+t.tri+'.'+t.num+'"></i>';}).join('')+'</div>'
+        +'<div class="cj-cfoot"><span class="mg-note" style="margin:0">'+n+'/'+temas.length+' temas · <b style="color:var(--award-bright)">'+(x.aguilas||0)+' águilas</b></span>'
+        +'<span class="cj-btns" style="margin:0"><button class="btn btn-sm" onclick="state.cjSub=\'respuestas\';render()">Respuestas</button>'+cjWaBtn(x.tel,'¡Hola, '+nombreBonito(x.nombre).split(' ')[0]+'! 👋 Soy tu consejero(a) de la Escuela de Edificadores NAVI.')+'</span></div></div>';
+    }).join('')+'</div>';
+  }
+  window.cjCargarResp = async function(key){
+    var p=key.split('-'); store.cjResp[key]={loading:true}; 
+    try{ var r=await NAVI.sb.schema('navi').rpc('respuestas_consejeria',{p_tri:+p[0],p_num:+p[1]}); if(r.error) throw r.error; store.cjResp[key]={data:r.data||[]}; }
+    catch(e){ store.cjResp[key]={error:true}; }
+    render();
+  };
+  window.cjGuardarRetro = async function(uid,tri,num,btn){
+    var ta=document.getElementById('cjr-'+uid); if(!ta) return; var txt=ta.value;
+    if(btn){ btn.disabled=true; btn.textContent='Guardando…'; }
+    try{ var r=await NAVI.sb.schema('navi').rpc('retro_consejero',{p_usuario_id:uid,p_tri:tri,p_num:num,p_texto:txt}); if(r.error) throw r.error;
+      var c=store.cjResp[tri+'-'+num]; if(c&&c.data){ c.data.forEach(function(x){ if(x.id===uid){ x.retro=txt; x.estatus=txt.trim()?'retroalimentado':'entregado'; } }); }
+      toast('Comentario guardado. '+(txt.trim()?'Le aparecerá junto a su respuesta.':''),'ok'); render();
+    }catch(e){ toast('No se pudo guardar el comentario','err'); if(btn){ btn.disabled=false; btn.textContent='Guardar comentario'; } }
+  };
+  function cjRespuestas(c){
+    var temas=cjTemas(); if(!temas.length) return '<div class="card"><div class="mg-note">Aún no hay temas abiertos.</div></div>';
+    if(!state.cjTema){ var ta=cjTemaActual(); state.cjTema=ta.tri+'-'+ta.num; }
+    var key=state.cjTema, p=key.split('-'), mod=temas.find(function(t){return t.tri===+p[0]&&t.num===+p[1];})||temas[temas.length-1];
+    var chips='<div class="cj-chips">'+temas.map(function(t){var k=t.tri+'-'+t.num; return '<button class="cj-chip'+(k===key?' on':'')+'" onclick="state.cjTema=\''+k+'\';render()">Tema '+t.tri+'.'+t.num+'</button>';}).join('')+'</div>';
+    var cache=store.cjResp[key];
+    if(!cache){ setTimeout(function(){ cjCargarResp(key); },0); cache={loading:true}; store.cjResp[key]=cache; }
+    if(cache.loading) return chips+'<div class="card"><div class="sk sk-line" style="width:60%"></div><div class="sk sk-line" style="width:40%;margin-top:10px"></div></div>';
+    if(cache.error) return chips+'<div class="card"><div class="mg-note">No pudimos cargar las respuestas. <button class="btn btn-sm" onclick="cjCargarResp(\''+key+'\')">Reintentar</button></div></div>';
+    var L=cache.data, si=L.filter(function(x){return x.estatus&&x.estatus!=='borrador';}), no=L.filter(function(x){return !x.estatus||x.estatus==='borrador';});
+    var Q=mod.preguntas||[];
+    return chips
+      +'<div class="card cj-temahead"><div style="flex:1;min-width:220px"><div class="mg-eyebrow" style="color:var(--accent)">Tema '+mod.tri+'.'+mod.num+'</div><div class="mg-title" style="font-size:18px">'+_esc(mod.titulo)+'</div></div><span class="pill pill-ok">'+si.length+' respondieron</span><span class="pill pill-wait">'+no.length+' pendientes</span></div>'
+      +si.map(function(x,i){ var arr=Array.isArray(x.respuestas)?x.respuestas:[];
+        return '<details class="cj-ans"'+(i===0?' open':'')+'><summary>'+cjAv(x,38)+'<div class="cj-nm">'+_esc(nombreBonito(x.nombre))+'<div class="mg-note" style="margin:2px 0 0">Entregó '+(x.fecha?fmtSello(x.fecha):'')+'</div></div>'
+          +(x.retro?'<span class="pill pill-award">Comentado</span>':'<span class="pill pill-ok">✓ Respondió</span>')+'<span class="cj-chev">▾</span></summary>'
+          +'<div class="cj-body">'+(Q.length?Q:arr).map(function(q,k){ return '<div class="cj-q">'+(k+1)+'. '+_esc(Q[k]||('Pregunta '+(k+1)))+'</div><div class="cj-a">'+(arr[k]?_esc(arr[k]).replace(/\n/g,'<br>'):'<i>Sin respuesta</i>')+'</div>'; }).join('')
+          +'<div class="cj-q" style="color:var(--award-bright)">Tu comentario para '+_esc(nombreBonito(x.nombre).split(' ')[0])+'</div>'
+          +'<textarea id="cjr-'+x.id+'" class="cj-ta" placeholder="Reconoce lo valioso de su respuesta y deja una pregunta o algo concreto para profundizar…">'+_esc(x.retro||'')+'</textarea>'
+          +'<div class="cj-btns"><button class="btn btn-sm btn-accent" onclick="cjGuardarRetro(\''+x.id+'\','+mod.tri+','+mod.num+',this)">Guardar comentario</button><span class="mg-note" style="margin:0;align-self:center">Le aparece en su plataforma, junto a su respuesta.</span></div></div></details>'; }).join('')
+      +'<div class="sec-title">Aún no responden</div>'
+      +'<div class="card cj-list">'+(no.length?no.map(function(x){ return '<div class="cj-row">'+cjAv(x,38)+'<div class="cj-nm">'+_esc(nombreBonito(x.nombre))+'</div><div class="cj-meta">Tema '+mod.tri+'.'+mod.num+' pendiente</div><div class="cj-act">'+cjWaBtn(x.tel,'¡Hola, '+nombreBonito(x.nombre).split(' ')[0]+'! 👋 Te recuerdo responder las preguntas del Tema '+mod.tri+'.'+mod.num+' («'+mod.titulo+'») en la plataforma. ¡Tu reflexión es muy valiosa para el grupo!','Recordarle')+'</div></div>'; }).join(''):'<div class="mg-note">¡Todos respondieron este tema! 🙌</div>')+'</div>';
+  }
+  function cjRecursos(){
+    var R=[['Guía de consejería · Modelo Daniel','assets/consejeros/Guia-Modelo-Daniel.pdf'],['Presentación Modelo Daniel (Dr. Jorge Salcedo)','assets/consejeros/Presentacion-Modelo-Daniel-Consejeros.pdf'],['Guion de sesión','assets/consejeros/Guion-de-Sesion.pdf'],['Manual del consejero','assets/consejeros/Manual.pdf'],['Carta de compromiso','assets/consejeros/Carta-Compromiso.pdf']];
+    return '<div class="cj-res">'+R.map(function(r){return '<div class="card cj-eq"><div class="mg-eyebrow" style="color:var(--accent)">PDF</div><div class="mg-title" style="font-size:16px;margin:6px 0 14px">'+r[0]+'</div><a class="btn btn-sm btn-accent" target="_blank" rel="noopener" href="'+r[1]+'">Abrir</a></div>';}).join('')+'</div>';
+  }
+  VIEWS.misedificadores = {title:'Mis edificadores', html:function(){
+    var c=store.consej;
+    if(!c) return head('Consejería','Mis edificadores','')+'<div class="card"><div class="mg-note">'+(store._cjLoaded?'Esta sección es para consejeros.':'Cargando tu grupo…')+'</div></div>';
+    var mb=c.miembros||[];
+    var SUB=[['resumen','Sesión y resumen'],['grupo','Mi grupo · '+mb.length],['respuestas','Leer respuestas'],['recursos','Recursos']];
+    var body={resumen:cjResumen,grupo:cjGrupo,respuestas:cjRespuestas,recursos:cjRecursos}[state.cjSub]||cjResumen;
+    return head('Consejería · '+_esc(c.grupo),'Mis edificadores','Consejeros: '+_esc(c.consejeros||'')+'. Tu grupo, la sesión en vivo y sus respuestas, en un solo lugar.')
+      +'<div class="cj-tabs">'+SUB.map(function(s){return '<button class="cj-tab'+(s[0]===state.cjSub?' on':'')+'" onclick="state.cjSub=\''+s[0]+'\';render()">'+s[1]+'</button>';}).join('')+'</div>'
+      +body(c);
+  }, after:function(){ if(typeof cargarConsejeria==='function') cargarConsejeria(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.migrupo = {title:'Mi grupo', html:function(){
     return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus consejeros y el acceso a la reunión en vivo de tu grupo.')+miGrupoVista();
   }, after:function(){ cargarMiGrupo(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
@@ -2924,7 +3075,7 @@ function goSlide(i){const c=document.getElementById('carousel');if(!c)return;con
 function startCarousel(){var _c=document.getElementById('carousel');var _n=_c?_c.querySelectorAll('.slide').length:0;carIdx=_n?((carIdx||0)%_n):0;if(_c)goSlide(carIdx);if(carInt)clearInterval(carInt);carInt=setInterval(()=>{const c=document.getElementById('carousel');if(!c){clearInterval(carInt);carInt=null;return;}goSlide(carIdx+1);},5000);}
 function feedbackBlock(ent){
   if(!ent||!ent.retro)return '';
-  return `<div class="reunion-card" style="margin-top:16px"><div class="reunion-h">✍ Retroalimentación de tu profesor</div><p style="margin:0;color:var(--cream)">${ent.retro.replace(/</g,'&lt;')}</p></div>`;
+  return `<div class="reunion-card" style="margin-top:16px"><div class="reunion-h">✍ Comentario de tu consejero</div><p style="margin:0;color:var(--cream)">${ent.retro.replace(/</g,'&lt;')}</p></div>`;
 }
 const EMOJIS=['😀','😄','😊','😉','😅','🤔','👍','🙏','❤️','🎉','🔥','✨','✝️','📖','💪','😎'];
 function colorFor(name){const cs=['var(--lime)','var(--coral)','var(--blue)','#B49CE0','#7FE090','#E9A23B'];let h=0;for(const c of name)h=(h*31+c.charCodeAt(0))>>>0;return cs[h%cs.length];}
