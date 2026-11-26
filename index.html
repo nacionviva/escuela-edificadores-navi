@@ -1343,7 +1343,7 @@ function reunionGrupoBlock(g){
   if(st.fase==='paso') return '<div class="mg-note">La última reunión fue el '+fechaLarga(st.t)+'. Te avisaremos aquí la próxima fecha.</div>';
   return (g.dia||g.hora)?'<div class="mg-when">'+_esc([g.dia,g.hora].filter(Boolean).join(' · '))+'</div>'+btn('btn-accent','Entrar a la reunión de mi grupo →'):'<div class="mg-note">Pronto publicaremos aquí la fecha de tu próxima reunión en vivo.</div>';
 }
-function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus mentores</span>'+ms.map(function(m){return '<span class="mg-chip">'+_esc(m)+'</span>';}).join('')+'</div>'; }
+function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus consejeros</span>'+ms.map(function(m){return '<span class="mg-chip">'+_esc(m)+'</span>';}).join('')+'</div>'; }
 function miClaseCard(enVista){
   if(state.role!=='participante') return '';
   var g=grupoData(); if(!g) return '';
@@ -1360,10 +1360,10 @@ function miClaseCard(enVista){
 }
 function miGrupoVista(){
   var g=grupoData();
-  if(!g) return '<div class="card"><div class="mg-note">Aún no tienes grupo asignado. En cuanto te asignemos uno, aquí verás a tus compañeros y a tus mentores.</div></div>';
+  if(!g) return '<div class="card"><div class="mg-note">Aún no tienes grupo asignado. En cuanto te asignemos uno, aquí verás a tus compañeros y a tus consejeros.</div></div>';
   var mem=(g.miembros||[]); var ments=mentoresDe(g);
   var lista=mem.length?mem.map(function(m){ var men=esMentorNombre(m.nombre,ments);
-      return '<div class="mg-row'+(m.yo?' is-me':'')+'">'+avatarMg(m,true)+'<div class="mg-rn">'+_esc(nombreBonito(m.nombre))+(m.yo?' <span class="mg-tag">Tú</span>':'')+(men?' <span class="mg-tag mg-tag-m">Mentor</span>':'')+'</div></div>'; }).join('')
+      return '<div class="mg-row'+(m.yo?' is-me':'')+'">'+avatarMg(m,true)+'<div class="mg-rn">'+_esc(nombreBonito(m.nombre))+(m.yo?' <span class="mg-tag">Tú</span>':'')+(men?' <span class="mg-tag mg-tag-m">Consejero</span>':'')+'</div></div>'; }).join('')
     :(store._mgLoaded?'<div class="mg-note">No pudimos cargar la lista de tu grupo. Intenta de nuevo en un momento.</div>':'<div class="mg-grid">'+[0,1,2,3,4,5].map(function(){return '<div class="mg-row"><span class="mg-av sk" style="width:46px;height:46px"></span><div class="sk sk-line" style="width:60%"></div></div>';}).join('')+'</div>');
   return miClaseCard(true)
     +'<div class="sec-title">Integrantes del '+_esc(g.grupo)+(mem.length?' · '+mem.length:'')+'</div>'
@@ -2233,7 +2233,7 @@ if (PRELANZAMIENTO) {
       +'</div><aside class="io-rail">'+sugeridosRail()+'</aside></div>';
   }, after:function(){ startCarousel(); cargarMiProgreso(); if(typeof cargarMisRespuestas==='function') cargarMisRespuestas(); if(typeof cargarAvisos==='function') cargarAvisos(); if(typeof cargarContenido==='function') cargarContenido(); if(typeof cargarGrupos==='function') cargarGrupos(); if(typeof cargarMiGrupo==='function') cargarMiGrupo(); }};
   VIEWS.migrupo = {title:'Mi grupo', html:function(){
-    return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus mentores y el acceso a la reunión en vivo de tu grupo.')+miGrupoVista();
+    return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus consejeros y el acceso a la reunión en vivo de tu grupo.')+miGrupoVista();
   }, after:function(){ cargarMiGrupo(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
