@@ -329,6 +329,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 @media(max-width:1000px){.cj-g2{grid-template-columns:1fr}.cj-g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.cj-row{grid-template-columns:36px minmax(0,1fr) auto}.cj-meta{display:none}.cj-body{padding-left:18px}}
 .mg-chip-link{cursor:pointer;font-family:inherit;line-height:1.4;display:inline-flex;align-items:center;gap:7px;transition:border-color .2s,background .2s}.mg-chip-link img{width:16px;height:16px;margin-left:-5px;border-radius:50%;object-fit:cover;filter:grayscale(1)}.mg-chip-link:hover{border-color:var(--accent);background:rgba(230,180,80,.08)}
+.ex-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap}.ex-grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px}.ex-photo img{width:200px;height:200px;object-fit:cover;border-radius:12px;border:1px solid var(--line,#2E4A74);background:#0E1B33;display:block}.ex-lab{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:12px 0 5px}.ex-in{width:100%;box-sizing:border-box;background:rgba(14,27,51,.6);border:1px solid var(--line,#2E4A74);border-radius:10px;color:var(--cream,#fff);padding:10px 12px;font:inherit}@media(max-width:700px){.ex-grid{grid-template-columns:1fr}}
 .pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
 .award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
 .stat-n.award{color:var(--award-bright)}
@@ -1264,6 +1265,7 @@ function buildMenu(){
   // Consejería: solo para consejeros (datos de navi.mi_consejeria)
   if(state.role==='participante'){
     if(typeof cargarConsejeria==='function' && !store._cjLoaded && typeof NAVI!=='undefined' && NAVI.sb) setTimeout(function(){ cargarConsejeria(); },0);
+    if(typeof cargarExpedientes==='function' && !store._expLoaded && typeof NAVI!=='undefined' && NAVI.sb) setTimeout(function(){ cargarExpedientes(); },0);
     if(store.consej){
       var _ta=(typeof cjTemaActual==='function')?cjTemaActual():null;
       var _n=_ta?(store.consej.miembros||[]).filter(function(x){return cjDone(x,_ta);}).length:0;
@@ -1278,28 +1280,76 @@ function dossierHTML(x){ if(!x) return ''; return `<div class="dossier">
        <div class="dz-head"><span>ARCHIVO DE CONSEJEROS · NACIÓN VIVA</span><span class="cls">EDIFICANDO</span></div>
        <div class="dz-body">${dossierPhoto(x,true)}
          <div class="dz-fields">
-           <div class="dz-row"><div class="dz-label">Expediente</div><div class="dz-val">${x.expediente}</div></div>
-           <div class="dz-row"><div class="dz-label">Nombre</div><div class="dz-val big">${x.nombre.toUpperCase()}${x.alias?` <span style="font-size:.7em;opacity:.75">· ${x.alias}</span>`:''}</div></div>
-           ${x.grupo?`<div class="dz-row"><div class="dz-label">${x.titulo||'Consejero'} de</div><div class="dz-val">${x.grupo}</div></div>`:''}
-           <div class="dz-row"><div class="dz-label">Área asignada</div><div class="dz-val">${x.materia}</div></div>
-           <div class="dz-row"><div class="dz-label">Formación</div><div class="dz-val">${x.formacion}</div></div>
-           <div class="dz-row"><div class="dz-label">Experiencia</div><div class="dz-val">${x.experiencia}</div></div>
-           <div class="dz-row"><div class="dz-label">Ingreso</div><div class="dz-val">${x.ingreso}</div></div>
+           <div class="dz-row"><div class="dz-label">Expediente</div><div class="dz-val">${_ex(x.expediente)}</div></div>
+           <div class="dz-row"><div class="dz-label">Nombre</div><div class="dz-val big">${_ex(x.nombre.toUpperCase())}${x.alias?` <span style="font-size:.7em;opacity:.75">· ${_ex(x.alias)}</span>`:''}</div></div>
+           ${x.grupo?`<div class="dz-row"><div class="dz-label">${_ex(x.titulo||'Consejero')} de</div><div class="dz-val">${_ex(x.grupo)}</div></div>`:''}
+           <div class="dz-row"><div class="dz-label">Área asignada</div><div class="dz-val">${_ex(x.materia)}</div></div>
+           <div class="dz-row"><div class="dz-label">Formación</div><div class="dz-val">${_ex(x.formacion)}</div></div>
+           <div class="dz-row"><div class="dz-label">Experiencia</div><div class="dz-val">${_ex(x.experiencia)}</div></div>
+           <div class="dz-row"><div class="dz-label">Ingreso</div><div class="dz-val">${_ex(x.ingreso)}</div></div>
            <div class="dz-row"><div class="dz-label">Estatus</div><div class="dz-val" style="color:#7FE090">EDIFICANDO</div></div>
          </div>
        </div>
        ${x.frase?`<div class="dz-section">Declaración en archivo</div>
-       <div class="dz-statement">${x.frase}</div>`:''}
+       <div class="dz-statement">${_ex(x.frase)}</div>`:''}
        <div class="dz-section">Notas del expediente</div>
-       <div class="dz-notes">${x.bio}</div>
+       <div class="dz-notes">${_ex(x.bio)}</div>
        ${x.cvPdf?`<div style="padding:12px 16px 4px"><a href="${x.cvPdf}" download="${(x.cvName||('CV-'+x.nombre+'.pdf')).replace(/"/g,'')}" class="btn btn-sm">Descargar CV (PDF)</a></div>`:''}
      </div>`; }
 function miDossier(){ var u=(state.user||{}); var ms=store.mentores||[]; return ms.find(function(x){return x.usuario&&u.usuario&&x.usuario===u.usuario;})||ms.find(function(x){return typeof esMentorNombre==='function'&&esMentorNombre(u.nombre||'',[x.nombre]);})||null; }
+function aplicarExpedientes(rows){
+  (Array.isArray(rows)?rows:[rows]).forEach(function(r){ if(!r||!r.usuario) return;
+    var ms=store.mentores, m=ms.find(function(x){return x.usuario===r.usuario;});
+    if(!m){ if(!(r.bio||r.experiencia||r.formacion)) return;
+      var n=ms.reduce(function(a,x){var k=parseInt(String(x.expediente||'').replace(/\D/g,''))||0;return Math.max(a,k);},0)+1;
+      m={id:'e_'+r.usuario.replace(/[^a-z0-9]/gi,'_'),usuario:r.usuario,publicado:true,expediente:'NV-'+String(n).padStart(3,'0'),ingreso:'2026',titulo:'Consejero',nombre:r.usuario,materia:'',formacion:'',experiencia:'',bio:'',frase:'',foto:''}; ms.push(m); }
+    ['nombre','titulo','grupo','materia','formacion','experiencia','bio','frase','foto'].forEach(function(k){ if(r[k]!=null && r[k]!=='') m[k]=r[k]; });
+    if(r.frase==='') m.frase='';
+  });
+}
+window.cargarExpedientes=async function(force){
+  if(!(NAVI&&NAVI.sb) || (typeof _enApp==='function'&&!_enApp())) return;
+  if(store._expLoaded && !force) return; store._expLoaded=true;
+  try{ var r=await NAVI.sb.schema('navi').from('expedientes').select('usuario,nombre,titulo,grupo,materia,formacion,experiencia,bio,frase,foto'); if(r.error) throw r.error; aplicarExpedientes(r.data||[]); render(); }
+  catch(e){ store._expLoaded=false; }
+};
+function cjExpForm(d){
+  var u=state.user||{}; d=d||{}; store._exFoto=null;
+  var foto=d.foto||u.foto||'';
+  var f=function(id,lab,val,ph,area){ return '<label class="ex-lab" for="'+id+'">'+lab+'</label>'+(area?'<textarea id="'+id+'" class="cj-ta ex-in" rows="4" placeholder="'+_ex(ph)+'">'+_ex(val)+'</textarea>':'<input id="'+id+'" class="ex-in" value="'+_ex(val)+'" placeholder="'+_ex(ph)+'">'); };
+  return '<div class="card ex-form"><div class="ex-grid"><div class="ex-photo">'
+    +'<img id="ex_prev" src="'+_ex(foto)+'" alt="" onerror="this.style.visibility=\'hidden\'" onload="this.style.visibility=\'visible\'">'
+    +'<label class="btn btn-sm" style="margin-top:10px;display:inline-block;cursor:pointer">Cambiar foto<input type="file" accept="image/*" style="display:none" onchange="cjFotoExp(this)"></label>'
+    +'<div class="mg-note" style="margin-top:6px">Se recorta en cuadro. Usa una foto de frente y con buena luz.</div></div><div>'
+    +f('ex_nombre','Nombre como quieres que aparezca',d.nombre||u.nombre||'','Ej. Dra. Ana López')
+    +'<label class="ex-lab" for="ex_titulo">Título</label><select id="ex_titulo" class="ex-in"><option'+((d.titulo||'Consejero')==='Consejero'?' selected':'')+'>Consejero</option><option'+(d.titulo==='Consejera'?' selected':'')+'>Consejera</option></select>'
+    +f('ex_materia','Área',d.materia||'','Ej. Liderazgo y servicio público')
+    +f('ex_formacion','Formación',d.formacion||'','Ej. Lic. en Derecho · Universidad…')
+    +f('ex_experiencia','Experiencia',d.experiencia||'','Tus cargos y trayectoria principales',true)
+    +f('ex_bio','Notas del expediente (semblanza)',d.bio||'','Libros, causas, reconocimientos, lo que quieras compartir',true)
+    +f('ex_frase','Frase o declaración (opcional)',d.frase||'','Una frase que te represente',true)
+    +'<div class="cj-btns" style="margin-top:14px"><button class="btn btn-sm btn-accent" onclick="cjGuardarExp(this)">Guardar cambios</button><button class="btn btn-sm" onclick="state.cjEdit=false;store._exFoto=null;render()">Cancelar</button></div>'
+    +'</div></div></div>';
+}
+window.cjFotoExp=function(inp){ var fl=inp.files&&inp.files[0]; if(!fl) return; var rd=new FileReader();
+  rd.onload=function(){ var im=new Image(); im.onload=function(){ var s=Math.min(im.width,im.height), c=document.createElement('canvas'); c.width=c.height=480;
+    c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)*0.3,s,s,0,0,480,480); store._exFoto=c.toDataURL('image/jpeg',0.85);
+    var p=document.getElementById('ex_prev'); if(p){ p.style.visibility='visible'; p.src=store._exFoto; } }; im.src=rd.result; };
+  rd.readAsDataURL(fl); };
+window.cjGuardarExp=async function(btn){
+  var g=function(id){ var e=document.getElementById(id); return e?e.value:''; };
+  if(!g('ex_nombre').trim()){ toast('Escribe tu nombre'); return; }
+  var t=btn.textContent; btn.disabled=true; btn.textContent='Guardando…';
+  try{ var r=await NAVI.sb.schema('navi').rpc('guardar_mi_expediente',{p_nombre:g('ex_nombre'),p_titulo:g('ex_titulo'),p_materia:g('ex_materia'),p_formacion:g('ex_formacion'),p_experiencia:g('ex_experiencia'),p_bio:g('ex_bio'),p_frase:g('ex_frase'),p_foto:store._exFoto||null});
+    if(r.error) throw r.error; aplicarExpedientes(r.data); store._exFoto=null; state.cjEdit=false; render(); toast('Tu expediente se actualizó');
+  }catch(e){ btn.disabled=false; btn.textContent=t; toast((e&&e.message)||'No se pudo guardar'); }
+};
 function goMentor(id){state.mentorId=id;state.view='mentorDetalle';buildMenu();render();window.scrollTo(0,0);}
-function mphoto(m){return m.foto?`<img class="mphoto" src="${m.foto}" alt="${m.nombre}">`:`<div class="mphoto">${initials(m.nombre)}</div>`;}
+function _ex(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function mphoto(m){return m.foto?`<img class="mphoto" src="${_ex(m.foto)}" alt="${_ex(m.nombre)}">`:`<div class="mphoto">${initials(m.nombre)}</div>`;}
 const _cors='<span class="cor tl"></span><span class="cor tr"></span><span class="cor bl"></span><span class="cor br"></span>';
 function dossierPhoto(m,big){
-  const inner=m.foto?`<img src="${m.foto}" alt="${m.nombre}">`:`<div class="ini">${initials(m.nombre)}</div>`;
+  const inner=m.foto?`<img src="${_ex(m.foto)}" alt="${_ex(m.nombre)}">`:`<div class="ini">${initials(m.nombre)}</div>`;
   return `<div class="${big?'dz-photo-lg':'dz-photo'}">${inner}<div class="scan"></div>${_cors}${big?'<div class="dz-stamp">EDIFICANDO</div>':''}</div>`;
 }
 
@@ -1478,7 +1528,7 @@ mentores:{title:'Mis Consejeros',html(){
    + ms.map(x=>`<div class="dossier-card" onclick="goMentor('${x.id}')">
         <div class="dz-topbar"><span>EXP. ${x.expediente}</span><span class="cls">EDIFICANDO</span></div>
         <div class="dzc-body">${dossierPhoto(x,false)}
-          <div class="dzc-meta"><div class="dzc-exp">${(x.titulo||'Consejero').toUpperCase()}${x.grupo?' · '+x.grupo.toUpperCase():''} · INGRESO ${x.ingreso}</div><div class="dzc-name">${x.nombre}</div><div class="dzc-area">${x.materia}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
+          <div class="dzc-meta"><div class="dzc-exp">${_ex((x.titulo||'Consejero').toUpperCase())}${x.grupo?' · '+_ex(x.grupo.toUpperCase()):''} · INGRESO ${_ex(x.ingreso)}</div><div class="dzc-name">${_ex(x.nombre)}</div><div class="dzc-area">${_ex(x.materia)}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
         </div></div>`).join('')
    + `</div>`
    : `<div class="empty">Los expedientes de los consejeros se publicarán pronto.</div>`);
@@ -2385,7 +2435,7 @@ if (PRELANZAMIENTO) {
     if(!c) return head('Consejería','Mis edificadores','')+'<div class="card"><div class="mg-note">'+(store._cjLoaded?'Esta sección es para consejeros.':'Cargando tu grupo…')+'</div></div>';
     var mb=c.miembros||[];
     var SUB=[['resumen','Sesión y resumen'],['grupo','Mi grupo · '+mb.length],['respuestas','Leer respuestas'],['recursos','Recursos'],['expediente','Mi expediente']];
-    var cjExpediente=function(){ var d=miDossier(); return d? '<div class="mg-note" style="margin:0 0 12px">Así ven tu expediente tus edificadores en la sección <b>Consejeros</b>. Si quieres cambiar algo, escríbenos.</div>'+dossierHTML(d) : '<div class="card"><div class="mg-note">Tu expediente se publicará muy pronto. Mientras tanto, envíanos tu foto y una breve semblanza.</div></div>'; };
+    var cjExpediente=function(){ var d=miDossier(); if(state.cjEdit) return cjExpForm(d); var eb='<button class="btn btn-sm btn-accent" onclick="state.cjEdit=true;render()">'+(d?'✎ Editar mi expediente':'Crear mi expediente')+'</button>'; return d? '<div class="ex-top"><div class="mg-note" style="margin:0">Así ven tu expediente tus edificadores en la sección <b>Consejeros</b>.</div>'+eb+'</div>'+dossierHTML(d) : '<div class="card"><div class="mg-note" style="margin:0 0 12px">Aún no tienes expediente publicado. Complétalo para que tus edificadores te conozcan.</div>'+eb+'</div>'; };
     var body={resumen:cjResumen,grupo:cjGrupo,respuestas:cjRespuestas,recursos:cjRecursos,expediente:cjExpediente}[state.cjSub]||cjResumen;
     return head('Consejería · '+_esc(c.grupo),'Mis edificadores','Consejeros: '+_esc(c.consejeros||'')+'. Tu grupo, la sesión en vivo y sus respuestas, en un solo lugar.')
       +'<div class="cj-tabs">'+SUB.map(function(s){return '<button class="cj-tab'+(s[0]===state.cjSub?' on':'')+'" onclick="state.cjSub=\''+s[0]+'\';render()">'+s[1]+'</button>';}).join('')+'</div>'
