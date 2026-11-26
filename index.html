@@ -1354,8 +1354,9 @@ function videoBienvenidaCard(){
 function _norm(x){ return (x==null?'':String(x)).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim(); }
 function _esc(x){ return (x==null?'':String(x)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 function _ini(n){ var p=nombreBonito(n).split(' ').filter(Boolean); return ((p[0]||'')[0]||'')+((p[1]||'')[0]||''); }
+function _enApp(){ var a=document.getElementById('app'); return !!(a&&!a.classList.contains('hidden')); }
 async function cargarMiGrupo(force){
-  if(!(NAVI&&NAVI.sb)||state.role!=='participante') return;
+  if(!(NAVI&&NAVI.sb)||state.role!=='participante'||!_enApp()) return;
   if(store._mgLoaded && !force) return; store._mgLoaded=true;
   try{ var r=await NAVI.sb.schema('navi').rpc('mi_grupo'); if(r.error) throw r.error; store.miGrupo=r.data||null; }
   catch(e){ store._mgLoaded=false; store.miGrupo=null; store._mgTries=(store._mgTries||0)+1; if(store._mgTries<6) setTimeout(function(){ cargarMiGrupo(true); },1200*store._mgTries); return; }
@@ -2285,7 +2286,7 @@ if (PRELANZAMIENTO) {
   store.cjResp = store.cjResp || {};
   state.cjSub = state.cjSub || 'resumen';
   window.cargarConsejeria = async function(force){
-    if(!(NAVI&&NAVI.sb) || state.role!=='participante') return;
+    if(!(NAVI&&NAVI.sb) || state.role!=='participante' || (typeof _enApp==='function'&&!_enApp())) return;
     if(store._cjLoaded && !force) return; store._cjLoaded=true;
     try{ var r=await NAVI.sb.schema('navi').rpc('mi_consejeria'); if(r.error) throw r.error;
       store.consej = r.data || null; store._cjTries=0;
