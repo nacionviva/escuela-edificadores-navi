@@ -1453,13 +1453,13 @@ function fechaLarga(t){ try{ var d=new Date(t); var s=d.toLocaleDateString('es-M
 function avatarMg(m,big){ var sz=big?46:34; return m.foto?'<img class="mg-av" style="width:'+sz+'px;height:'+sz+'px" src="'+_esc(m.foto)+'" alt="">':'<span class="mg-av mg-ini" style="width:'+sz+'px;height:'+sz+'px;font-size:'+(big?15:12)+'px">'+_esc(_ini(m.nombre))+'</span>'; }
 function reunionGrupoBlock(g){
   var st=estadoReunion(g), link=g.link||'';
-  var btn=function(cls,txt){ return link?'<a class="btn '+cls+' btn-lg mg-go" href="'+_esc(link)+'" target="_blank" rel="noopener">'+txt+'</a>':'<div class="mg-note">Tu consejero publicará aquí el enlace de la reunión.</div>'; };
-  if(st.fase==='vivo') return '<div class="mg-live"><span class="mg-dot"></span>La reunión de tu grupo está por comenzar o ya comenzó</div>'+btn('btn-solid','Entrar ahora a la reunión en vivo →');
+  var btn=function(cls,txt){ return link?'<a class="btn '+cls+' btn-lg mg-go" href="'+_esc(link)+'" target="_blank" rel="noopener">'+txt+'</a>':'<div class="mg-note">Tu consejero publicará aquí el enlace de la Mesa de consejo.</div>'; };
+  if(st.fase==='vivo') return '<div class="mg-live"><span class="mg-dot"></span>La Mesa de consejo de tu grupo está por comenzar o ya comenzó</div>'+btn('btn-solid','Entrar ahora a la Mesa de consejo →');
   if(st.fase==='antes') return '<div class="mg-when">'+fechaLarga(st.t)+' · Google Meet</div>'
      +'<div class="countdown mg-cd" data-t="'+st.t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>'
-     +btn('btn-accent','Entrar a la reunión de mi grupo →')+'<div class="mg-note">El botón te lleva a la sala de Google Meet de tu grupo. Te recomendamos entrar 5 minutos antes.</div>';
+     +btn('btn-accent','Entrar a la Mesa de consejo de mi grupo →')+'<div class="mg-note">El botón te lleva a la sala de Google Meet de tu grupo. Te recomendamos entrar 5 minutos antes.</div>';
   if(st.fase==='paso') return '<div class="mg-note">La última reunión fue el '+fechaLarga(st.t)+'. Te avisaremos aquí la próxima fecha.</div>';
-  return (g.dia||g.hora)?'<div class="mg-when">'+_esc([g.dia,g.hora].filter(Boolean).join(' · '))+'</div>'+btn('btn-accent','Entrar a la reunión de mi grupo →'):'<div class="mg-note">Pronto publicaremos aquí la fecha de tu próxima reunión en vivo.</div>';
+  return (g.dia||g.hora)?'<div class="mg-when">'+_esc([g.dia,g.hora].filter(Boolean).join(' · '))+'</div>'+btn('btn-accent','Entrar a la Mesa de consejo de mi grupo →'):'<div class="mg-note">Pronto publicaremos aquí la fecha de tu próxima Mesa de consejo.</div>';
 }
 function dossierDe(nombre){ try{ return (store.mentores||[]).find(function(x){ return x.publicado && (esMentorNombre(x.nombre,[nombre]) || (x.alias && _norm(x.alias)===_norm(nombre))); })||null; }catch(e){ return null; } }
 function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus consejeros</span>'+ms.map(function(m){ var d=dossierDe(m); return d?'<button class="mg-chip mg-chip-link" onclick="goMentor(\''+d.id+'\')" title="Ver expediente">'+(d.foto?'<img src="'+d.foto+'" alt="">':'')+_esc(m)+' ›</button>':'<span class="mg-chip">'+_esc(m)+'</span>'; }).join('')+'</div>'; }
@@ -1471,7 +1471,7 @@ function miClaseCard(enVista){
   var faces=mem.slice(0,8).map(function(m){return avatarMg(m,false);}).join('')+(mem.length>8?'<span class="mg-av mg-ini mg-more">+'+(mem.length-8)+'</span>':'');
   return '<div class="card mg-card'+(st.fase==='vivo'?' is-live':'')+'">'
     +'<div class="mg-top"><div><div class="mg-eyebrow">Mi grupo</div><div class="mg-title">'+_esc(g.grupo)+'</div></div>'
-    +(st.fase==='vivo'?'<span class="pill pill-ok">● EN VIVO</span>':(st.fase==='antes'?'<span class="pill pill-award">Reunión en vivo</span>':''))+'</div>'
+    +(st.fase==='vivo'?'<span class="pill pill-ok">● EN VIVO</span>':(st.fase==='antes'?'<span class="pill pill-award">Mesa de consejo</span>':''))+'</div>'
     +mentoresChips(g)
     +reunionGrupoBlock(g)
     +(mem.length&&!enVista?'<div class="mg-foot" onclick="nav(\'migrupo\')"><div class="mg-faces">'+faces+'</div><span class="mg-link">Ver a mis '+(mem.length-1)+' compañeros →</span></div>':'')
@@ -2358,11 +2358,11 @@ if (PRELANZAMIENTO) {
     var resp=ta? mb.filter(function(x){return cjDone(x,ta);}).length : 0;
     var atn=mb.filter(function(x){ return temas.filter(function(t){return cjDone(x,t);}).length < Math.max(1,nT-1); });
     var st=estadoReunion({proxima:c.proxima,en_vivo:false}), t=st.t;
-    var cd = (st.fase==='antes') ? '<div class="countdown mg-cd" data-t="'+t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>' : (st.fase==='vivo'?'<div class="mg-live"><span class="mg-dot"></span>La reunión está por comenzar o ya comenzó</div>':'');
-    var aviso='¡Hola, Grupo '+c.grupo.replace('Grupo ','')+'! 👋 Les recordamos nuestra reunión en vivo'+(t?(' el '+fechaLarga(t)):'')+'. Entren aquí: '+(c.link||'')+' ¡Los esperamos!';
+    var cd = (st.fase==='antes') ? '<div class="countdown mg-cd" data-t="'+t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>' : (st.fase==='vivo'?'<div class="mg-live"><span class="mg-dot"></span>La Mesa de consejo está por comenzar o ya comenzó</div>':'');
+    var aviso='¡Hola, Grupo '+c.grupo.replace('Grupo ','')+'! 👋 Les recordamos nuestra Mesa de consejo'+(t?(' el '+fechaLarga(t)):'')+'. Entren aquí: '+(c.link||'')+' ¡Los esperamos!';
     return '<div class="cj-g2">'
-      +'<div class="card mg-card is-live cj-eq"><div class="mg-eyebrow">Sesión en vivo · '+_esc(c.grupo)+'</div><div class="mg-title" style="font-size:19px">'+(t?fechaLarga(t):'Pronto publicaremos la fecha')+'</div><div class="mg-note" style="margin-top:4px">Google Meet · sala de tu grupo</div>'+cd
-      +'<div class="cj-btns">'+(c.link?'<a class="btn btn-solid" target="_blank" rel="noopener" href="'+_esc(c.link)+'">Entrar a la reunión →</a>':'')
+      +'<div class="card mg-card is-live cj-eq"><div class="mg-eyebrow">Mesa de consejo · '+_esc(c.grupo)+'</div><div class="mg-title" style="font-size:19px">'+(t?fechaLarga(t):'Pronto publicaremos la fecha')+'</div><div class="mg-note" style="margin-top:4px">Google Meet · sala de tu grupo</div>'+cd
+      +'<div class="cj-btns">'+(c.link?'<a class="btn btn-solid" target="_blank" rel="noopener" href="'+_esc(c.link)+'">Entrar a la Mesa de consejo →</a>':'')
       +'<a class="btn btn-sm" target="_blank" rel="noopener" href="assets/consejeros/Guion-de-Sesion.pdf">Guion de la sesión</a>'
       +'<a class="btn btn-sm cj-wa" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(aviso)+'">Avisar al grupo</a></div></div>'
       +'<div class="card cj-eq"><div class="mg-eyebrow" style="color:var(--accent)">Tema de esta quincena</div>'
@@ -2442,7 +2442,7 @@ if (PRELANZAMIENTO) {
       +body(c);
   }, after:function(){ if(typeof cargarConsejeria==='function') cargarConsejeria(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.migrupo = {title:'Mi grupo', html:function(){
-    return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus consejeros y el acceso a la reunión en vivo de tu grupo.')+miGrupoVista();
+    return head('Escuela de Edificadores NAVI','Mi grupo','Aquí están tus compañeros, tus consejeros y el acceso a la Mesa de consejo de tu grupo.')+miGrupoVista();
   }, after:function(){ cargarMiGrupo(); if(typeof cargarGrupos==='function') cargarGrupos(); }};
   VIEWS.clases = {title:'Mis Clases', html:function(){
     return head('Escuela de Edificadores NAVI','Mis Clases','Tu formación se compone de tres ejes. Los módulos se abrirán próximamente; te avisaremos en cuanto estén listos.')
@@ -2935,9 +2935,9 @@ function heroProxima(mod,sinReunion){
   if(sinReunion){ _nm=null; }
   if(_nm && _cerca){
     reunionHtml='<div class="countdown"><div class="cd-box"><div class="n" id="cdH">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" id="cdM">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" id="cdS">–</div><div class="u">seg</div></div></div>'
-      +'<div style="font-size:11.5px;color:var(--soft);margin-top:8px">Reunión en vivo: '+_fr(_nm)+' · 7:00 pm (CDMX).</div>';
+      +'<div style="font-size:11.5px;color:var(--soft);margin-top:8px">Mesa de consejo: '+_fr(_nm)+' · 7:00 pm (CDMX).</div>';
   } else if(_nm){
-    reunionHtml='<div style="margin-top:12px;font-size:13px;color:var(--dim)">🗓️ Próxima reunión en vivo: <b style="color:var(--cream)">'+_fr(_nm)+' · 7:00 pm (CDMX)</b></div>';
+    reunionHtml='<div style="margin-top:12px;font-size:13px;color:var(--dim)">🗓️ Próxima Mesa de consejo: <b style="color:var(--cream)">'+_fr(_nm)+' · 7:00 pm (CDMX)</b></div>';
   }
   var _vid=(m.videoUrl&&/^[A-Za-z0-9_-]{6,15}$/.test(m.videoUrl))?m.videoUrl:'';
   var _thumb=(sinReunion&&_vid)?('<div class="hero-thumb" onclick="goModule('+m.id+')"><img src="https://img.youtube.com/vi/'+_vid+'/hqdefault.jpg" alt="" onerror="this.parentNode.remove()"><span class="vbplay"></span></div>'):'';
