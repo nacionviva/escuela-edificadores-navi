@@ -3121,9 +3121,11 @@ function guardarPreguntas(mod){captureClase(mod);const m=DB.modulo(mod);
 /* carrusel de artículos (revista Nación Viva) */
 let carIdx=0, carInt=null;
 var ANUNCIOS=[
-  {img:'https://cyiwuolmjihdrhdagrgk.supabase.co/storage/v1/object/public/publico/anuncios/mesa-consejo-26nov.png', go:"nav('migrupo')", lbl:'Entrar a la Mesa de consejo', hasta:'2026-11-27T04:00:00Z'}
+  {img:'https://cyiwuolmjihdrhdagrgk.supabase.co/storage/v1/object/public/publico/anuncios/mesa-consejo-26nov-grupo-c.png', go:"nav('migrupo')", lbl:'Entrar a la Mesa de consejo', hasta:'2026-11-27T05:00:00Z', solo:['Grupo C']},
+  {img:'https://cyiwuolmjihdrhdagrgk.supabase.co/storage/v1/object/public/publico/anuncios/mesa-consejo-26nov.png', go:"nav('migrupo')", lbl:'Entrar a la Mesa de consejo', hasta:'2026-11-27T04:00:00Z', excepto:['Grupo C']}
 ];
-function anunciosActivos(){ var now=Date.now(); return ANUNCIOS.filter(function(a){ return !a.hasta || now < new Date(a.hasta).getTime(); }); }
+function _miGrupoNombre(){ try{ return (store.miGrupo&&store.miGrupo.grupo)||(store.consej&&store.consej.grupo)||((state.user||{}).grupo)||''; }catch(e){ return ''; } }
+function anunciosActivos(){ var now=Date.now(), g=_miGrupoNombre(); return ANUNCIOS.filter(function(a){ if(a.hasta && now >= new Date(a.hasta).getTime()) return false; if(a.solo && a.solo.indexOf(g)<0) return false; if(a.excepto && g && a.excepto.indexOf(g)>=0) return false; return true; }); }
 function articulosCarousel(soloAnuncios){
   var a0=anunciosActivos().map(function(a){return {img:a.img,bg:'',titulo:'',autor:'',edicion:'',go:a.go,lbl:a.lbl};});
   var a1=DB.articulos().filter(function(a){return a.publicado;}).map(function(a){return {img:a.img,bg:a.bg,titulo:a.titulo,autor:a.autor,edicion:a.edicion,go:"nav('revista')",lbl:'Leer la revista'};});
