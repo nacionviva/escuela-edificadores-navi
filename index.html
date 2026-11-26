@@ -301,6 +301,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .cj-tab.on{color:var(--cream);border-bottom-color:var(--award)}
 .cj-g2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:var(--gap-sec,20px);align-items:stretch}
 .cj-g2>.card{margin:0}.cj-eq{display:flex;flex-direction:column}.cj-eq>.cj-btns{margin-top:auto;padding-top:14px}
+.cj-eq>a.btn{margin-top:auto;text-decoration:none}
 .cj-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:var(--gap-sec,20px)}.cj-g4>.card{margin:0}
 .cj-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.cj-btns a,.cj-act a{text-decoration:none!important}
 .cj-wa{background:#25D366!important;border-color:#25D366!important;color:#04361A!important;font-weight:800;text-decoration:none}
@@ -327,6 +328,7 @@ h1.page{font-size:26px;font-weight:800;margin-bottom:4px}
 .cj-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.cj-res>.card{margin:0}
 @media(max-width:1000px){.cj-g2{grid-template-columns:1fr}.cj-g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.cj-row{grid-template-columns:36px minmax(0,1fr) auto}.cj-meta{display:none}.cj-body{padding-left:18px}}
+.mg-chip-link{cursor:pointer;font-family:inherit;line-height:1.4;display:inline-flex;align-items:center;gap:7px;transition:border-color .2s,background .2s}.mg-chip-link img{width:16px;height:16px;margin-left:-5px;border-radius:50%;object-fit:cover;filter:grayscale(1)}.mg-chip-link:hover{border-color:var(--accent);background:rgba(230,180,80,.08)}
 .pill-award{background:var(--award-tint);color:var(--award-bright);border:1px solid var(--award-line);font-weight:700}
 .award-card{border-color:var(--award-line)!important;background:linear-gradient(180deg,var(--award-soft),rgba(238,239,236,.03))!important}
 .stat-n.award{color:var(--award-bright)}
@@ -913,7 +915,7 @@ const store = {
   ],
   donativos:[],
   // MENTORES (uno por trimestre). foto:'' => se muestra avatar con iniciales; al desplegar se pone la URL de la foto real.
-  mentores:[{id:'m1',foto:'assets/mentores/gamaliela-tan.jpg',publicado:true,nombre:'Gamaliela Tan',materia:'Coach de lo Familiar',expediente:'NV-003',ingreso:'2026',frase:'Acompaño a las familias a sanar, a comunicarse sin violencia y a descubrir su razón de ser (IKIGAI) para vivir el propósito con el que Dios las diseñó.',formacion:'Lic. en Ciencias Jurídicas · Mexicana de ascendencia china',experiencia:'Comenzó en Malasia impartiendo talleres y conferencias. Actualmente radica en Monterrey, N.L., donde imparte cursos en línea de Sanidad Emocional, Mente Renovada y Encontrando tu Propósito de Vida. Apasionada por las Familias Transculturales (CTC), la Comunicación No Violenta (CNV) y el IKIGAI.',bio:'Autora de tres libros: «Linaje Escogido», «Cimientos Eternos» y «Mujeres Anónimas». Madre de dos hijos y esposa de Jeffrey Tan, autor de «El Reformador». Su trabajo se centra en la restauración familiar, la sanidad emocional y el acompañamiento de personas para que descubran y vivan su propósito.'}],
+  mentores:[{id:'m1',foto:'assets/mentores/gamaliela-tan.jpg',publicado:true,titulo:'Consejera',grupo:'Grupo B',nombre:'Gamaliela Tan',materia:'Coach de lo Familiar',expediente:'NV-003',ingreso:'2026',frase:'Acompaño a las familias a sanar, a comunicarse sin violencia y a descubrir su razón de ser (IKIGAI) para vivir el propósito con el que Dios las diseñó.',formacion:'Lic. en Ciencias Jurídicas · Mexicana de ascendencia china',experiencia:'Comenzó en Malasia impartiendo talleres y conferencias. Actualmente radica en Monterrey, N.L., donde imparte cursos en línea de Sanidad Emocional, Mente Renovada y Encontrando tu Propósito de Vida. Apasionada por las Familias Transculturales (CTC), la Comunicación No Violenta (CNV) y el IKIGAI.',bio:'Autora de tres libros: «Linaje Escogido», «Cimientos Eternos» y «Mujeres Anónimas». Madre de dos hijos y esposa de Jeffrey Tan, autor de «El Reformador». Su trabajo se centra en la restauración familiar, la sanidad emocional y el acompañamiento de personas para que descubran y vivan su propósito.'},{id:'m2',foto:'assets/mentores/brenda-sanchez.jpg',publicado:true,titulo:'Consejera',grupo:'Grupo F',nombre:'Brenda Lizbeth Sánchez Castro',materia:'Gobierno, Territorio y Acción Climática',expediente:'NV-004',ingreso:'2026',frase:'Una ciudad no se transforma únicamente construyendo infraestructura, sino fortaleciendo instituciones, reglas y capacidades públicas.',formacion:'Politóloga y abogada · Maestra en Gestión Energética',experiencia:'Más de 25 años en los tres órdenes de gobierno y en los ámbitos legislativo, académico y social. Hoy es directora de Política de Cambio Climático del Gobierno de Nuevo León y diputada suplente de la LXXVII Legislatura. Fue secretaria de Desarrollo Urbano Sostenible de Monterrey (2022–2024), diputada local en la LXXVI Legislatura y delegada de SEMARNAT en Nuevo León y Tlaxcala.',bio:'Autora del libro «Fracking: una visión municipal» (2020) y de la exposición fotográfica «La gran migración», sobre la mariposa monarca. Ha sido docente universitaria de Derecho Romano y Derecho Municipal y consejera editorial de El Norte. Integra la Sociedad de Urbanismo Región Monterrey y la Asociación Mexicana de Urbanistas. Su trabajo conecta el derecho con el territorio y la política con la evidencia.'}],
   // ARTÍCULOS de la revista/blog Nación Viva (se conectará al blog real). img: placeholder con degradado.
   articulos:[
     {id:1,titulo:'¿Cuál es el mejor modelo para desarrollar liderazgo?',autor:'Dr. Jorge Salcedo Mireles',edicion:'1ª edición',img:'assets/revista/art1.png',bg:'linear-gradient(135deg,#0A1426,#2A3F5C)'},
@@ -1026,10 +1028,10 @@ const DB = {
    ============================================================ */
 const state = {role:'participante', view:'inicio', user:null, modId:null, sesMod:1, editGrupo:null, showNuevoGrupo:false, editMentor:null, editAviso:null, editArt:null, editMod:null};
 const MENUS = {
-  participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Mentores'],['calendario','calendar','Calendario'],['revista','news','Revista'],['avance','chart','Mi Avance'],['comunidad','chat','Comunidad'],['midonativo','heart','Donativo']],
+  participante:[['inicio','home','Inicio'],['avisos','mega','Avisos'],['trimestre','book','Mi Trimestre'],['mentores','cap','Mis Consejeros'],['calendario','calendar','Calendario'],['revista','news','Revista'],['avance','chart','Mi Avance'],['comunidad','chat','Comunidad'],['midonativo','heart','Donativo']],
   profesor:[['pinicio','home','Inicio'],['pgrupo','users','Mi grupo'],['pentregas','file','Entregas'],['ppreguntas','edit','Mi clase'],['pasistencia','check','Asistencia'],['pmateriales','folder','Materiales'],['comunidad','chat','Comunidad']],
-  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
-  superadmin:[['dpanel','grid','Panel'],['davance','chart','Avance'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Mentores'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  director:[['dpanel','grid','Panel'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Consejeros'],['dcontenido','book','Programa de estudio'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
+  superadmin:[['dpanel','grid','Panel'],['davance','chart','Avance'],['iregistros','list','Registros'],['ialumnos','users','Alumnos'],['dgrupos','layers','Grupos'],['dmentores','cap','Consejeros'],['dcontenido','book','Programa de estudio'],['drespuestas','list','Respuestas'],['idonativos','heart','Donativos'],['dfinanzas','chart','Finanzas'],['davisos','mega','Avisos'],['drevista','news','Revista'],['didentidad','image','Identidad']],
   inscripciones:[['ialta','userplus','Alta de participante'],['iregistros','list','Registros'],['ialumnos','users','Alumnos']]
 };
 // Muestra el nombre en formato Título aunque en la BD esté en MAYÚSCULAS (no toca la BD).
@@ -1119,7 +1121,6 @@ const NAVI = {
     'participante':'participante@edificadores.navi',
     'direccion':'director@edificadores.navi',
     'director':'director@edificadores.navi',
-    'jorge.salcedo':'mentor@edificadores.navi',
     'mentor':'mentor@edificadores.navi',
     'registro':'inscripciones@edificadores.navi',
     'inscripciones':'inscripciones@edificadores.navi'
@@ -1380,7 +1381,7 @@ function fechaLarga(t){ try{ var d=new Date(t); var s=d.toLocaleDateString('es-M
 function avatarMg(m,big){ var sz=big?46:34; return m.foto?'<img class="mg-av" style="width:'+sz+'px;height:'+sz+'px" src="'+_esc(m.foto)+'" alt="">':'<span class="mg-av mg-ini" style="width:'+sz+'px;height:'+sz+'px;font-size:'+(big?15:12)+'px">'+_esc(_ini(m.nombre))+'</span>'; }
 function reunionGrupoBlock(g){
   var st=estadoReunion(g), link=g.link||'';
-  var btn=function(cls,txt){ return link?'<a class="btn '+cls+' btn-lg mg-go" href="'+_esc(link)+'" target="_blank" rel="noopener">'+txt+'</a>':'<div class="mg-note">Tu mentor publicará aquí el enlace de la reunión.</div>'; };
+  var btn=function(cls,txt){ return link?'<a class="btn '+cls+' btn-lg mg-go" href="'+_esc(link)+'" target="_blank" rel="noopener">'+txt+'</a>':'<div class="mg-note">Tu consejero publicará aquí el enlace de la reunión.</div>'; };
   if(st.fase==='vivo') return '<div class="mg-live"><span class="mg-dot"></span>La reunión de tu grupo está por comenzar o ya comenzó</div>'+btn('btn-solid','Entrar ahora a la reunión en vivo →');
   if(st.fase==='antes') return '<div class="mg-when">'+fechaLarga(st.t)+' · Google Meet</div>'
      +'<div class="countdown mg-cd" data-t="'+st.t+'"><div class="cd-box"><div class="n" data-u="d">–</div><div class="u">días</div></div><div class="cd-box"><div class="n" data-u="h">–</div><div class="u">horas</div></div><div class="cd-box"><div class="n" data-u="m">–</div><div class="u">min</div></div><div class="cd-box"><div class="n" data-u="s">–</div><div class="u">seg</div></div></div>'
@@ -1388,7 +1389,8 @@ function reunionGrupoBlock(g){
   if(st.fase==='paso') return '<div class="mg-note">La última reunión fue el '+fechaLarga(st.t)+'. Te avisaremos aquí la próxima fecha.</div>';
   return (g.dia||g.hora)?'<div class="mg-when">'+_esc([g.dia,g.hora].filter(Boolean).join(' · '))+'</div>'+btn('btn-accent','Entrar a la reunión de mi grupo →'):'<div class="mg-note">Pronto publicaremos aquí la fecha de tu próxima reunión en vivo.</div>';
 }
-function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus consejeros</span>'+ms.map(function(m){return '<span class="mg-chip">'+_esc(m)+'</span>';}).join('')+'</div>'; }
+function dossierDe(nombre){ try{ return (store.mentores||[]).find(function(x){ return x.publicado && esMentorNombre(x.nombre,[nombre]); })||null; }catch(e){ return null; } }
+function mentoresChips(g){ var ms=mentoresDe(g); if(!ms.length) return ''; return '<div class="mg-ments"><span class="mg-lab">Tus consejeros</span>'+ms.map(function(m){ var d=dossierDe(m); return d?'<button class="mg-chip mg-chip-link" onclick="goMentor(\''+d.id+'\')" title="Ver expediente">'+(d.foto?'<img src="'+d.foto+'" alt="">':'')+_esc(m)+' ›</button>':'<span class="mg-chip">'+_esc(m)+'</span>'; }).join('')+'</div>'; }
 function miClaseCard(enVista){
   if(state.role!=='participante') return '';
   var g=grupoData(); if(!g) return '';
@@ -1447,28 +1449,29 @@ inicio:{title:'Inicio',html(){
    + mods.map(m=>moduloRow(m)).join('');
 },after(){startCarousel(); if(NAVI&&NAVI.sb) cargarGrupos();}},
 
-mentores:{title:'Mis Mentores',html(){
+mentores:{title:'Mis Consejeros',html(){
   const ms=DB.mentores().filter(x=>x.publicado);
-  return head('Archivo de la Escuela','Mis Mentores','Consulta el expediente de cada mentor que acompaña los trimestres. Toca una ficha para abrir el expediente completo.')
+  return head('Archivo de la Escuela','Mis Consejeros','Conoce a los consejeros que acompañan a cada grupo. Toca una ficha para abrir su expediente completo.')
    + (ms.length?`<div class="dossier-grid">`
    + ms.map(x=>`<div class="dossier-card" onclick="goMentor('${x.id}')">
         <div class="dz-topbar"><span>EXP. ${x.expediente}</span><span class="cls">EDIFICANDO</span></div>
         <div class="dzc-body">${dossierPhoto(x,false)}
-          <div class="dzc-meta"><div class="dzc-exp">MENTOR · INGRESO ${x.ingreso}</div><div class="dzc-name">${x.nombre}</div><div class="dzc-area">${x.materia}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
+          <div class="dzc-meta"><div class="dzc-exp">${(x.titulo||'Consejero').toUpperCase()}${x.grupo?' · '+x.grupo.toUpperCase():''} · INGRESO ${x.ingreso}</div><div class="dzc-name">${x.nombre}</div><div class="dzc-area">${x.materia}</div><div class="dzc-open">ABRIR EXPEDIENTE ▸</div></div>
         </div></div>`).join('')
    + `</div>`
-   : `<div class="empty">Los expedientes de los mentores se publicarán pronto.</div>`);
+   : `<div class="empty">Los expedientes de los consejeros se publicarán pronto.</div>`);
 }},
 
 mentorDetalle:{title:'Expediente',html(){
   const x=DB.mentor(state.mentorId)||DB.mentores()[0];
   return `<button class="back-link" onclick="nav('mentores')">← Volver al archivo</button>`
    + `<div class="dossier">
-       <div class="dz-head"><span>ARCHIVO DE MENTORES · NACIÓN VIVA</span><span class="cls">EDIFICANDO</span></div>
+       <div class="dz-head"><span>ARCHIVO DE CONSEJEROS · NACIÓN VIVA</span><span class="cls">EDIFICANDO</span></div>
        <div class="dz-body">${dossierPhoto(x,true)}
          <div class="dz-fields">
            <div class="dz-row"><div class="dz-label">Expediente</div><div class="dz-val">${x.expediente}</div></div>
            <div class="dz-row"><div class="dz-label">Nombre</div><div class="dz-val big">${x.nombre.toUpperCase()}</div></div>
+           ${x.grupo?`<div class="dz-row"><div class="dz-label">${x.titulo||'Consejero'} de</div><div class="dz-val">${x.grupo}</div></div>`:''}
            <div class="dz-row"><div class="dz-label">Área asignada</div><div class="dz-val">${x.materia}</div></div>
            <div class="dz-row"><div class="dz-label">Formación</div><div class="dz-val">${x.formacion}</div></div>
            <div class="dz-row"><div class="dz-label">Experiencia</div><div class="dz-val">${x.experiencia}</div></div>
@@ -1519,7 +1522,7 @@ calendario:{title:'Calendario',html(){return calendarioHTML();}},
 
 comunidad:{title:'Comunidad',html(){
   const me=state.user;
-  const contactos=[...DB.mentores().map(m=>({nombre:m.nombre,pm:'Mentor · '+m.materia.split(' · ')[0]})),
+  const contactos=[...DB.mentores().map(m=>({nombre:m.nombre,pm:(m.titulo||'Consejero')+' · '+m.materia.split(' · ')[0]})),
     ...DB.participantes().filter(p=>p.insc==='activo'&&p.nombre!==me.nombre).map(p=>({nombre:p.nombre,pm:pmSample(p.nombre)}))];
   return `<div class="page-head"><div class="eyebrow">Generación 2026–2027</div><h1 class="page">Comunidad</h1><div class="page-sub">Un espacio para conversar sobre las clases, con calma y buen humor. Un guiño a los messengers de los 2000. ✨</div></div>`
    + `<div class="msn">`
@@ -1539,7 +1542,7 @@ comunidad:{title:'Comunidad',html(){
 
 avisos:{title:'Avisos',html(){
   const av=store.avisos.filter(a=>a.publicado);
-  return head('Generación 2026–2027','Avisos','Comunicados de la dirección y los mentores de la Escuela.')
+  return head('Generación 2026–2027','Avisos','Comunicados de la dirección y los consejeros de la Escuela.')
    + (av.length? av.map(a=>`<div class="row" style="align-items:flex-start;padding:14px 16px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex-shrink:0"></div><div class="rinfo"><div class="t">${a.titulo}</div><div class="d" style="color:var(--dim);font-size:13.5px;margin-top:4px">${a.cuerpo||''}</div><div style="font-size:11.5px;color:var(--soft);margin-top:6px">${a.autor} · ${a.cuando}</div></div></div>`).join('')
      : `<div class="empty">No hay avisos por ahora.</div>`);
 }, after:function(){ if(typeof cargarAvisos==='function') cargarAvisos(); }},
@@ -1789,11 +1792,11 @@ dcontenido:{title:'Programa de estudio',html(){
        + `</div>`).join('');
 }},
 
-dmentores:{title:'Mentores',html(){
+dmentores:{title:'Consejeros',html(){
   const ms=store.mentores;
-  if(state.editMentor!==null) return head('Dirección Académica','Mentores','Completa la ficha; la foto se muestra en blanco y negro estilo expediente.')+mentorForm();
-  let h=head('Dirección Académica','Mentores','Da de alta, edita, publica o retira mentores. Solo los publicados aparecen en "Mis Mentores" para los participantes.')
-   + `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.editMentor='nuevo';render()">＋ Nuevo mentor</button>`;
+  if(state.editMentor!==null) return head('Dirección Académica','Consejeros','Completa la ficha; la foto se muestra en blanco y negro estilo expediente.')+mentorForm();
+  let h=head('Dirección Académica','Consejeros','Da de alta, edita, publica o retira consejeros. Solo los publicados aparecen en "Mis Consejeros" para los participantes.')
+   + `<button class="btn btn-accent" style="margin-bottom:16px" onclick="state.editMentor='nuevo';render()">＋ Nuevo consejero</button>`;
   h+= ms.length? ms.map(m=>`<div class="row" style="padding:11px 13px">
        <div style="width:44px;height:52px;border-radius:5px;overflow:hidden;flex-shrink:0;background:#0A1426;filter:grayscale(1);border:1px solid rgba(238,239,236,.2);display:flex;align-items:center;justify-content:center">${m.foto?`<img src="${m.foto}" style="width:100%;height:100%;object-fit:cover" alt="">`:`<span style="font-family:'Courier New',monospace;color:rgba(238,239,236,.5);font-size:14px">${initials(m.nombre)}</span>`}</div>
        <div class="rinfo"><div class="t">${m.nombre}</div><div class="d">${m.materia||'—'}</div></div>
@@ -1801,7 +1804,7 @@ dmentores:{title:'Mentores',html(){
          <button class="btn btn-sm" onclick="toggleMentorPub('${m.id}')">${m.publicado?'Despublicar':'Publicar'}</button>
          <button class="btn btn-sm" onclick="state.editMentor='${m.id}';render()">Editar</button>
          <button class="btn btn-sm" onclick="eliminarMentor('${m.id}')">Eliminar</button></div></div>`).join('')
-     : `<div class="empty">Aún no hay mentores. Agrega el primero.</div>`;
+     : `<div class="empty">Aún no hay consejeros. Agrega el primero.</div>`;
   return h;
 }},
 
@@ -2088,6 +2091,7 @@ if (PRELANZAMIENTO) {
     ['inicio','home','Inicio'],
     ['clases','book','Mis Clases'],
     ['migrupo','users','Mi grupo'],
+    ['mentores','maestros','Consejeros'],
     ['congreso','cap','Congreso'],
     ['revista','news','Revista'],
     ['avisos','mega','Avisos'],
@@ -2200,7 +2204,7 @@ if (PRELANZAMIENTO) {
     var mp=store.miProgreso||{aguilas:0,meses:0};
     var desc=Math.min(50,mp.meses*5);
     var niv=mp.aguilas>=300?'C':mp.aguilas>=150?'B':mp.aguilas>=60?'A':'—';
-    var grupoTxt = mp.grupo ? ('<b style="color:var(--cream)">'+mp.grupo+'</b>'+(mp.mentor?(' · Mentor: <b style="color:var(--cream)">'+mp.mentor+'</b>'):'')) : 'Te asignaremos a tu grupo muy pronto.';
+    var grupoTxt = mp.grupo ? ('<b style="color:var(--cream)">'+mp.grupo+'</b>'+(mp.mentor?(' · Consejero: <b style="color:var(--cream)">'+mp.mentor+'</b>'):'')) : 'Te asignaremos a tu grupo muy pronto.';
     return '<details class="eje-acc" style="margin-top:0"><summary><div style="flex:1"><div class="t" style="font-size:16.5px">Mi progreso</div><div class="d">Tu grupo, tus \u00e1guilas y tus recompensas</div></div><span class="eje-chev">\u25be</span></summary><div class="eje-body" style="padding-top:14px">'
       +'<div class="card" style="margin-bottom:14px;border-color:var(--accent-line);background:var(--accent-tint);display:flex;align-items:center;gap:12px">'
       +'<span style="flex:none;width:38px;height:38px;border-radius:10px;background:rgba(127,168,214,.18);display:flex;align-items:center;justify-content:center;color:var(--accent)">'+svgIcon('layers')+'</span>'
